@@ -5,10 +5,10 @@ A part of this pluggin was designed so people learn about trading and investment
 
 # Features
 
-- Accounts with easy log in with wallets that can hold multiple assets (Meaning multiple currencies as of now)
+- multi-asset wallets (Multi-asset meaning multiple currencies as of now)
 - Vault compatibility, If vault is present it can be used to deposit or withdraw funds from wallet
 - Player driven prices
-- Instant transactions at the best price
+- Instant transactions at the best price using orders
 - Partial fills
 - Offline transactions
 - Entity trading!
