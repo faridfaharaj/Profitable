@@ -2,6 +2,8 @@ Features----------------------------------------------------------------------
 
 ----> ----> Add mySQL support <---- <----
 
+Add MariaDB support
+
 Add futures contracts
 Add options contracts
 
@@ -29,8 +31,11 @@ Make an api
 
 Add more compatibility
 
-Fixing?-----------------------------------------------------------------------
+Fixing-----------------------------------------------------------------------
 Destroy ChatColor enum (but not make jar be paper only, nor version specific)
+
+add per world configuration
+Fix Multiworld support or rework completely
 
 Make admin commands, and command outputs less shitty (im sorry)
 
