@@ -1,0 +1,377 @@
+name: Profitable
+version: ${project.version}
+main: com.cappuccino.profitable.Profitable
+api-version: '1.21'
+author: faridfaharaj
+prefix: "Profitable"
+description: "Real supply and demand in minecraft!"
+website: "https://github.com/faridfaharaj/Profitable"
+softdepend:
+  - Vault
+
+commands:
+  profitable:
+    description: Returns info about the plugin
+    usage: /profitable
+    aliases: [ ]
+
+  help:
+    description: Returns command usage and functions
+    usage: /help <Page>
+    aliases: [ ]
+
+  buy:
+    description: Command used to buy assets on the exchange
+    usage: /buy <Asset> <Order type> <units> <price>
+    aliases: [ ]
+
+  sell:
+    description: Command used to sell assets on the exchange
+    usage: /sell <Asset> <Order type> <units> <price>
+    aliases: [ ]
+
+  account:
+    description: Command used to manage your trading account
+    usage: /account <args>...
+    aliases: [ ]
+
+  assets:
+    description: Command used to get information about an asset
+    usage: /assets <action> <asset> <args>...
+    aliases: [ ]
+
+  admin:
+    description: Admin commands
+    usage: /admin <args>...
+    aliases: [ ]
+
+permissions:
+
+  profitable.market.trade.asset.item:
+    description: "Allows the player to trade items on the exchange"
+    default: true
+  profitable.market.trade.asset.entity:
+    description: "Allows the player to trade entities on the exchange"
+    default: true
+  profitable.market.trade.asset.forex:
+    description: "Allows the player to trade currencies on the exchange"
+    default: true
+
+  profitable.market.trade.*:
+    description: "Grants access to trade on the exchange"
+    default: true
+    children:
+      profitable.market.trade.asset.currency: true
+      profitable.market.trade.asset.item: true
+      profitable.market.trade.asset.entity: true
+
+  profitable.asset.tops:
+    description: "Grants the ability to view the highest ranked assets"
+    default: true
+  profitable.asset.categories:
+    description: "Grants the ability to view registered assets on a certain category"
+    default: true
+  profitable.asset.info:
+    description: "Grants the ability to view specific information from an asset"
+    default: true
+  profitable.asset.graphs:
+    description: "Grants the ability to view graphs that display prices from an asset"
+    default: true
+
+  profitable.asset.*:
+    description: "Grants access to all public information from assets"
+    default: true
+    children:
+      profitable.asset.tops: true
+      profitable.asset.categories: true
+      profitable.asset.info: true
+      profitable.asset.graphs: true
+
+  profitable.account.claim:
+    description: "Grants the ability to own entities to trade on the exchange"
+    default: true
+  profitable.account.manage.delete:
+    description: "Grants the ability to delete own active account"
+    default: true
+  profitable.account.manage.login:
+    description: "Grants the ability to login to another account"
+    default: true
+  profitable.account.manage.register:
+    description: "Grants the ability to register another account apart from default"
+    default: true
+  profitable.account.manage.changepassword:
+    description: "Grants the ability to change own active account's password"
+    default: true
+  profitable.account.manage.logout:
+    description: "Grants the ability to delete own active account"
+    default: true
+  profitable.account.manage.setdelivery:
+    description: "Grants the ability to change own active account's delivery location"
+    default: true
+  profitable.account.manage.orders.cancel:
+    description: "Grants the ability to cancel orders on own account"
+    default: true
+  profitable.account.funds.deposit:
+    description: "Grants the ability to deposit external currencies"
+    default: true
+  profitable.account.funds.withdraw:
+    description: "Grants the ability to withdraw external currencies"
+    default: true
+  profitable.account.info.orders:
+    description: "Grants the ability to view detailed information of orders on own account"
+    default: true
+  profitable.account.info.delivery:
+    description: "Grants the ability to check own active account's delivery location"
+    default: true
+  profitable.account.info.wallet:
+    description: "Grants the ability to view asset balances on own account"
+    default: true
+
+  profitable.account.*:
+    description: "Grants full access to accounts"
+    default: true
+    children:
+      profitable.account.claim: true
+      profitable.account.manage.delete: true
+      profitable.account.manage.login: true
+      profitable.account.manage.register: true
+      profitable.account.manage.changepassword: true
+      profitable.account.manage.logout: true
+      profitable.account.manage.setdelivery: true
+      profitable.account.manage.orders.cancel: true
+      profitable.account.funds.deposit: true
+      profitable.account.funds.withdraw: true
+      profitable.account.info.orders: true
+      profitable.account.info.delivery: true
+      profitable.account.info.wallet: true
+
+  profitable.account.manage.*:
+    description: "Grants access to edit and create new accounts"
+    default: true
+    children:
+      profitable.account.manage.delete: true
+      profitable.account.manage.login: true
+      profitable.account.manage.register: true
+      profitable.account.manage.changepassword: true
+      profitable.account.manage.logout: true
+      profitable.account.manage.setdelivery: true
+      profitable.account.manage.orders.cancel: true
+
+  profitable.account.info.*:
+    description: "Grants access to view all information on owns' active account"
+    default: true
+    children:
+      profitable.account.info.orders: true
+      profitable.account.info.delivery: true
+      profitable.account.info.wallet: true
+
+
+  profitable.admin.accounts.info.getplayeracc:
+    description: "Grants the ability to get the active account on a player"
+    default: op
+  profitable.admin.accounts.info.wallet:
+    description: "Grants the ability to view an account's wallet contents"
+    default: op
+  profitable.admin.accounts.info.delivery:
+    description: "Grants the ability to view an account's delivery locations"
+    default: op
+  profitable.admin.accounts.info.orders:
+    description: "Grants the ability to view all orders owned by some account"
+    default: op
+  profitable.admin.accounts.info.claimid:
+    description: "Grants the ability to check an account's entity claim id"
+    default: op
+  profitable.admin.accounts.manage.passwordreset:
+    description: "Grants the ability reset the password of any account for recovery"
+    default: op
+  profitable.admin.accounts.manage.forcelogout:
+    description: "Grants the ability to log some one out of their account"
+    default: op
+  profitable.admin.accounts.manage.wallet:
+    description: "Grants the ability to set asset balances to an account's wallet"
+    default: op
+  profitable.admin.accounts.manage.delivery:
+    description: "Grants the ability to change an accounts delivery location"
+    default: op
+  profitable.admin.accounts.manage.delete:
+    description: "Grants the ability to delete any account"
+    default: op
+
+  profitable.admin.assets.manage.register:
+    description: "Allows registering assets to the exchange"
+    default: op
+  profitable.admin.assets.manage.newtransaction:
+    description: "lets you insert transactions to simulate fake price changes"
+    default: op
+  profitable.admin.assets.manage.resettransactions:
+    description: "Allows to erase all transactions from an asset"
+    default: op
+  profitable.admin.assets.manage.delete:
+    description: "Allows DELETION of assets"
+    default: op
+  profitable.admin.assets.info.getallassets:
+    description: "Allows looking at all assets at once"
+    default: op
+
+  profitable.admin.orders.manage.cancel:
+    description: "Allows canceling specific orders"
+    default: op
+  profitable.admin.orders.manage.delete:
+    description: "Allows DELETING specific orders"
+    default: op
+  profitable.admin.orders.manage.cancelall:
+    description: "Allows canceling all orders"
+    default: op
+  profitable.admin.orders.manage.deleteall:
+    description: "Allows DELETING all orders"
+    default: op
+  profitable.admin.orders.manage.newlimitorder:
+    description: "Allows inserting limit orders"
+    default: op
+  profitable.admin.orders.info.findbyasset:
+    description: "Allows looking at all orders from any order book"
+    default: op
+
+  profitable.admin.*:
+    description: "Allows to view, edit, create, and delete everything on the exchange"
+    default: op
+    children:
+      profitable.admin.accounts.info.getplayeracc: true
+      profitable.admin.accounts.info.wallet: true
+      profitable.admin.accounts.info.delivery: true
+      profitable.admin.accounts.info.orders: true
+      profitable.admin.accounts.info.claimid: true
+      profitable.admin.accounts.manage.passwordreset: true
+      profitable.admin.accounts.manage.forcelogout: true
+      profitable.admin.accounts.manage.wallet: true
+      profitable.admin.accounts.manage.delivery: true
+      profitable.admin.accounts.manage.delete: true
+      profitable.admin.assets.manage.register: true
+      profitable.admin.assets.manage.newtransaction: true
+      profitable.admin.assets.manage.resettransactions: true
+      profitable.admin.assets.manage.delete: true
+      profitable.admin.assets.info.getallassets: true
+      profitable.admin.orders.manage.cancel: true
+      profitable.admin.orders.manage.delete: true
+      profitable.admin.orders.manage.cancelall: true
+      profitable.admin.orders.manage.deleteall: true
+      profitable.admin.orders.manage.newlimitorder: true
+      profitable.admin.orders.info.findbyasset: true
+
+  profitable.admin.accounts.*:
+    description: "Grants unlimited access to account related commands"
+    default: op
+    children:
+      profitable.admin.accounts.info.getplayeracc: true
+      profitable.admin.accounts.info.wallet: true
+      profitable.admin.accounts.info.delivery: true
+      profitable.admin.accounts.info.orders: true
+      profitable.admin.accounts.info.claimid: true
+      profitable.admin.accounts.manage.passwordreset: true
+      profitable.admin.accounts.manage.forcelogout: true
+      profitable.admin.accounts.manage.wallet: true
+      profitable.admin.accounts.manage.delivery: true
+      profitable.admin.accounts.manage.delete: true
+
+  profitable.admin.accounts.manage.*:
+    description: "Grants management permissions on accounts"
+    default: op
+    children:
+      profitable.admin.accounts.manage.passwordreset: true
+      profitable.admin.accounts.manage.forcelogout: true
+      profitable.admin.accounts.manage.wallet: true
+      profitable.admin.accounts.manage.delivery: true
+      profitable.admin.accounts.manage.delete: true
+
+  profitable.admin.accounts.info.*:
+    description: "Grants access to information about accounts"
+    default: op
+    children:
+      profitable.admin.accounts.info.getplayeracc: true
+      profitable.admin.accounts.info.wallet: true
+      profitable.admin.accounts.info.delivery: true
+      profitable.admin.accounts.info.orders: true
+      profitable.admin.accounts.info.claimid: true
+
+  profitable.admin.assets.*:
+    description: "Grants access to asset related commands"
+    default: op
+    children:
+      profitable.admin.assets.manage.register: true
+      profitable.admin.assets.manage.newtransaction: true
+      profitable.admin.assets.manage.resettransactions: true
+      profitable.admin.assets.manage.delete: true
+      profitable.admin.assets.info.getallassets: true
+
+  profitable.admin.orders.*:
+    description: "Grants access to order related commands"
+    default: op
+    children:
+      profitable.admin.orders.manage.cancel: true
+      profitable.admin.orders.manage.delete: true
+      profitable.admin.orders.manage.cancelall: true
+      profitable.admin.orders.manage.deleteall: true
+      profitable.admin.orders.manage.newlimitorder: true
+      profitable.admin.orders.info.findbyasset: true
+
+  profitable.admin.infoonly:
+    description: "Allows to view all exchange information"
+    default: op
+    children:
+      profitable.admin.accounts.info.getplayeracc: true
+      profitable.admin.accounts.info.wallet: true
+      profitable.admin.accounts.info.delivery: true
+      profitable.admin.accounts.info.orders: true
+      profitable.admin.accounts.info.claimid: true
+      profitable.admin.assets.info.getallassets: true
+      profitable.admin.orders.info.findbyasset: true
+
+  profitable.admin.helper:
+    description: "Grants access to mostly safe admin commands"
+    default: op
+    children:
+      profitable.admin.accounts.info.getplayeracc: true
+      profitable.admin.accounts.info.wallet: true
+      profitable.admin.accounts.info.delivery: true
+      profitable.admin.accounts.info.orders: true
+      profitable.admin.accounts.info.claimid: true
+      profitable.admin.accounts.manage.forcelogout: true
+      profitable.admin.assets.info.getallassets: true
+      profitable.admin.orders.manage.cancel: true
+      profitable.admin.orders.info.findbyasset: true
+
+  profitable.admin.mod:
+    description: "Grants access to fix raids or smth, idk"
+    default: op
+    children:
+      profitable.admin.accounts.info.getplayeracc: true
+      profitable.admin.accounts.info.wallet: true
+      profitable.admin.accounts.info.delivery: true
+      profitable.admin.accounts.info.orders: true
+      profitable.admin.accounts.info.claimid: true
+      profitable.admin.accounts.manage.passwordreset: true
+      profitable.admin.accounts.manage.forcelogout: true
+      profitable.admin.accounts.manage.wallet: true
+      profitable.admin.accounts.manage.delivery: true
+      profitable.admin.accounts.manage.delete: true
+      profitable.admin.assets.manage.newtransaction: true
+      profitable.admin.assets.manage.resettransactions: true
+      profitable.admin.assets.manage.delete: true
+      profitable.admin.assets.info.getallassets: true
+      profitable.admin.orders.manage.cancel: true
+      profitable.admin.orders.manage.delete: true
+      profitable.admin.orders.info.findbyasset: true
+
+  profitable.admin.configurer:
+    description: "Grants access needed to create assets and initial supply"
+    default: op
+    children:
+      profitable.admin.assets.manage.register: true
+      profitable.admin.assets.manage.newtransaction: true
+      profitable.admin.assets.manage.delete: true
+      profitable.admin.assets.info.getallassets: true
+      profitable.admin.orders.manage.cancel: true
+      profitable.admin.orders.manage.newlimitorder: true
+      profitable.admin.orders.info.findbyasset: true
+
+

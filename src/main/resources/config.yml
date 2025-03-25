@@ -1,0 +1,164 @@
+
+# allows multiworld support (orders are able to transact across worlds if false)
+multi-world-support: false
+
+# allows vault currency be added as an asset, and can be withdrawn or deposited to your account
+vault-support: true
+
+exchange:
+
+  commodities:
+
+    # note: commodities are RAW and FUNGIBLE materials traded in BULK that are then processed into different products
+    #       crops and building material can be commodities as well:
+    #
+    #       IRON IS a commodity (in real life)
+    #             -All bars are the same quality, therefore interchangeable (Fungible) v
+    #             -Traded in large amounts (Traded in Bulk) v
+    #             -Usually gathered from the ground (raw material) v
+    #
+    #       DIAMOND HELMET is NOT a commodity
+    #             -Enchantments, damage, and trims make each one unique (Non-Fungible) x
+    #             -Usually traded one at a time (not in bulk) x
+    #             -Finished product (not raw) x
+    #
+    #     but this is only a recommendation anyway, use this plugin however you want.
+    #
+    commodity-item-whitelist: #having items on whitelist disables blacklist
+      - coal
+      - charcoal
+      - iron_ingot
+      - copper_ingot
+      - gold_ingot
+      - netherite_scrap
+      - amethyst_shard
+      - diamond
+      - nether_quartz
+      - emerald
+      - lapis_lazuli
+      - glowstone_dust
+      - redstone
+      - wheat
+      - egg
+      - apple
+      - melon_slice
+      - pumpkin
+      - sweet_berries
+      - glow_berries
+      - chorus_fruit
+      - carrot
+      - potato
+      - poisonous_potato
+      - beetroot
+      - fish
+      - raw_cod
+      - raw_salmon
+      - tropical_fish
+      - pufferfish
+      - sugarcane
+      - kelp
+      - cocoa_beans
+      - honey_bottle
+      - spider_eye
+      - rotten_flesh
+      - flint
+      - bone
+      - string
+      - feather
+      - leather
+      - honeycomb
+      - ink_sac
+      - glow_ink_sac
+      - turtle_scute
+      - armadillo_scute
+      - slime_ball
+      - clay_ball
+      - prismarine_shard
+      - prismarine_crystals
+      - nautilus_shell
+      - heart_of_the_sea
+      - blaze_rod
+      - breeze_rod
+      - heavy_core
+      - nether_star
+      - ender_pearl
+      - shulker_shell
+      - echo_shard
+      - nether_wart
+      - gunpowder
+      - dragon_breath
+      - ghast_tear
+      - phantom_membrane
+      - bamboo
+      - cactus
+      - powder_snow_bucket
+      - ink_sac
+      - water_bucket
+      - milk_bucket
+      - lava_bucket
+      - oak_log
+      - spruce_log
+      - birch_log
+      - jungle_log
+      - acacia_log
+      - dark_oak_log
+      - mangrove_log
+      - cherry_log
+      - crimson_stem
+      - warped_stem
+      - dirt
+      - gravel
+      - sand
+      - cobblestone
+      - granite
+      - diorite
+      - andesite
+      - obsidian
+      - netherrack
+      - sponge
+      - soul_sand
+      - soul_soil
+      - ice
+      - end_stone
+      - totem_of_undying
+      - brown_mushroom
+      - red_mushroom
+
+    commodity-item-blacklist:
+      - barrier
+      - commandBlock
+      - structure_block
+      - structure_void
+
+    commodity-entity-whitelist: #having items on whitelist disables blacklist
+      - chicken
+      - pig
+      - cow
+      - sheep
+      - mooshroom
+      - villager
+
+    # withers can be used for mining... imagine trading withers... hmmm....
+    commodity-entity-blacklist:
+      - ender_dragon
+      - warden
+
+    claiming-fees: 2
+
+
+main-currency:
+  # sets vault as main currency if found in files (VLT)
+  vault-main-currency: true
+
+  # identifier for the currency example: USD ---> you have: 89.32 USD !!
+  currency-code: EMD
+
+  # name
+  name: Villager Emeralds
+
+  # color for display on chat (empty for random)
+  color: green
+
+  # initial currency new players will have on their wallets by default (other than 0 may devalue your currency, use only for initial supply)
+  initial-balance: 0
+
