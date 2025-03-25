@@ -1,4 +1,4 @@
-## Profitable
+#### Profitable
 Profitable is a Minecraft plugin that adds real supply and demand to the game by introducing an exchange system designed to be as close to reality as possible.
 
 A part of this pluggin was designed so people can learn a thing or two about trading and investments while playing this nice game, so realism and ease of use are core principles of this plugin :D.
