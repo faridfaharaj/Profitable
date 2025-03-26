@@ -34,14 +34,15 @@ For example:
 Profitable will find the best prices in the order book, filling your order with as many existing orders as needed or just adding it to the book if no match is found;
 However, for you, it only takes a simple command.
 
-By using a single:
+By using a single command:
 
+``/buy <Asset> limit <units> <price>`` or ``/sell <Asset> limit <units> <price>``
 
-``/sell <Asset> limit <units> <price>``
+![Untitled video - Made with Clipchamp](https://github.com/user-attachments/assets/c091b8f5-9f20-44d2-bd6f-17b3ca0171b3)
 
-or 
+``/buy <Asset> market <units>`` or ``/sell <Asset> market <units>``
 
-``/buy <Asset> limit <units> <price>``
+![Untitled video - Made with Clipchamp (1)](https://github.com/user-attachments/assets/79305223-eb12-4910-af62-429dc131a6dd)
 
 
 Players can place an order to trade stuff at the price they think fair, actually influencing the market.
@@ -56,13 +57,17 @@ Players can monitor **prices**, **price movements**, **liquidity**, **supply**, 
 
 ``/asset peek <asset>``
 
+![Untitled video - Made with Clipchamp (2)](https://github.com/user-attachments/assets/c0f40c8b-6477-47f9-84f1-947d9ac7eff9)
+
+
+
 Even some nice candle graphs.
 
 
 
 # Compatibility
 
-This plugin can work with vault, meaning its compatible with anything compatible with vault! (this can be configured too)
+This plugin supports vault, meaning it supports anything that vault supports (this can be configured too)
 
 # Why?
 
