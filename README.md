@@ -18,9 +18,7 @@ A part of this pluggin was designed so people can learn a thing or two about tra
 
 # About
 Profitable adds a quick and authentic way for players to buy and sell stuff on your server.
-Although is designed to work alongside other economy plugins, it can totally work by its own as it uses its a separate **wallet** which supports **multiple currencies** and assets.
-
-T
+Although is designed to work alongside other economy plugins, it can totally work by its own as it uses its a separate **wallets** which supports **multiple currencies** and assets.
 
 ### Orders
 
