@@ -29,7 +29,7 @@ For example:
 
 - **Limit order** lets you choose prize, but may not execute right away
 
-- **Market order** acts immediatly at the lowest available prize
+- **Market order** acts immediatly at the lowest available price
 
 Profitable will find the best prices in the order book, filling your order with as many existing orders as needed or just adding it to the book if no match is found;
 However, for you, it only takes a simple command.
