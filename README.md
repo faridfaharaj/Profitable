@@ -18,7 +18,7 @@ A part of this pluggin was designed so people can learn a thing or two about tra
 
 # About
 Profitable adds a quick and authentic way for players to buy and sell stuff on your server.
-Although is designed to work alongside other economy plugins, it can totally work by its own as it uses its a separate **wallets** which supports **multiple currencies** and assets.
+Although it is designed to work alongside other economy plugins, it can totally work by its own as it uses its own separate **wallets** which supports **multiple currencies** and assets.
 
 ### Orders
 
@@ -29,19 +29,20 @@ For example:
 
 - **Limit order** lets you choose prize, but may not execute right away
 
-- **Market order** acts inmediatly at the lowest available prize
+- **Market order** acts immediatly at the lowest available prize
 
 Profitable will find the best prices in the order book, filling your order with as many existing orders as needed or just adding it to the book if no match is found;
 However, for you, it only takes a simple command.
 
-By using a single:
+By using a single command:
 
+``/buy <Asset> limit <units> <price>`` or ``/sell <Asset> limit <units> <price>``
 
-``/sell <Asset> limit <units> <price>``
+![Untitled video - Made with Clipchamp](https://github.com/user-attachments/assets/c091b8f5-9f20-44d2-bd6f-17b3ca0171b3)
 
-or 
+``/buy <Asset> market <units>`` or ``/sell <Asset> market <units>``
 
-``/buy <Asset> limit <units> <price>``
+![Untitled video - Made with Clipchamp (1)](https://github.com/user-attachments/assets/79305223-eb12-4910-af62-429dc131a6dd)
 
 
 Players can place an order to trade stuff at the price they think fair, actually influencing the market.
@@ -50,19 +51,23 @@ Players can place an order to trade stuff at the price they think fair, actually
 
 ### Market Data & Analysis
 
-Since profitable its a plugin that simulates real trading, it includes speculation and market data tracking, wich of course you can do.
+Since Profitable is a plugin designed to simulate real trading, which includes speculation and market data tracking,
 
 Players can monitor **prices**, **price movements**, **liquidity**, **supply**, and more stuff using:
 
 ``/asset peek <asset>``
 
-Even some nice candle graphs.
+![Untitled video - Made with Clipchamp (2)](https://github.com/user-attachments/assets/c0f40c8b-6477-47f9-84f1-947d9ac7eff9)
+
+
+
+Even get some nice fancy candle graphs, so players can predict and profit off of speculation.
 
 
 
 # Compatibility
 
-This plugin can work with vault, meaning its compatible with anything compatible with vault! (this can be configured too)
+This plugin supports vault, meaning it supports anything that vault supports (this can be configured too)
 
 # Why?
 
@@ -78,7 +83,7 @@ And those who do, **want it cheaper**, so every time someone sells a diamond, it
 jhonny has now a bunch of useless diamonds and no money,
 however, if **prices had gone up** as he expected **he'd be rich**
 
-Profitable makes this kind of scenarios possible, it lets everyone experience the actual depth of a real market. Its not just a store like many linear price adjustment systems that have led to **broken economies** because of farms and the rising number of raids, 
+Profitable makes this kind of scenarios possible, it lets everyone experience the actual depth of a real market. Its not just a store like many linear price adjustment systems that have led to **broken economies** due to farms and the rising number of raids, 
  
 **Profitable** not only makes that add to the fun, but prices adjust **themselves**. 
 Because you’re not just buying and selling; you’re participating in an **actual economy** where people and events are behind prices.
