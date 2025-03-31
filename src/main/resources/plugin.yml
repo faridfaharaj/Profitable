@@ -1,9 +1,9 @@
 name: Profitable
 version: ${project.version}
-main: com.cappuccino.profitable.Profitable
-api-version: '1.21'
+main: com.faridfaharaj.profitable.Profitable
 author: faridfaharaj
 prefix: "Profitable"
+api-version: '1.21'
 description: "Real supply and demand in minecraft!"
 website: "https://github.com/faridfaharaj/Profitable"
 softdepend:
@@ -13,12 +13,12 @@ commands:
   profitable:
     description: Returns info about the plugin
     usage: /profitable
-    aliases: [ ]
+    aliases: [prft]
 
   help:
     description: Returns command usage and functions
-    usage: /help <Page>
-    aliases: [ ]
+    usage: /help or /help admin
+    aliases: []
 
   buy:
     description: Command used to buy assets on the exchange
@@ -30,19 +30,49 @@ commands:
     usage: /sell <Asset> <Order type> <units> <price>
     aliases: [ ]
 
-  account:
-    description: Command used to manage your trading account
-    usage: /account <args>...
+  assets:
+    description: sends you a list of all tradeable assets
+    usage: /assets <Asset Type>
     aliases: [ ]
 
-  assets:
-    description: Command used to get information about an asset
-    usage: /assets <action> <asset> <args>...
+  asset:
+    description: gets market information about an asset
+    usage: /asset <Asset>
+    aliases: [ ]
+
+  top:
+    description: Lets you view the most popular assets
+    usage: /top or /top <Category>
+    aliases: []
+
+  account:
+    description: Command used to manage your trading account
+    usage: /account or /account <Subcommand> <args>
+    aliases: [acc]
+
+  wallet:
+    description: Displays all asset balances on your account
+    usage: /wallet or /wallet <Subcommand>
+    aliases: [bal,balance,wal]
+
+  delivery:
+    description: Displays and sets where should your items and entities arrive
+    usage: /delivery or /delivery set items or /delivery set entity
+    aliases: [ ]
+
+  claimtag:
+    description: Sends you a name tag to mark entities as yours
+    usage: /claimtag
+    aliases: [claim]
+
+  orders:
+    description: Displays all active orders on your account
+    usage: /orders
     aliases: [ ]
 
   admin:
     description: Admin commands
-    usage: /admin <args>...
+    usage: /admin <subcomand> <args>...
     aliases: [ ]
 
 permissions:

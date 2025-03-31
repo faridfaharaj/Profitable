@@ -6,7 +6,7 @@
 
     <groupId>com.cappuccino</groupId>
     <artifactId>Profitable</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <packaging>jar</packaging>
 
     <name>Profitable</name>
@@ -71,6 +71,11 @@
             <artifactId>paper-api</artifactId>
             <version>1.21-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bukkit</artifactId>
+            <version>4.3.3</version>
         </dependency>
         <dependency>
             <groupId>com.github.MilkBowl</groupId>

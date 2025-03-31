@@ -1,6 +1,6 @@
 
-# allows multiworld support (orders are able to transact across worlds if false)
-multi-world-support: false
+# orders are able to transact across worlds if false
+database-per-world: false
 
 # allows vault currency be added as an asset, and can be withdrawn or deposited to your account
 vault-support: true
@@ -143,12 +143,16 @@ exchange:
       - ender_dragon
       - warden
 
-    claiming-fees: 2
+    claiming-fees: 0
 
 
 main-currency:
-  # sets vault as main currency if found in files (VLT)
-  vault-main-currency: true
+  vault:
+    # sets vault as main currency if found in files
+    as-main-currency: true
+
+    # makes values of main currency be used instead of VLT
+    use-alias: false
 
   # identifier for the currency example: USD ---> you have: 89.32 USD !!
   currency-code: EMD
@@ -156,8 +160,8 @@ main-currency:
   # name
   name: Villager Emeralds
 
-  # color for display on chat (empty for random)
-  color: green
+  # color for display on chat (hex #FFFFFF)
+  color: 00FF00
 
   # initial currency new players will have on their wallets by default (other than 0 may devalue your currency, use only for initial supply)
   initial-balance: 0
