@@ -1,5 +1,3 @@
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V110GP3T)
-
 # Profitable
 Profitable is a Minecraft plugin that adds real supply and demand to the game by introducing an exchange system designed to be as close to reality as possible.
 
@@ -97,3 +95,5 @@ I hope with that i have convinced you to download this wonderful plugin, have a 
 # Final notes
 
 This is an early version of the plugin. Future updates will bring more refined features and improvements.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V110GP3T)
