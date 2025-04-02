@@ -50,6 +50,16 @@
         </resources>
     </build>
 
+<profiles>
+    <profile>
+        <id>Testing-package</id>
+        <build>
+            <directory>${project.basedir}/Testing/plugins</directory>
+            <finalName>Profitable-TESTING-JAR</finalName>
+        </build>
+    </profile>
+</profiles>
+
     <repositories>
         <repository>
             <id>papermc-repo</id>
