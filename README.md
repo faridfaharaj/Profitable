@@ -27,7 +27,7 @@ Orders are instructions to sell or buy an asset (item, entity, currency, etc..) 
 
 For example:
 
-- **Limit order** lets you choose prize, but may not execute right away
+- **Limit order** lets you choose price, but may not execute right away
 
 - **Market order** acts immediatly at the lowest available price
 
