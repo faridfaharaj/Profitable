@@ -8,6 +8,7 @@ description: "Real supply and demand in minecraft!"
 website: "https://github.com/faridfaharaj/Profitable"
 softdepend:
   - Vault
+folia-supported: true
 
 commands:
   profitable:

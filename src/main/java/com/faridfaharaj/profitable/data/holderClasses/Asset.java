@@ -1,5 +1,6 @@
 package com.faridfaharaj.profitable.data.holderClasses;
 
+import com.faridfaharaj.profitable.Scheduler;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.util.RandomUtil;
@@ -240,36 +241,38 @@ public class Asset {
         int maxStackSize = material.getMaxStackSize();
 
         Location location = Accounts.getItemDelivery(account);
-        World world = location.getWorld();
-        Block block = location.getBlock();
-        if (block.getState() instanceof Chest) {
-            Chest chest = (Chest) block.getState();
 
-            int missing = amount;
-            while (missing > 0) {
-                int giveAmount = Math.min(missing, maxStackSize);
-                ItemStack itemStack = new ItemStack(material, giveAmount);
+        Scheduler.runAtLocation(location, () -> {
+            World world = location.getWorld();
+            Block block = location.getBlock();
+            if (block.getState() instanceof Chest) {
+                Chest chest = (Chest) block.getState();
+
+                int missing = amount;
+                while (missing > 0) {
+                    int giveAmount = Math.min(missing, maxStackSize);
+                    ItemStack itemStack = new ItemStack(material, giveAmount);
 
 
-                Inventory inventory = chest.getInventory();
-                for (ItemStack drop : inventory.addItem(itemStack).values()) {
-                    world.dropItemNaturally(location, drop);
+                    Inventory inventory = chest.getInventory();
+                    for (ItemStack drop : inventory.addItem(itemStack).values()) {
+                        world.dropItemNaturally(location, drop);
+                    }
+
+                    missing -= giveAmount;
                 }
 
-                missing -= giveAmount;
+            }else{
+
+                world.dropItemNaturally(location, new ItemStack(material, amount));
+
             }
 
-        }else{
-
-            world.dropItemNaturally(location, new ItemStack(material, amount));
-
-        }
-
-        world.spawnParticle(Particle.FIREWORK, location.add(0.5,0.5,0.5), 5);
-        world.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
-        world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
-        world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
-
+            world.spawnParticle(Particle.FIREWORK, location.add(0.5,0.5,0.5), 5);
+            world.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
+            world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
+            world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+        });
     }
 
     public static void sendCommodityEntity(String player, String asset, String id, int amount){
@@ -277,19 +280,20 @@ public class Asset {
         EntityType entityType = EntityType.fromName(asset);
 
         Location location = Accounts.getEntityDelivery(player);
-        World world = location.getWorld();
+        Scheduler.runAtLocation(location, () -> {
+            World world = location.getWorld();
 
-        for(int i = 0; i<amount; i++){
-            Entity entity = world.spawnEntity(location, entityType);
-            entity.setCustomName(id);
-            entity.setCustomNameVisible(true);
-        }
+            for(int i = 0; i<amount; i++){
+                Entity entity = world.spawnEntity(location, entityType);
+                entity.setCustomName(id);
+                entity.setCustomNameVisible(true);
+            }
 
-        world.spawnParticle(Particle.FIREWORK, location, 10);
-        world.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
-        world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
-        world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
-
+            world.spawnParticle(Particle.FIREWORK, location, 10);
+            world.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
+            world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
+            world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+        });
     }
 
     public static boolean retrieveAsset(Player player, String notice, String asset, int assetType, double ammount){

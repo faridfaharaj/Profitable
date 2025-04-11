@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="RunFolia 1.21" type="JarApplication" folderName="Run server">
+    <option name="JAR_PATH" value="$PROJECT_DIR$/Testing/servers/folia-1.21.jar" />
+    <option name="VM_PARAMETERS" value="-Xms4G -Xmx4G -jar" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$\Testing" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2" />
+  </configuration>
+</component>
