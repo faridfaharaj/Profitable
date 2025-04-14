@@ -9,6 +9,7 @@ website: "https://github.com/faridfaharaj/Profitable"
 softdepend:
   - Vault
   - PlayerPoints
+folia-supported: true
 
 commands:
   profitable:
@@ -230,9 +231,6 @@ permissions:
 
   profitable.admin.assets.manage.register:
     description: "Allows registering assets to the exchange"
-    default: op
-  profitable.admin.assets.manage.edit:
-    description: "Allows registering modifying existing assets"
     default: op
   profitable.admin.assets.manage.newtransaction:
     description: "lets you insert transactions to simulate fake price changes"
