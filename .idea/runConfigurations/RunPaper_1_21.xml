@@ -2,7 +2,7 @@
   <configuration default="false" name="RunPaper 1.21" type="JarApplication" folderName="Run server">
     <option name="JAR_PATH" value="$PROJECT_DIR$/Testing/servers/paper-1.21.jar" />
     <option name="VM_PARAMETERS" value="-Xms4G -Xmx4G -jar" />
-    <option name="WORKING_DIRECTORY" value="C:\Users\farid\Desktop\PluginsMC\Profitable\Profitable\Testing" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$\Testing" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <method v="2">
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="prepareTest" run_configuration_type="ShConfigurationType" />
