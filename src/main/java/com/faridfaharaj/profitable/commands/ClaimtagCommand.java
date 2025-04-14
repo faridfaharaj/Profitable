@@ -1,5 +1,7 @@
 package com.faridfaharaj.profitable.commands;
 
+import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.util.TextUtil;
 import org.bukkit.command.Command;
@@ -19,6 +21,11 @@ public class ClaimtagCommand implements CommandExecutor {
             TextUtil.sendGenericMissingPerm(sender);
             return true;
         }
+
+        if(Configuration.MULTIWORLD){
+            DataBase.universalUpdateWorld(sender);
+        }
+
         Player player = null;
         if(sender instanceof Player got){
             player = got;

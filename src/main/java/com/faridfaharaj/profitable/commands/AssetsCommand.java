@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.util.TextUtil;
@@ -27,6 +28,10 @@ public class AssetsCommand implements CommandExecutor {
             return false;
         }
 
+        if(Configuration.MULTIWORLD){
+            DataBase.universalUpdateWorld(sender);
+        }
+
         if(Objects.equals(args[0], "categories")){
 
             if(!sender.hasPermission("profitable.asset.categories")){
@@ -47,6 +52,11 @@ public class AssetsCommand implements CommandExecutor {
                 List<Asset> foundAssets = Assets.getAssetFancyType(2);
                 foundAssets.addAll(Assets.getAssetFancyType(3));
 
+                if(foundAssets.isEmpty()){
+                    TextUtil.sendEmptyNotice(sender, "No commodities can be traded");
+                    return true;
+                }
+
                 int page;
 
                 if(args.length == 2){
@@ -60,9 +70,9 @@ public class AssetsCommand implements CommandExecutor {
                     }
                 }
 
-                int totalPages = (foundAssets.size()-1)/7;
-                Component component = TextUtil.profitableTopSeparator().appendNewline()
-                        .append(getAssetList(page, foundAssets, "Tradeable commodities:")).appendNewline()
+                int totalPages = (foundAssets.size()-1)/8;
+                Component component = TextUtil.profitableTopSeparator("Commodities", "--------------").appendNewline()
+                        .append(getAssetList(page, foundAssets))
                         .append(TextUtil.profitablePaginator(page, totalPages, "/assets categories " + args[1]))
                         ;
 
@@ -78,6 +88,10 @@ public class AssetsCommand implements CommandExecutor {
             }
 
             List<Asset> foundAssets = Assets.getAssetFancyType(assetType);
+            if(foundAssets.isEmpty()){
+                TextUtil.sendEmptyNotice(sender, "No "+ TextUtil.nameType(assetType) +" can be traded");
+                return true;
+            }
 
             int page;
 
@@ -92,29 +106,28 @@ public class AssetsCommand implements CommandExecutor {
                 }
             }
 
-            int totalPages = (foundAssets.size()-1)/7;
-            Component component = TextUtil.profitableTopSeparator().appendNewline()
-                    .append(getAssetList(page, foundAssets, "Tradeable " + TextUtil.nameType(assetType) + ":")).appendNewline()
-                    .append(TextUtil.profitablePaginator(page, totalPages, "/assets categories " + args[1]))
-                    ;
-
+            int totalPages = (foundAssets.size()-1)/8;
+            Component component = TextUtil.profitableTopSeparator(TextUtil.nameType(assetType), "-----------------").appendNewline()
+                    .append(getAssetList(page, foundAssets))
+                    .append(TextUtil.profitablePaginator(page, totalPages, "/assets categories " + args[1]));
             TextUtil.sendCustomMessage(sender, component);
 
             return true;
         }
 
+
         return false;
     }
 
-    private static Component getAssetList(int page, List<Asset> foundAssets, String cat) {
-        Component component = Component.text(cat);
+    private static Component getAssetList(int page, List<Asset> foundAssets) {
+        Component component = Component.text("");
 
-        for(int i = page *7; i<Math.min(page *7+7, foundAssets.size()); i++){
+        for(int i = page *8; i<Math.min(page *8+8, foundAssets.size()); i++){
             String cmnd = "/asset " + foundAssets.get(i).getCode();
-            component = component.appendNewline().append(
+            component = component.append(
                     Component.text("["+foundAssets.get(i).getCode()+ "]").color(foundAssets.get(i).getColor())
                             .clickEvent(ClickEvent.runCommand(cmnd))
-                            .hoverEvent(HoverEvent.showText(Component.text(cmnd, Configuration.COLORINFO))));
+                            .hoverEvent(HoverEvent.showText(Component.text(cmnd, Configuration.COLORINFO)))).appendNewline();
         }
         return component;
     }

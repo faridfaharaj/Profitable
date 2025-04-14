@@ -2,6 +2,7 @@ package com.faridfaharaj.profitable.util;
 
 import net.kyori.adventure.text.format.TextColor;
 
+import java.awt.*;
 import java.util.Random;
 
 public class RandomUtil {
@@ -10,15 +11,11 @@ public class RandomUtil {
 
     public static TextColor randomTextColor(){
 
-        int r, g, b;
-
-        do {
-            r = RANDOM.nextInt(256);
-            g = RANDOM.nextInt(256);
-            b = RANDOM.nextInt(256);
-        } while (Math.max(Math.max(r,g),b) >= 200);
-
-        return TextColor.color(r,g,b);
+        return TextColor.color(Color.getHSBColor(
+                RANDOM.nextFloat(1f),
+                RANDOM.nextFloat(0.7f)+0.3f,
+                RANDOM.nextFloat(0.3f)+0.7f
+        ).getRGB());
 
     }
 

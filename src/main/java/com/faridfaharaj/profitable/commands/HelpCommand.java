@@ -21,17 +21,24 @@ public class HelpCommand implements CommandExecutor {
 > /help admin
 §e Sends a list of commands meant for administrators and ops §r
 -----
-> /buy <Asset> limit <Units> <Price>
+-----
+> /sell <Asset> <Units>
 §e Sends an order to buy an asset at an specified price §r
 -----
-> /buy <Asset> market <Units> <Price>
+> /sell <Asset> <Units>
 §e Sends an order to sell an asset immediately at the lowest price §r
 -----
-> /sell <Asset> limit <Units> <Price>
+> /buy <Asset> <Units> <Price>
 §e Sends an order to buy an asset at an specified price §r
 -----
-> /sell <Asset> market <Units> <Price>
+> /buy <Asset> <Units> <Price>
 §e Sends an order to sell an asset immediately at the lowest price §r
+-----
+> /buy <Asset> <Units> <Price> stop-limit
+§e Sends an order to buy an asset at an specified price §r
+-----
+> /buy <Asset> <Units> <Price> stop-limit
+§e Sends an order that turns into a limit order when market reaches this price §r
 -----
 > /account
 §e Returns current active account §r
@@ -54,11 +61,11 @@ public class HelpCommand implements CommandExecutor {
 > /wallet
 §e Displays all asset balances on your account §r
 -----
-> /wallet deposit <amount>
-§e Transfers desired amount from vault to your profitable's account wallet §r
+> /wallet deposit <Currency> <amount>
+§e Transfers desired amount from economy to your profitable's account wallet §r
 -----
-> /wallet withdraw <amount>
-§e Transfers desired amount from your wallet to vault §r
+> /wallet withdraw <Currency> <amount>
+§e Transfers desired amount from your wallet to your economy §r
 -----
 > /orders
 §e Displays all active orders on your account §r
@@ -163,6 +170,15 @@ public class HelpCommand implements CommandExecutor {
 -----
 > /admin assets fromid <asset> newtransaction <price> <volume>
 §e fakes transactions to make the illusion of market movement on an asset §r
+-----
+> /admin assets fromid <asset> resettransactions
+§e deletes all records of transactions from an asset (this kills graphs) §r
+-----
+> /admin assets fromid <asset> edit <New symbol> <New name> <New Color>
+§e Allows you to edit the appearance and identifier of assets §r
+-----
+> /admin config reload
+§e Reloads and updates most config changes §r
 -----
 > /admin assets fromid <asset> resettransactions
 §e deletes all records of transactions from an asset (this kills graphs) §r"""

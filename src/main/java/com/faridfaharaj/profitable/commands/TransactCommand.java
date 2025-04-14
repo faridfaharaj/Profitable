@@ -1,7 +1,11 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.data.DataBase;
+import com.faridfaharaj.profitable.data.holderClasses.Order;
+import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.exchange.Books.Exchange;
+import com.faridfaharaj.profitable.hooks.VaultHook;
 import com.faridfaharaj.profitable.util.TextUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -22,6 +26,10 @@ public class TransactCommand implements CommandExecutor {
             player = got;
         }
 
+        if(Configuration.MULTIWORLD){
+            DataBase.universalUpdateWorld(sender);
+        }
+
         if(player != null){
 
             boolean sideBuy;
@@ -33,50 +41,59 @@ public class TransactCommand implements CommandExecutor {
                 return false;
             }
 
+            Order.OrderType orderType;
             double price;
 
-            if(args.length <= 1){
-                TextUtil.sendError(sender, "/" + command.getName() + " <Asset> <Order Type> <args>..");
-                return true;
-            }
-
-            if(Objects.equals(args[1], "market")){
-
-                if(args.length < 3){
-                    TextUtil.sendError(sender, "/" + command.getName() + " <Asset> market <Units>");
-                    return true;
-                }
-
-                price = sideBuy?Double.MAX_VALUE:Double.MIN_VALUE;
-
-            }else if(Objects.equals(args[1], "limit")){
-
-                if(args.length < 4){
-                    TextUtil.sendError(sender, "/" + command.getName() + " <Asset> limit <Units> <Price>");
-                    return true;
-                }
+            if (args.length > 2) {
+                orderType = Order.OrderType.LIMIT;
 
                 try{
-                    price = Double.parseDouble(args[3]);
+                    price = Double.parseDouble(args[2]);
                 }catch (Exception e){
                     TextUtil.sendError(sender, "Invalid Price");
                     return true;
                 }
 
+            }else {
+                orderType = Order.OrderType.MARKET;
+                price = sideBuy?Double.MAX_VALUE:Double.MIN_VALUE;
+            }
+
+            if(args.length > 3){
+                if(args[3].equals("stop-limit")){
+                    orderType = Order.OrderType.STOP_LIMIT;
+                }else if(args[3].equals("stop-market")){
+                    orderType = Order.OrderType.STOP_MARKET;
+                } else if (args[3].equals("limit")) {
+
+                }else if (args[3].equals("market")) {
+
+                    TextUtil.sendWarning(sender, "Ignoring price for market order");
+                    price = sideBuy?Double.MAX_VALUE:Double.MIN_VALUE;
+                    orderType = Order.OrderType.MARKET;
+
+                } else{
+                    TextUtil.sendError(sender,"Invalid Order Type");
+                    return true;
+                }
+            }
+
+            double units;
+            if(args.length == 1){
+
+                units = 1d;
+
             }else{
-                TextUtil.sendError(sender, args[1] + " is not a valid type of order");
-                return true;
+                try{
+                    units = Double.parseDouble(args[1]);
+                }catch (Exception e){
+                    TextUtil.sendError(sender, "Invalid Units");
+                    return true;
+                }
             }
 
-            Double units;
-            try{
-                units = Double.parseDouble(args[2]);
-            }catch (Exception e){
-                TextUtil.sendError(sender, "Invalid Units");
-                return true;
-            }
 
-            Exchange.sendNewOrder(player, args[0], sideBuy, price, units);
+            Exchange.sendNewOrder(player, new Order(UUID.randomUUID(), Accounts.getAccount(player), args[0], sideBuy, price, units, orderType));
             return true;
 
         }
@@ -95,23 +112,23 @@ public class TransactCommand implements CommandExecutor {
             if(args.length == 1){
                 List<String> options = new ArrayList<>(Configuration.ALLOWEITEMS);
                 options.addAll(Configuration.ALLOWENTITIES);
-                if(Configuration.VAULTENABLED){
-                    options.add("VLT");
+                if(VaultHook.isConnected()){
+                    options.add(VaultHook.getAsset().getCode());
                 }
 
                 StringUtil.copyPartialMatches(args[0], options, suggestions);
             }
 
             if(args.length == 2){
-                suggestions = Arrays.asList("limit", "market");
-            }
-
-            if(args.length == 3){
                 suggestions = Collections.singletonList("[<Units>]");
             }
 
-            if(args.length == 4 && !Objects.equals(args[1], "market")){
+            if(args.length == 3){
                 suggestions = Collections.singletonList("[<Price each>]");
+            }
+
+            if(args.length == 4){
+                suggestions = List.of("stop-limit","stop-market","limit","market");
             }
 
             return suggestions;

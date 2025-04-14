@@ -15,12 +15,11 @@ import org.bukkit.command.CommandSender;
 public class PluginInfoCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
-        TextUtil.sendCustomMessage(sender, Component.text("Running ", TextColor.color(0x41B169)).append(Component.text("Profitable", TextColor.color(0x64FF9D)).decorate(TextDecoration.BOLD)).append(Component.text(" v0.1.1-beta", TextColor.color(0x64FF9D))).clickEvent(ClickEvent.openUrl("https://github.com/faridfaharaj/Profitable")).hoverEvent(HoverEvent.showText(Component.text("link to download page", NamedTextColor.BLUE))));
+        TextUtil.sendCustomMessage(sender, Component.text("Running ", TextColor.color(0x41B169)).append(Component.text("Profitable", TextColor.color(0x64FF9D)).decorate(TextDecoration.BOLD)).append(Component.text(" v0.1.1-beta", TextColor.color(0x64FF9D))).clickEvent(ClickEvent.openUrl("https://github.com/faridfaharaj/Profitable")).hoverEvent(HoverEvent.showText(Component.text("link to download page", NamedTextColor.BLUE)))
+                .appendNewline().append(Component.text("[/profitable:help]",Configuration.COLORINFO).clickEvent(ClickEvent.runCommand("/profitable:help")).hoverEvent(HoverEvent.showText(Component.text("/profitable:help",Configuration.COLORINFO))))
+                .append(Component.text("  [/profitable:help admin]",Configuration.COLORINFO).clickEvent(ClickEvent.runCommand("/profitable:help admin")).hoverEvent(HoverEvent.showText(Component.text("/profitable:help admin",Configuration.COLORINFO))))
 
-        TextUtil.sendButton(sender, "  /profitable:help", "/profitable:help");
-        TextUtil.sendButton(sender, "  /profitable:help admin", "/profitable:help admin");
-
-
+        );
         return true;
     }
 }

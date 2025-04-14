@@ -7,10 +7,14 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class TextUtil {
@@ -89,6 +93,12 @@ public class TextUtil {
         return Component.text("").append(Component.text("--------------- [",Configuration.COLORPROFITABLE))
                 .append(Component.text("Profitable",Configuration.COLORPROFITABLE).decorate(TextDecoration.BOLD))
                 .append(Component.text("] ----------------",Configuration.COLORPROFITABLE));
+    }
+
+    public static Component profitableTopSeparator(String text, String sides){
+        return Component.text("").append(Component.text(sides + " [",Configuration.COLORPROFITABLE))
+                .append(Component.text(text,Configuration.COLORPROFITABLE).decorate(TextDecoration.BOLD))
+                .append(Component.text("] " + sides,Configuration.COLORPROFITABLE));
     }
 
     public static Component profitableBottomSeparator(){
@@ -173,6 +183,21 @@ public class TextUtil {
 
     public static void genericInvalidSubcom(CommandSender sender, String subcom){
         sendError(sender, "Invalid Subcommand " + subcom);
+    }
+
+    public static byte[] UUIDtoBytes(UUID uuid) throws IOException {
+        ByteBuffer buffer = ByteBuffer.allocate(16);
+
+        buffer.putLong(uuid.getMostSignificantBits());
+        buffer.putLong(uuid.getLeastSignificantBits());
+
+        return buffer.array();
+    }
+
+    public static UUID UUIDfromBytes(byte[] uuid) throws IOException {
+        ByteBuffer buffer = ByteBuffer.wrap(uuid);
+
+        return new UUID(buffer.getLong(),buffer.getLong());
     }
 
 }

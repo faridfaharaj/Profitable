@@ -8,6 +8,7 @@ description: "Real supply and demand in minecraft!"
 website: "https://github.com/faridfaharaj/Profitable"
 softdepend:
   - Vault
+  - PlayerPoints
 
 commands:
   profitable:
@@ -53,7 +54,7 @@ commands:
   wallet:
     description: Displays all asset balances on your account
     usage: /wallet or /wallet <Subcommand>
-    aliases: [bal,balance,wal]
+    aliases: [wal]
 
   delivery:
     description: Displays and sets where should your items and entities arrive
@@ -229,6 +230,9 @@ permissions:
 
   profitable.admin.assets.manage.register:
     description: "Allows registering assets to the exchange"
+    default: op
+  profitable.admin.assets.manage.edit:
+    description: "Allows registering modifying existing assets"
     default: op
   profitable.admin.assets.manage.newtransaction:
     description: "lets you insert transactions to simulate fake price changes"

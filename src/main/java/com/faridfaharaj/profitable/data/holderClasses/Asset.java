@@ -1,7 +1,10 @@
 package com.faridfaharaj.profitable.data.holderClasses;
 
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.AccountHoldings;
+import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
+import com.faridfaharaj.profitable.hooks.VaultHook;
 import com.faridfaharaj.profitable.util.RandomUtil;
 import com.faridfaharaj.profitable.util.TextUtil;
 import net.kyori.adventure.text.Component;
@@ -20,6 +23,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class Asset {
 
@@ -90,6 +94,36 @@ public class Asset {
         }
 
         return new Asset(code, assetType, color, name, stringList, numericList);
+    }
+
+    public static Asset StringToCurrency(String currencystring){
+
+        String[] MCdata = currencystring.split("_");
+
+        TextColor color;
+        String name;
+
+        if(MCdata.length >= 2){
+
+            name = MCdata[1];
+
+        }else{
+            name = MCdata[0];
+        }
+        if(MCdata.length >= 3){
+
+            color = TextColor.fromHexString(MCdata[2]);
+
+            if(color == null){
+                color = RandomUtil.randomTextColor();
+                Profitable.getInstance().getLogger().warning("Invalid main currency color, selecting at random");
+            }
+
+        }else {
+            color = RandomUtil.randomTextColor();
+        }
+
+        return new Asset(MCdata[0], 1, color, name);
     }
 
     public String getCode(){
@@ -184,6 +218,28 @@ public class Asset {
 
             dos.writeInt(numericData.size());
             for(double number : numericData){
+                dos.writeDouble(number);
+            }
+
+            return bos.toByteArray();
+        }
+    }
+
+    public static byte[] metaData(Asset asset) throws IOException {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+             DataOutputStream dos = new DataOutputStream(bos)) {
+
+            dos.writeInt(asset.getColor().value());
+
+            dos.writeUTF(asset.getName());
+
+            dos.writeInt(asset.getStringData().size());
+            for(String string : asset.getStringData()){
+                dos.writeUTF(string);
+            }
+
+            dos.writeInt(asset.getNumericalData().size());
+            for(double number : asset.getNumericalData()){
                 dos.writeDouble(number);
             }
 
@@ -301,7 +357,6 @@ public class Asset {
                     return retrieveCommodityEntity(player, notice, asset, Accounts.getEntityClaimId(Accounts.getAccount(player)), (int) ammount);
             case 4: // Fluid
                     return false;
-
             case 5: // Energy
                     return false;
             default: // any numerical value
@@ -316,6 +371,51 @@ public class Asset {
         double balance = AccountHoldings.getAccountAssetBalance(account, asset);
         double difference = balance - ammount;
         if(difference < 0){
+
+            if(Objects.equals(asset, VaultHook.getAsset().getCode())){
+
+                if(VaultHook.getEconomy().withdrawPlayer(player, ammount).transactionSuccess()){
+                    return true;
+                }
+
+            } else if (Objects.equals(asset, PlayerPointsHook.getAsset().getCode())) {
+
+                if(PlayerPointsHook.getApi().take(player.getUniqueId(), (int) Math.ceil(ammount))){
+                    return true;
+                }
+
+            }
+
+            TextUtil.sendError(player,notice + ", insufficient " + asset + " on your account");
+
+            return false;
+        }
+        AccountHoldings.setHolding(account, asset, difference);
+        return true;
+    }
+
+    public static boolean retrieveBalance(Player player, String notice, String asset, double ammount , boolean takeExternal){
+        String account = Accounts.getAccount(player);
+
+        double balance = AccountHoldings.getAccountAssetBalance(account, asset);
+        double difference = balance - ammount;
+        if(difference < 0){
+
+            if(takeExternal){
+                if(Objects.equals(asset, VaultHook.getAsset().getCode())){
+
+                    if(VaultHook.getEconomy().withdrawPlayer(player, ammount).transactionSuccess()){
+                        return true;
+                    }
+
+                } else if (Objects.equals(asset, PlayerPointsHook.getAsset().getCode())) {
+
+                    if(PlayerPointsHook.getApi().take(player.getUniqueId(), (int) Math.ceil(ammount))){
+                        return true;
+                    }
+
+                }
+            }
 
             TextUtil.sendError(player,notice + ", insufficient " + asset + " on your account");
 
@@ -342,7 +442,7 @@ public class Asset {
         if (block.getState() instanceof Chest chest) {
             chest.getInventory();
         }else{
-            player.sendEmptyNotice(ChatColor.YELLOW + "Container set for delivery is missing");
+            TextUtil.sendWarning(player, "Your delivery container seems to be missing");
         }
 
         if(inventory.containsAtLeast(itemStack, amount)){
@@ -380,6 +480,7 @@ public class Asset {
             if(entitiesRemaining <= 0){
 
                 for(Entity retrieved : entities){
+                    world.playSound(retrieved.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
                     world.spawnParticle(Particle.HAPPY_VILLAGER, retrieved.getLocation(), 5, 1,1,1,1);
                     retrieved.remove();
                 }

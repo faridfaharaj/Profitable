@@ -52,15 +52,12 @@ public class MapGraphRenderer extends MapRenderer {
 
 
         List<Candle> candles;
-        
+
         if (time > 5376000) {
-            System.out.println("month");
             candles = Candles.getInterval(asset, player.getWorld().getFullTime()/720000*720000-time, 2);
         }else if(time > 768000){
-            System.out.println("week");
             candles = Candles.getInterval(asset, player.getWorld().getFullTime()/168000*168000-time, 1);
         } else{
-            System.out.println("day");
             candles = Candles.getInterval(asset, player.getWorld().getFullTime()/24000*24000-time, 0);
         }
 
@@ -110,6 +107,7 @@ public class MapGraphRenderer extends MapRenderer {
                     lowPos = (candles.get(candleIndex).getLow()-lowest),
                     volume = (candles.get(candleIndex).getVolume());
 
+
             Color color = new Color(closePos<openPos? Configuration.COLORBEARISH.value() : Configuration.COLORBULLISH.value());
 
             openPos = bottom - Math.ceil( openPos / ceiling * top);
@@ -120,12 +118,12 @@ public class MapGraphRenderer extends MapRenderer {
 
             if(volume > 0){
                 volume = bottom - (int) Math.ceil(volume / candles.getLast().getVolume() * ((double) top /2));
-                rectangle(canvas, offset+spacing, bottom,offset+wideness-1, (int) volume, volumeColor);
+                shadedRectangle(canvas, offset+spacing, bottom,offset+wideness-1, (int) volume, volumeColor);
             }
 
-            rectangle(canvas, offset+spacing, (int) openPos,offset+wideness-1, (int) closePos, color);
-            rectangle(canvas, offset+center, (int) highPos,offset+center, (int) lowPos, color);
-
+            shadedRectangle(canvas, offset+center, (int) Math.min(openPos, closePos),offset+center, (int) highPos, color);
+            shadedRectangle(canvas, offset+spacing, (int) openPos,offset+wideness-1, (int) closePos, color);
+            shadedRectangle(canvas, offset+center, (int) Math.max(openPos,closePos),offset+center, (int) lowPos, color);
         }
 
         for (double current = Math.ceil(lowest / interval) * interval; current < highest; current += interval) {
@@ -157,16 +155,27 @@ public class MapGraphRenderer extends MapRenderer {
                 canvas.setPixelColor(x, y, color);
             }
         }
+
     }
 
     public static void transparentRectangle(MapCanvas canvas, int initX, int initY, int targetX, int targetY, Color color){
-
 
         for (int x = Math.min(initX, targetX); x <= Math.max(initX, targetX); x++) {
             for (int y = Math.min(initY, targetY); y <= Math.max(initY, targetY); y++) {
                 canvas.setPixelColor(x, y, blendColors(canvas.getPixelColor(x,y), color));
             }
         }
+    }
+
+    public static void shadedRectangle(MapCanvas canvas, int initX, int initY, int targetX, int targetY, Color color){
+
+        for (int x = Math.min(initX, targetX); x <= Math.max(initX, targetX); x++) {
+            for (int y = Math.min(initY, targetY); y <= Math.max(initY, targetY); y++) {
+                canvas.setPixelColor(x, y, color);
+                canvas.setPixelColor(x+1, y+1, color.darker());
+            }
+        }
+
     }
 
     public static void DIERectangle(MapCanvas canvas, int initX, int initY, int targetX, int targetY, Color color){
@@ -198,14 +207,28 @@ public class MapGraphRenderer extends MapRenderer {
     public static Color blendColors(Color base, Color overlay) {
         if (base == null) return overlay;
 
-        float alphaOver = overlay.getAlpha() / 255.0f; // Convert to range [0,1]
-        float alphaBase = base.getAlpha() / 255.0f; // Usually 1.0 if fully opaque
+        float alphaOver = overlay.getAlpha() / 255.0f;
+        float alphaBase = base.getAlpha() / 255.0f;
 
         int r = (int) ((overlay.getRed() * alphaOver) + (base.getRed() * (1 - alphaOver)));
         int g = (int) ((overlay.getGreen() * alphaOver) + (base.getGreen() * (1 - alphaOver)));
         int b = (int) ((overlay.getBlue() * alphaOver) + (base.getBlue() * (1 - alphaOver)));
 
-        // The resulting alpha is calculated, but the base is fully opaque (255)
+        int alphaOut = (int) ((alphaOver + alphaBase * (1 - alphaOver)) * 255);
+
+        return new Color(r, g, b, alphaOut);
+    }
+
+    public static Color blendColors(Color base, Color overlay, float amount) {
+        if (base == null) return overlay;
+
+        float alphaOver = amount / 255.0f;
+        float alphaBase = base.getAlpha() / 255.0f;
+
+        int r = (int) ((overlay.getRed() * alphaOver) + (base.getRed() * (1 - alphaOver)));
+        int g = (int) ((overlay.getGreen() * alphaOver) + (base.getGreen() * (1 - alphaOver)));
+        int b = (int) ((overlay.getBlue() * alphaOver) + (base.getBlue() * (1 - alphaOver)));
+
         int alphaOut = (int) ((alphaOver + alphaBase * (1 - alphaOver)) * 255);
 
         return new Color(r, g, b, alphaOut);

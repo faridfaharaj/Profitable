@@ -1,6 +1,9 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.data.DataBase;
+import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
+import com.faridfaharaj.profitable.hooks.VaultHook;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.util.TextUtil;
 import net.kyori.adventure.text.Component;
@@ -29,6 +32,10 @@ public class AssetCommand  implements CommandExecutor {
         if(!sender.hasPermission("profitable.asset.info")){
             TextUtil.sendGenericMissingPerm(sender);
             return true;
+        }
+
+        if(Configuration.MULTIWORLD){
+            DataBase.universalUpdateWorld(sender);
         }
 
         if(args.length == 1){
@@ -118,8 +125,11 @@ public class AssetCommand  implements CommandExecutor {
             if(args.length == 1){
                 List<String> options = new ArrayList<>(Configuration.ALLOWEITEMS);
                 options.addAll(Configuration.ALLOWENTITIES);
-                if(Configuration.VAULTENABLED){
-                    options.add("VLT");
+                if(VaultHook.isConnected()){
+                    options.add(VaultHook.getAsset().getCode());
+                }
+                if(PlayerPointsHook.isConnected()){
+                    options.add(PlayerPointsHook.getAsset().getCode());
                 }
 
                 StringUtil.copyPartialMatches(args[0], options, suggestions);

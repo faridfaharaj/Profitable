@@ -1,17 +1,35 @@
 package com.faridfaharaj.profitable;
 
 import com.faridfaharaj.profitable.commands.*;
+import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.tables.Accounts;
+import com.faridfaharaj.profitable.data.tables.Assets;
+import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
+import com.faridfaharaj.profitable.hooks.VaultHook;
+import com.faridfaharaj.profitable.util.TextUtil;
 import net.kyori.adventure.platform.bukkit.*;
 
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /*                                                                            *
@@ -34,19 +52,14 @@ import java.util.*;
 public final class Profitable extends JavaPlugin {
 
     private static Profitable instance;
-
     private static BukkitAudiences audiences;
-
-    public static File DATAPATH;
 
     public static Profitable getInstance() {
         return instance;
     }
-
     public static BukkitAudiences getBukkitAudiences() {
         return audiences;
     }
-
     public static void setInstance(Profitable profitable){
         instance = profitable;
     }
@@ -54,33 +67,62 @@ public final class Profitable extends JavaPlugin {
     @Override
     public void onEnable() {
         getLogger().info("====================    Profitable    ====================" );
+
+        checkForUpdate(this);
+
         setInstance(this);
         audiences = BukkitAudiences.create(this);
 
         //config-----------------
         Configuration.loadConfig(this);
 
-        //SQLite----------------------------
-        DATAPATH = new File(getDataFolder().getAbsolutePath(), "data");
-        if(!DATAPATH.exists()) {
-            if(!DATAPATH.mkdirs()){
-                getLogger().severe("couldn't create saves folder, plugin might not work as intended");
+        //DATABASE---------
+        try {
+
+            switch (getConfig().getInt("database.database-type")){
+                case 0:
+                    DataBase.connectSQLite();
+                    getLogger().info("Connected to SQLite database");
+                    break;
+                case 1:
+                    DataBase.connectMySQL();
+                    getLogger().info("Connected to MySQL database");
+                    break;
+
             }
+            DataBase.migrateDatabase(DataBase.getConnection());
+
+        } catch (SQLException e) {
+            getLogger().severe("Error loading database");
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
-        if(!getConfig().getBoolean("database-per-world")){
+        // MainCurrency
+        if(Configuration.MULTIWORLD){
+            for(World world : this.getServer().getWorlds()){
+                try {
+                    DataBase.updateWorld(world);
+                    Assets.generateAssets();
+                    Accounts.registerDefaultAccount("server");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            getLogger().info("Using per-world data");
+        }else{
             try {
-                DataBase.setConnection("serverWide");
-                getLogger().info("Using single server-wide database");
-            } catch (SQLException e) {
+                DataBase.updateWorld(Profitable.getInstance().getServer().getWorlds().getFirst());
+                Assets.generateAssets();
+                Accounts.registerDefaultAccount("server");
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }else{
-            getLogger().info("Using per-world databases");
+            getLogger().info("Using single server-wide data");
         }
 
-        getLogger().info("Loaded Sqlite database");
-
+        getLogger().info("Using " + Configuration.MAINCURRENCYASSET.getCode() + " as main currency on the exchange");
 
         //commands-------------------------
         getCommand("buy").setExecutor(new TransactCommand());
@@ -122,7 +164,6 @@ public final class Profitable extends JavaPlugin {
         getCommand("help").setExecutor(new HelpCommand());
         getCommand("help").setTabCompleter(new HelpCommand.CommandTabCompleter());
 
-
         getCommand("profitable").setExecutor(new PluginInfoCommand());
 
         //event handler------------------
@@ -135,7 +176,11 @@ public final class Profitable extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        DataBase.closeAllConnections();
+        try {
+            DataBase.closeConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         for(UUID playerid:TemporalItems.holdingTemp.keySet()){
 
@@ -143,6 +188,46 @@ public final class Profitable extends JavaPlugin {
             if(player != null){
                 TemporalItems.removeTempItem(player);
             }
+        }
+    }
+
+    public void checkForUpdate(Profitable plugin) {
+        try {
+            plugin.getLogger().info("Looking for updates...");
+
+            HttpURLConnection conn = (HttpURLConnection) URI.create("https://api.spiget.org/v2/resources/123560/versions?size=1&sort=-releaseDate&fields=name").toURL().openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            StringBuilder jsonBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                jsonBuilder.append(line);
+            }
+            reader.close();
+
+            String json = jsonBuilder.toString();
+
+            Pattern pattern = Pattern.compile("\"name\"\\s*:\\s*\"(.*?)\"");
+            Matcher matcher = pattern.matcher(json);
+
+            if (matcher.find()) {
+                String latestVersion = matcher.group(1).replace("v","");
+                String currentVersion = plugin.getDescription().getVersion();
+
+                if (!latestVersion.equalsIgnoreCase(currentVersion)) {
+                    plugin.getLogger().warning("UPDATE AVAILABLE! Latest: " + latestVersion);
+                } else {
+                    plugin.getLogger().info("Up to date!");
+                }
+            } else {
+                plugin.getLogger().warning("Could not parse version from API response.");
+            }
+
+        } catch (Exception ex) {
+            plugin.getLogger().warning("Could not check for updates");
         }
     }
 

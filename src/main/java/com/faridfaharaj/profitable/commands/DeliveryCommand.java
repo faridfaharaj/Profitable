@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.util.TextUtil;
@@ -22,6 +23,9 @@ public class DeliveryCommand implements CommandExecutor {
     @Override
     public boolean onCommand( CommandSender sender,  Command command,  String s,  String[] args) {
 
+        if(Configuration.MULTIWORLD){
+            DataBase.universalUpdateWorld(sender);
+        }
         if(sender instanceof Player player){
 
             String account = Accounts.getAccount(player);
@@ -37,7 +41,7 @@ public class DeliveryCommand implements CommandExecutor {
                 Location itemDelivery = Accounts.getItemDelivery(account);
 
                 TextUtil.sendCustomMessage(sender,
-                        TextUtil.profitableTopSeparator().appendNewline()
+                        TextUtil.profitableTopSeparator("Delivery","----------------").appendNewline()
                                 .append(Component.text("Item Delivery Location:")).appendNewline()
                                 .append(Component.text((itemDelivery == null?"Not set":itemDelivery.toVector() + " (" + itemDelivery.getWorld().getName()+")")).color(Configuration.COLORINFO)).appendNewline()
                                 .appendNewline()

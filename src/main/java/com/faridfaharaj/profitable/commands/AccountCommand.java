@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.util.TextUtil;
 import net.kyori.adventure.text.Component;
@@ -25,6 +26,10 @@ public class AccountCommand implements CommandExecutor {
         Player player = null;
         if(sender instanceof Player got){
             player = got;
+        }
+
+        if(Configuration.MULTIWORLD){
+            DataBase.universalUpdateWorld(sender);
         }
 
         if(args.length == 0){
@@ -53,12 +58,16 @@ public class AccountCommand implements CommandExecutor {
             }
 
             if(Objects.equals(args[2], args[3])){
-                if(Accounts.registerAccount(args[1], args[2])){
-                    TextUtil.sendSuccsess(sender, "Account " + args[1] + " registered successfully");
-                    return true;
+                if(args[2].length() < 32){
+                    if(Accounts.registerAccount(args[1], args[2])){
+                        TextUtil.sendSuccsess(sender, "Account " + args[1] + " registered successfully");
+                        return true;
+                    }else{
+                        TextUtil.sendError(sender, "Account already exists");
+                        return true;
+                    }
                 }else{
-                    TextUtil.sendError(sender, "Account already exists");
-                    return true;
+                    TextUtil.sendError(sender, "Max password length is 32 characters");
                 }
             }else {
                 TextUtil.sendError(sender, "Passwords don't match");
@@ -94,9 +103,7 @@ public class AccountCommand implements CommandExecutor {
                         return true;
                     }
 
-                    TextUtil.sendWarning(sender, "logged out of active account");
                     Accounts.logOut(playerid);
-
                     if(Accounts.getCurrentAccounts().containsValue(account)) {
                         TextUtil.sendError(sender, "Someone else is still using this account, cannot delete");
                     }else{
@@ -187,8 +194,12 @@ public class AccountCommand implements CommandExecutor {
             if(player != null){
                 String account = Accounts.getAccount(player);
                 if(Accounts.comparePasswords(account, args[1])){
-                    Accounts.changePassword(account, args[2]);
-                    TextUtil.sendSuccsess(sender, "Password updated successfully");
+                    if(args[2].length() < 32){
+                        Accounts.changePassword(account, args[2]);
+                        TextUtil.sendSuccsess(sender, "Password updated successfully");
+                    }else{
+                        TextUtil.sendError(sender, "Max password length is 32 characters");
+                    }
                 }else{
                     TextUtil.sendError(sender,"Incorrect password");
                 }

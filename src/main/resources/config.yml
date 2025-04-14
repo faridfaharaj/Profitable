@@ -1,6 +1,18 @@
 
-# orders are able to transact across worlds if false
-database-per-world: false
+database:
+  # orders are able to transact across worlds if false
+  database-per-world: false
+
+  # (0)-SQLite (1)-mySQL
+  database-type: 0
+
+  mysql:
+    host:
+    port:
+    database:
+    username:
+    password:
+    options: "?useSSL=true&requireSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true"
 
 # allows vault currency be added as an asset, and can be withdrawn or deposited to your account
 vault-support: true
@@ -24,145 +36,158 @@ exchange:
     #
     #     but this is only a recommendation anyway, use this plugin however you want.
     #
-    commodity-item-whitelist: #having items on whitelist disables blacklist
-      - coal
-      - charcoal
-      - iron_ingot
-      - copper_ingot
-      - gold_ingot
-      - netherite_scrap
-      - amethyst_shard
-      - diamond
-      - nether_quartz
-      - emerald
-      - lapis_lazuli
-      - glowstone_dust
-      - redstone
-      - wheat
-      - egg
-      - apple
-      - melon_slice
-      - pumpkin
-      - sweet_berries
-      - glow_berries
-      - chorus_fruit
-      - carrot
-      - potato
-      - poisonous_potato
-      - beetroot
-      - fish
-      - raw_cod
-      - raw_salmon
-      - tropical_fish
-      - pufferfish
-      - sugarcane
-      - kelp
-      - cocoa_beans
-      - honey_bottle
-      - spider_eye
-      - rotten_flesh
-      - flint
-      - bone
-      - string
-      - feather
-      - leather
-      - honeycomb
-      - ink_sac
-      - glow_ink_sac
-      - turtle_scute
-      - armadillo_scute
-      - slime_ball
-      - clay_ball
-      - prismarine_shard
-      - prismarine_crystals
-      - nautilus_shell
-      - heart_of_the_sea
-      - blaze_rod
-      - breeze_rod
-      - heavy_core
-      - nether_star
-      - ender_pearl
-      - shulker_shell
-      - echo_shard
-      - nether_wart
-      - gunpowder
-      - dragon_breath
-      - ghast_tear
-      - phantom_membrane
-      - bamboo
-      - cactus
-      - powder_snow_bucket
-      - ink_sac
-      - water_bucket
-      - milk_bucket
-      - lava_bucket
-      - oak_log
-      - spruce_log
-      - birch_log
-      - jungle_log
-      - acacia_log
-      - dark_oak_log
-      - mangrove_log
-      - cherry_log
-      - crimson_stem
-      - warped_stem
-      - dirt
-      - gravel
-      - sand
-      - cobblestone
-      - granite
-      - diorite
-      - andesite
-      - obsidian
-      - netherrack
-      - sponge
-      - soul_sand
-      - soul_soil
-      - ice
-      - end_stone
-      - totem_of_undying
-      - brown_mushroom
-      - red_mushroom
+    generation:
+      # Allows auto-generation of assets for commodities in each world using whitelisting/blacklisting
+      active: true
 
-    commodity-item-blacklist:
-      - barrier
-      - commandBlock
-      - structure_block
-      - structure_void
+      item-whitelisting: true
+      commodity-item-whitelist: #having items on whitelist disables blacklist
+        - COAL
+        - CHARCOAL
+        - IRON_INGOT
+        - COPPER_INGOT
+        - GOLD_INGOT
+        - NETHERITE_SCRAP
+        - AMETHYST_SHARD
+        - DIAMOND
+        - NETHER_QUARTZ
+        - EMERALD
+        - LAPIS_LAZULI
+        - GLOWSTONE_DUST
+        - REDSTONE
+        - WHEAT
+        - EGG
+        - APPLE
+        - MELON_SLICE
+        - PUMPKIN
+        - SWEET_BERRIES
+        - GLOW_BERRIES
+        - CHORUS_FRUIT
+        - CARROT
+        - POTATO
+        - POISONOUS_POTATO
+        - BEETROOT
+        - FISH
+        - RAW_COD
+        - RAW_SALMON
+        - TROPICAL_FISH
+        - PUFFERFISH
+        - SUGARCANE
+        - KELP
+        - COCOA_BEANS
+        - HONEY_BOTTLE
+        - SPIDER_EYE
+        - ROTTEN_FLESH
+        - FLINT
+        - BONE
+        - STRING
+        - FEATHER
+        - LEATHER
+        - HONEYCOMB
+        - INK_SAC
+        - GLOW_INK_SAC
+        - TURTLE_SCUTE
+        - ARMADILLO_SCUTE
+        - SLIME_BALL
+        - CLAY_BALL
+        - PRISMARINE_SHARD
+        - PRISMARINE_CRYSTALS
+        - NAUTILUS_SHELL
+        - HEART_OF_THE_SEA
+        - BLAZE_ROD
+        - BREEZE_ROD
+        - HEAVY_CORE
+        - NETHER_STAR
+        - ENDER_PEARL
+        - SHULKER_SHELL
+        - ECHO_SHARD
+        - NETHER_WART
+        - GUNPOWDER
+        - DRAGON_BREATH
+        - GHAST_TEAR
+        - PHANTOM_MEMBRANE
+        - BAMBOO
+        - CACTUS
+        - POWDER_SNOW_BUCKET
+        - INK_SAC
+        - WATER_BUCKET
+        - MILK_BUCKET
+        - LAVA_BUCKET
+        - OAK_LOG
+        - SPRUCE_LOG
+        - BIRCH_LOG
+        - JUNGLE_LOG
+        - ACACIA_LOG
+        - DARK_OAK_LOG
+        - MANGROVE_LOG
+        - CHERRY_LOG
+        - CRIMSON_STEM
+        - WARPED_STEM
+        - DIRT
+        - GRAVEL
+        - SAND
+        - COBBLESTONE
+        - GRANITE
+        - DIORITE
+        - ANDESITE
+        - OBSIDIAN
+        - NETHERRACK
+        - SPONGE
+        - SOUL_SAND
+        - SOUL_SOIL
+        - ICE
+        - END_STONE
+        - TOTEM_OF_UNDYING
+        - BROWN_MUSHROOM
+        - RED_MUSHROOM
 
-    commodity-entity-whitelist: #having items on whitelist disables blacklist
-      - chicken
-      - pig
-      - cow
-      - sheep
-      - mooshroom
-      - villager
+      commodity-item-blacklist:
+        - BARRIER
+        - COMMAND_BLOCK
+        - STRUCTURE_BLOCK
+        - STRUCTURE_VOID
 
-    # withers can be used for mining... imagine trading withers... hmmm....
-    commodity-entity-blacklist:
-      - ender_dragon
-      - warden
+      entity-whitelisting: true
+      commodity-entity-whitelist: #having items on whitelist disables blacklist
+        - PIG
+        - SHEEP
+        - COW
+        - CHICKEN
+        - MOOSHROOM
+        - VILLAGER
 
-    claiming-fees: 0
+      # withers can be used for mining... imagine trading withers... hmmm....
+      commodity-entity-blacklist:
+        - ENDER_DRAGON
+        - WARDEN
+
+    entity-claiming-fees: 0
 
 
-main-currency:
-  vault:
-    # sets vault as main currency if found in files
-    as-main-currency: true
+main-currency: # setting for the currency used to trade on the exchange (This can be changed in game)
 
-    # makes values of main currency be used instead of VLT
-    use-alias: false
+  # Sets Main currency to a currency with matching code
+  # If no match is found, the asset will be created using values below
+  currency: EMD_Villager Emerald_#00ff00
+  #
+  #           <code>_<name>_<hex color>
+  #
+  # Example: EMD_Villager Emerald_#21ff59   (use this if you want it to look good even if it's not found)
+  # Example: USD_US dollars                 (use if you want a random color)
+  # Example: EUR                            (use this is you are really sure currency already exists)
+  #
+  # creation:
+  # 3-letter codes only, example: USD ---> you have: 89.32 USD !!
+  # Name, color and description are optional. (color is selected at random) (name uses code)
 
-  # identifier for the currency example: USD ---> you have: 89.32 USD !!
-  currency-code: EMD
 
-  # name
-  name: Villager Emeralds
+  # When true, if no match is found a hook currency will take its place, or create if no hooks are found
+  # hooks: Vault (VLT), Player Points (PTS)
+  create-last-resort-only: true
 
-  # color for display on chat (hex #FFFFFF)
-  color: 00FF00
-
-  # initial currency new players will have on their wallets by default (other than 0 may devalue your currency, use only for initial supply)
+  # Initial amount of Main Currency that new players will have on their wallets by default (other than 0 may devalue your currency, use only for initial supply)
   initial-balance: 0
 
+  # currency that will be deposited or withdrawn for every hook
+  vault-currency: VLT_Vault Currency_#ffbb15
+  playerpoints-currency: PTS_Player Points_#ff6d92

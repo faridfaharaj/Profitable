@@ -1,5 +1,7 @@
 package com.faridfaharaj.profitable.commands;
 
+import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.tables.Candles;
 import com.faridfaharaj.profitable.util.TextUtil;
 import net.kyori.adventure.text.Component;
@@ -18,7 +20,9 @@ public class TopCommand  implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
 
-
+        if(Configuration.MULTIWORLD){
+            DataBase.universalUpdateWorld(sender);
+        }
         if(sender instanceof Player player){
 
             if(!sender.hasPermission("profitable.asset.tops")){

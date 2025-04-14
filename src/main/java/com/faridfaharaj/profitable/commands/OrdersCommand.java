@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.Orders;
@@ -16,11 +17,15 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class OrdersCommand  implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
 
+        if(Configuration.MULTIWORLD){
+            DataBase.universalUpdateWorld(sender);
+        }
         if(sender instanceof Player player){
 
             if(args.length > 0 && args[0].equals("cancel")){
@@ -37,7 +42,7 @@ public class OrdersCommand  implements CommandExecutor {
 
                 }
 
-                if(!Orders.cancelOrder(args[1], player)){
+                if(!Orders.cancelOrder(UUID.fromString(args[1]), player)){
                     TextUtil.sendError(sender, "Couldn't cancel that order");
                 }
                 return true;
@@ -88,12 +93,8 @@ public class OrdersCommand  implements CommandExecutor {
 
             List<String> suggestions = new ArrayList<>();
             if(args.length == 1){
-                suggestions = List.of("[<Page>]","cancel");
+                suggestions = List.of("[<Page>]");
 
-            }
-
-            if(args.length == 2){
-                suggestions = List.of("[<Order ID>]");
             }
 
             return suggestions;
