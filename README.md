@@ -1,7 +1,7 @@
 # Profitable
 Profitable is a Minecraft plugin that adds real supply and demand to the game by introducing an exchange system designed to be as close to reality as possible.
 
-A part of this pluggin was designed so people can learn a thing or two about trading and investments while playing this nice game, so realism and ease of use are core principles of this plugin :D.
+A part of this plugin was designed so people can learn a thing or two about trading and investments while playing this nice game, so realism and ease of use are core principles of this plugin :D.
 
 # Features
 
@@ -22,14 +22,14 @@ Although it is designed to work alongside other economy plugins, it can totally 
 
 ### Orders
 
-This plugins uses **Orders** to trade.
-Orders are instructions to sell or buy an asset (item, entity, currency, etc..) under specified conditions
+This plugin uses **Orders** to trade.
+Orders are instructions to sell or buy an asset (item, entity, currency, etc...) under specified conditions
 
 For example:
 
 - **Limit order** lets you choose price, but may not execute right away
 
-- **Market order** acts immediatly at the lowest available price
+- **Market order** acts immediately at the lowest available price
 
 Profitable will find the best prices in the order book, filling your order with as many existing orders as needed or just adding it to the book if no match is found;
 However, for you, it only takes a simple command.
@@ -74,22 +74,22 @@ This plugin supports vault, meaning it supports anything that vault supports (th
 
 Imagine you have a server where two groups of players start fighting, they start buying a lot of diamonds and netherite for gear so people start selling it a bit more expensive every time because they have to go farther and farther to find them, so **prices start rising**.
 
-now our friend **jhonny** here, notices this and buys 100 diamonds with all his balance expecting prices to go even higher,
+now our friend **johnny** here, notices this and buys 100 diamonds with all his balance expecting prices to go even higher,
 
-Sadly the leader of one of this groups gets banned a day later so they stop fighting, and now everyone has so many and the **price is so high** people dont wanna buy anymore. 
+Sadly the leader of one of these groups gets banned a day later so they stop fighting, and now everyone has so many and the **price is so high** people don't want to buy anymore. 
 And those who do, **want it cheaper**, so every time someone sells a diamond, it transacts with a cheaper order, so **prices start to fall**.
 
-jhonny has now a bunch of useless diamonds and no money,
+johnny has now a bunch of useless diamonds and no money,
 however, if **prices had gone up** as he expected **he'd be rich**
 
-Profitable makes this kind of scenarios possible, it lets everyone experience the actual depth of a real market. Its not just a store like many linear price adjustment systems that have led to **broken economies** due to farms and the rising number of raids, 
+Profitable makes this kind of scenarios possible, it lets everyone experience the actual depth of a real market. It's not just a store like many linear price adjustment systems that have led to **broken economies** due to farms and the rising number of raids, 
  
 **Profitable** not only makes that add to the fun, but prices adjust **themselves**. 
 Because you’re not just buying and selling; you’re participating in an **actual economy** where people and events are behind prices.
 With this plugin You can outsmart other players, invest, predict trends, and see how real markets work by playing a game.
 
 
-I hope with that i have convinced you to download this wonderful plugin, have a great day.
+I hope with that I have convinced you to download this wonderful plugin, have a great day.
 
 
 # Final notes

@@ -1,16 +1,11 @@
 Features----------------------------------------------------------------------
 
-----> ----> Add mySQL support <---- <----
-
-Add MariaDB support
-
 Add futures contracts
 Add options contracts
 
 Add stocks
 Add more assets
 
-Add Stop-limit orders
 Add Stop-loss orders
 Add Take-profit orders
 
@@ -33,7 +28,6 @@ Add more compatibility
 Fixing-----------------------------------------------------------------------
 
 add per world configuration
-Fix Multi-world support or rework completely
 
 Make more useful admin commands
 
