@@ -1,7 +1,7 @@
 package com.faridfaharaj.profitable.data;
 
 import com.faridfaharaj.profitable.Profitable;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -69,7 +69,7 @@ public class DataBase {
 
     //update world
     public static void updateWorld(World world) throws IOException {
-        currentWorldid = TextUtil.UUIDtoBytes(world.getUID());
+        currentWorldid = MessagingUtil.UUIDtoBytes(world.getUID());
     }
 
     public static void universalUpdateWorld(CommandSender sender) {

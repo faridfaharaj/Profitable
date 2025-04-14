@@ -5,7 +5,7 @@ import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -22,8 +22,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.world.WorldInitEvent;
-import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
@@ -101,10 +99,10 @@ public class Events implements Listener {
         if(Objects.equals(TemporalItems.holdingTemp.get(player.getUniqueId()), TemporalItems.TemporalItem.CLAIMINGTAG)){
             Entity entity = event.getRightClicked();
             if(entity.getCustomName() != null){
-                TextUtil.sendError(player, "Cannot claim named entities");
+                MessagingUtil.sendError(player, "Cannot claim named entities");
             }else if(!Configuration.ALLOWENTITIES.contains(entity.getType().name())){
 
-                TextUtil.sendError(player, "Owning this entity isn't allowed");
+                MessagingUtil.sendError(player, "Owning this entity isn't allowed");
 
             } else {
 
@@ -115,7 +113,7 @@ public class Events implements Listener {
                 }
 
                 entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));
-                TextUtil.sendCustomMessage(player, TextUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName() + " using: ")).append(Component.text(fees + " " + Configuration.MAINCURRENCYASSET.getCode(),Configuration.MAINCURRENCYASSET.getColor())));
+                MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName() + " using: ")).append(Component.text(fees + " " + Configuration.MAINCURRENCYASSET.getCode(),Configuration.MAINCURRENCYASSET.getColor())));
             }
             event.setCancelled(true);
         }
@@ -152,16 +150,16 @@ public class Events implements Listener {
                     Block block = event.getClickedBlock();
                     if(block != null){
                         if(!(block.getState() instanceof Container)){
-                            TextUtil.sendError(player, "Item delivery location must be a container");
+                            MessagingUtil.sendError(player, "Item delivery location must be a container");
                             return;
                         }
                         Location correctedlocation = block.getLocation();
                         if(Accounts.changeItemDelivery(Accounts.getAccount(player), correctedlocation)){
-                            TextUtil.sendSuccsess(player,"Updated item delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
+                            MessagingUtil.sendSuccsess(player,"Updated item delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
 
                             TemporalItems.removeTempItem(player);
                         }else {
-                            TextUtil.sendError(player, "Could not update Item delivery");
+                            MessagingUtil.sendError(player, "Could not update Item delivery");
                         }
                     }
 
@@ -181,7 +179,7 @@ public class Events implements Listener {
                         correctedlocation = correctedlocation.add(event.getBlockFace().getDirection());
 
                         Accounts.changeEntityDelivery(Accounts.getAccount(player), correctedlocation);
-                        TextUtil.sendSuccsess(player,"Updated entity delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
+                        MessagingUtil.sendSuccsess(player,"Updated entity delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
                         TemporalItems.removeTempItem(player);
                     }
 

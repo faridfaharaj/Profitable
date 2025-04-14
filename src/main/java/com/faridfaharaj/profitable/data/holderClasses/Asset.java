@@ -7,7 +7,7 @@ import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
 import com.faridfaharaj.profitable.hooks.VaultHook;
 import com.faridfaharaj.profitable.util.RandomUtil;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -391,7 +391,7 @@ public class Asset {
 
             }
 
-            TextUtil.sendError(player,notice + ", insufficient " + asset + " on your account");
+            MessagingUtil.sendError(player,notice + ", insufficient " + asset + " on your account");
 
             return false;
         }
@@ -422,7 +422,7 @@ public class Asset {
                 }
             }
 
-            TextUtil.sendError(player,notice + ", insufficient " + asset + " on your account");
+            MessagingUtil.sendError(player,notice + ", insufficient " + asset + " on your account");
 
             return false;
         }
@@ -456,7 +456,7 @@ public class Asset {
         }*/
 
 
-        TextUtil.sendError(player, notice + ", not enough " + asset.toLowerCase().replace("_", " "));
+        MessagingUtil.sendError(player, notice + ", not enough " + asset.toLowerCase().replace("_", " "));
         return false;
 
     }
@@ -495,7 +495,7 @@ public class Asset {
 
         }
 
-        TextUtil.sendError(player,notice + ", Not enough claimed " + asset.toLowerCase().replace("_", " ") + "s around");
+        MessagingUtil.sendError(player,notice + ", Not enough claimed " + asset.toLowerCase().replace("_", " ") + "s around");
         return false;
 
     }

@@ -3,8 +3,7 @@ package com.faridfaharaj.profitable.data.tables;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
-import com.faridfaharaj.profitable.util.TextUtil;
-import com.faridfaharaj.profitable.util.RandomUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -36,7 +35,7 @@ public class Accounts {
                 k -> {
             String uuidString = k.toString();
             registerDefaultAccount(uuidString);
-            TextUtil.sendSuccsess(player, "Logged into default account");
+            MessagingUtil.sendSuccsess(player, "Logged into default account");
             return uuidString;
         }
 

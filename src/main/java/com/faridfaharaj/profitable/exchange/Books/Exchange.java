@@ -10,7 +10,8 @@ import com.faridfaharaj.profitable.data.tables.Orders;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
+import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
@@ -27,25 +28,25 @@ public class Exchange {
 
         //validate
         if(Objects.equals(order.getAsset(), Configuration.MAINCURRENCYASSET.getCode())){
-            TextUtil.sendError(player, "Cannot trade " + order.getAsset() + " using " + order.getAsset());
+            MessagingUtil.sendError(player, "Cannot trade " + order.getAsset() + " using " + order.getAsset());
             return;
         }
 
         Asset tradedAsset = Assets.getAssetData(order.getAsset());
         if(tradedAsset == null){
-            TextUtil.sendError(player, "That asset cannot be traded here");
+            MessagingUtil.sendError(player, "That asset cannot be traded here");
             return;
         }
 
-        String assetTypeName = TextUtil.nameType(tradedAsset.getAssetType());
+        String assetTypeName = NamingUtil.nameType(tradedAsset.getAssetType());
         if(tradedAsset.getAssetType() == 2){
             if(!player.hasPermission("profitable.market.trade.asset.item")){
-                TextUtil.sendError(player, "You don't have permission to trade items");
+                MessagingUtil.sendError(player, "You don't have permission to trade items");
                 return;
             }
             if(Accounts.getItemDelivery(order.getOwner()) == null){
-                TextUtil.sendWarning(player, "You must set a location for delivery");
-                TextUtil.sendButton(player, "[/delivery set item]", "/delivery set item");
+                MessagingUtil.sendWarning(player, "You must set a location for delivery");
+                MessagingUtil.sendButton(player, "[/delivery set item]", "/delivery set item");
                 TemporalItems.sendDeliveryStick(player, true);
                 return;
             }
@@ -53,31 +54,31 @@ public class Exchange {
 
         }else if(tradedAsset.getAssetType() == 3){
             if(!player.hasPermission("profitable.market.trade.asset.entity")){
-                TextUtil.sendError(player, "You don't have permission to trade entities");
+                MessagingUtil.sendError(player, "You don't have permission to trade entities");
                 return;
             }
             if(Accounts.getEntityDelivery(order.getOwner()) == null){
-                TextUtil.sendWarning(player, "You must set a location for delivery");
-                TextUtil.sendButton(player, "[/delivery set entity]", "/delivery set entity");
+                MessagingUtil.sendWarning(player, "You must set a location for delivery");
+                MessagingUtil.sendButton(player, "[/delivery set entity]", "/delivery set entity");
                 TemporalItems.sendDeliveryStick(player, false);
                 return;
             }
 
 
         }else if(!player.hasPermission("profitable.market.trade.asset."+ assetTypeName.toLowerCase())){
-            TextUtil.sendError(player, "You don't have permission to trade assets from type: " + assetTypeName);
+            MessagingUtil.sendError(player, "You don't have permission to trade assets from type: " + assetTypeName);
             return;
         }
 
         if(tradedAsset.getAssetType() == 2 || tradedAsset.getAssetType() == 3) order.setUnits((int) order.getUnits());
 
         if(order.getUnits() <= 0){
-            TextUtil.sendError(player, "Units must be at least 1");
+            MessagingUtil.sendError(player, "Units must be at least 1");
             return;
         }
 
         if(order.getPrice() < 0){
-            TextUtil.sendError(player, "Invalid price");
+            MessagingUtil.sendError(player, "Invalid price");
             return;
         }
 
@@ -89,7 +90,7 @@ public class Exchange {
             Candle lastday = Candles.getLastDay(tradedAsset.getCode(), player.getWorld().getFullTime());
 
             if(order.isSideBuy()?lastday.getClose() >= order.getPrice(): lastday.getClose() <= order.getPrice()){
-                TextUtil.sendError(player, (order.isSideBuy()? "Stop price must be higher than market's when buying": "Stop price must be lower than market's when selling"));
+                MessagingUtil.sendError(player, (order.isSideBuy()? "Stop price must be higher than market's when buying": "Stop price must be lower than market's when selling"));
                 return;
             }
 
@@ -105,7 +106,7 @@ public class Exchange {
             Candle lastday = Candles.getLastDay(tradedAsset.getCode(), player.getWorld().getFullTime());
 
             if(order.isSideBuy()?order.getPrice() <= lastday.getClose() : lastday.getClose() <= order.getPrice()){
-                TextUtil.sendError(player, (order.isSideBuy()? "Stop price must be higher than market's when buying": "Stop price must be lower than market's when selling"));
+                MessagingUtil.sendError(player, (order.isSideBuy()? "Stop price must be higher than market's when buying": "Stop price must be lower than market's when selling"));
                 return;
             }
 
@@ -121,7 +122,7 @@ public class Exchange {
 
             //Market
             if(order.getType() == Order.OrderType.MARKET){
-                TextUtil.sendWarning(player, "No orders available, add a price to place limit order");
+                MessagingUtil.sendWarning(player, "No orders available, add a price to place limit order");
                 return;
             }
 
@@ -175,7 +176,7 @@ public class Exchange {
         if(unitsMissing > 0){
             sendTransactionNotice(player, order.isSideBuy(), tradedAsset.getColor(), order.getAsset(), (order.getUnits()-unitsMissing), moneyTransacted);
 
-            TextUtil.sendWarning(player, "Partially filled because no more orders are available");
+            MessagingUtil.sendWarning(player, "Partially filled because no more orders are available");
 
             if(order.getPrice() != Double.MAX_VALUE && order.getPrice() != Double.MIN_VALUE){
 
@@ -197,7 +198,7 @@ public class Exchange {
     }
 
     public static void sendTransactionNotice(Player player, boolean sideBuy, TextColor tradedColor, String tradedCode, double units, double money){
-        TextUtil.sendCustomMessage(player, TextUtil.profitablePrefix()
+        MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix()
                         .append(Component.text("Successfully ")).append(sideBuy?Component.text("bought ", Configuration.COLORBULLISH):Component.text("sold ", Configuration.COLORBEARISH))
                         .append(Component.text(units + " " + tradedCode, tradedColor))
                         .append(Component.text(" using "))
@@ -209,7 +210,7 @@ public class Exchange {
     public static void addToBook(Player player, Order order, Asset currency, Asset tradedasset){
         Orders.insertOrder(UUID.randomUUID(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), order.getType());
 
-        TextUtil.sendCustomMessage(player, TextUtil.profitablePrefix()
+        MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix()
                 .append(Component.text("New " + order.getType().toString().replace("_","-").toLowerCase() + " order ")).append(order.isSideBuy()?Component.text("Buy ", Configuration.COLORBULLISH):Component.text("Sell ", Configuration.COLORBEARISH))
                 .append(Component.text(order.getUnits() + " " + tradedasset.getCode(), tradedasset.getColor()))
                 .append(Component.text(" at "))
@@ -225,7 +226,7 @@ public class Exchange {
 
         if(sidebuy){
 
-            sendMessageDefaultAcc(sellerAccount, TextUtil.profitablePrefix()
+            sendMessageDefaultAcc(sellerAccount, MessagingUtil.profitablePrefix()
                     .append(Component.text("Successfully ")).append(Component.text("sold ", Configuration.COLORBEARISH))
                     .append(Component.text(units + " " + asset,assetColor))
                     .append(Component.text(" for "))
@@ -233,7 +234,7 @@ public class Exchange {
             );
 
         }else {
-            sendMessageDefaultAcc(buyerAccount, TextUtil.profitablePrefix()
+            sendMessageDefaultAcc(buyerAccount, MessagingUtil.profitablePrefix()
                     .append(Component.text("Successfully ")).append(Component.text("bought ", Configuration.COLORBULLISH))
                     .append(Component.text(units + " " + asset,assetColor))
                     .append(Component.text(" for "))
@@ -256,7 +257,7 @@ public class Exchange {
         Player player = Profitable.getInstance().getServer().getPlayer(playerid);
         if(player != null){
             Location location = player.getLocation();
-            TextUtil.sendCustomMessage(player, notice);
+            MessagingUtil.sendCustomMessage(player, notice);
             player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
             player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
             player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);

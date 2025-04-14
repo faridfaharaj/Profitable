@@ -1,31 +1,21 @@
 package com.faridfaharaj.profitable;
 
 import com.faridfaharaj.profitable.commands.*;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.Assets;
-import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
-import com.faridfaharaj.profitable.hooks.VaultHook;
-import com.faridfaharaj.profitable.util.TextUtil;
 import net.kyori.adventure.platform.bukkit.*;
 
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;

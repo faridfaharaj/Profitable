@@ -3,7 +3,7 @@ package com.faridfaharaj.profitable.commands;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.tables.Candles;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.command.Command;
@@ -26,13 +26,13 @@ public class TopCommand  implements CommandExecutor {
         if(sender instanceof Player player){
 
             if(!sender.hasPermission("profitable.asset.tops")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
             if(args.length == 0 || args[0].equals("HOT")){
 
-                TextUtil.sendCustomMessage(player,
+                MessagingUtil.sendCustomMessage(player,
 
                         Component.text("=========== [ HOT Assets ] ===========", TextColor.color(0xFF7C1E)).appendNewline().append(Candles.getHotAssets(player.getWorld().getFullTime(), 0))
 
@@ -40,7 +40,7 @@ public class TopCommand  implements CommandExecutor {
 
             }else if(args[0].equals("LIQUID")){
 
-                TextUtil.sendCustomMessage(player,
+                MessagingUtil.sendCustomMessage(player,
 
                         Component.text("========== [ Liquid Assets ] ==========", TextColor.color(0x2BCCFF)).appendNewline().append(Candles.getHotAssets(player.getWorld().getFullTime(),2))
 
@@ -48,7 +48,7 @@ public class TopCommand  implements CommandExecutor {
 
             }else if(args[0].equals("GROW")){
 
-                TextUtil.sendCustomMessage(player,
+                MessagingUtil.sendCustomMessage(player,
 
                         Component.text("========= [ Growing Assets ] =========", TextColor.color(0xFF7A)).appendNewline().append(Candles.getHotAssets(player.getWorld().getFullTime(),1))
 
@@ -56,14 +56,14 @@ public class TopCommand  implements CommandExecutor {
 
             }else if(args[0].equals("BIG")){
 
-                TextUtil.sendCustomMessage(player,
+                MessagingUtil.sendCustomMessage(player,
 
                         Component.text("========= [ Biggest Assets ] =========", TextColor.color(0xFFCA00)).appendNewline().append(Candles.getHotAssets(player.getWorld().getFullTime(),3))
 
                 );
 
             }else{
-                TextUtil.sendError(sender, "Invalid Subcommand");
+                MessagingUtil.sendError(sender, "Invalid Subcommand");
                 return true;
             }
 
@@ -71,7 +71,7 @@ public class TopCommand  implements CommandExecutor {
 
         }else{
 
-            TextUtil.sendGenericCantConsole(sender);
+            MessagingUtil.sendGenericCantConsole(sender);
 
         }
 

@@ -7,73 +7,13 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
-public class TextUtil {
-
-    private static final Map<String, String> commodityNaming = new HashMap<>();
-
-    private static final Pattern UNWANTED_SUFFIXES = Pattern.compile("_(block|ingot|nugget|bucket)$");
-
-    static {
-        commodityNaming.put("COW", "Live Cattle");
-        commodityNaming.put("PIG", "Lean Hogs");
-        commodityNaming.put("SHEEP", "Lamb");
-        commodityNaming.put("CHICKEN", "Broilers");
-
-        commodityNaming.put("ACACIA_PLANKS", "Lumber");
-        commodityNaming.put("ACACIA_LOG", "Timber");
-
-        commodityNaming.put("BIRCH_PLANKS", "Lumber");
-        commodityNaming.put("BIRCH_LOG", "Timber");
-
-        commodityNaming.put("CHERRY_PLANKS", "Lumber");
-        commodityNaming.put("CHERRY_LOG", "Timber");
-
-        commodityNaming.put("DARK_OAK_PLANKS", "Lumber");
-        commodityNaming.put("DARK_OAK_LOG", "Timber");
-
-        commodityNaming.put("JUNGLE_PLANKS", "Lumber");
-        commodityNaming.put("JUNGLE_LOG", "Timber");
-
-        commodityNaming.put("MANGROVE_PLANKS", "Lumber");
-        commodityNaming.put("MANGROVE_LOG", "Timber");
-
-        commodityNaming.put("OAK_PLANKS", "Lumber");
-        commodityNaming.put("OAK_LOG", "Timber");
-
-        commodityNaming.put("SPRUCE_PLANKS", "Lumber");
-        commodityNaming.put("SPRUCE_LOG", "Timber");
-    }
-
-
-
-
-    private static final String[] assetTypeNaming = {"" , "Forex", "Commodity", "Commodity", "Commodity", "Commodity", "Stock"};
-
-    public static String nameCommodity(String code) {
-        String name = commodityNaming.get(code);
-        if (name != null) {
-            return name;
-        }
-
-        return UNWANTED_SUFFIXES.matcher(code).replaceAll("").toLowerCase().replace("_", " ");
-    }
-
-    public static String nameType(int assetType) {
-        if (assetType < 1 || assetType >= assetTypeNaming.length) {
-            return "Unknown";
-        }
-        return assetTypeNaming[assetType];
-    }
+public class MessagingUtil {
 
     public static void sendButton(CommandSender sender, String text, String command){
 

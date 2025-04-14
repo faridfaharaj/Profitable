@@ -6,7 +6,7 @@ import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.hooks.VaultHook;
 import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -23,7 +23,7 @@ public class WalletCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
 
         if(!sender.hasPermission("profitable.account.info.wallet")){
-            TextUtil.sendGenericMissingPerm(sender);
+            MessagingUtil.sendGenericMissingPerm(sender);
             return true;
         }
 
@@ -38,10 +38,10 @@ public class WalletCommand implements CommandExecutor {
             if(args.length == 0){
 
                 String account = Accounts.getAccount(player);
-                TextUtil.sendCustomMessage(sender,
-                        TextUtil.profitableTopSeparator("Wallet","------------------").appendNewline()
+                MessagingUtil.sendCustomMessage(sender,
+                        MessagingUtil.profitableTopSeparator("Wallet","------------------").appendNewline()
                                 .append(AccountHoldings.AssetBalancesToString(account, 1)).appendNewline()
-                                .append(TextUtil.profitableBottomSeparator())
+                                .append(MessagingUtil.profitableBottomSeparator())
                 );
 
                 return true;
@@ -51,12 +51,12 @@ public class WalletCommand implements CommandExecutor {
                 if(args[0].equals("deposit")){
 
                     if(!sender.hasPermission("profitable.account.funds.deposit")){
-                        TextUtil.sendGenericMissingPerm(sender);
+                        MessagingUtil.sendGenericMissingPerm(sender);
                         return true;
                     }
 
                     if(args.length < 3){
-                        TextUtil.sendError(player, "/wallet deposit <Currency> <amount>");
+                        MessagingUtil.sendError(player, "/wallet deposit <Currency> <amount>");
                         return true;
                     }
 
@@ -64,11 +64,11 @@ public class WalletCommand implements CommandExecutor {
                     try{
                         ammount = Double.parseDouble(args[2]);
                         if(ammount == 0){
-                            TextUtil.sendError(sender, "Invalid amount");
+                            MessagingUtil.sendError(sender, "Invalid amount");
                             return true;
                         }
                     }catch (Exception e){
-                        TextUtil.sendError(sender, "Invalid amount");
+                        MessagingUtil.sendError(sender, "Invalid amount");
                         return true;
                     }
 
@@ -78,7 +78,7 @@ public class WalletCommand implements CommandExecutor {
                         Asset asset = VaultHook.getAsset();
                         if(VaultHook.getEconomy().withdrawPlayer(player, ammount).transactionSuccess()){
                             Asset.distributeAsset(Accounts.getAccount(player), asset.getCode(), 1, ammount);
-                            TextUtil.sendCustomMessage(sender, TextUtil.profitablePrefix().append(Component.text("Added ")).append(Component.text(ammount + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" to your wallet")));
+                            MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Added ")).append(Component.text(ammount + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" to your wallet")));
                             return true;
                         }
 
@@ -89,29 +89,29 @@ public class WalletCommand implements CommandExecutor {
                         Asset asset = PlayerPointsHook.getAsset();
                         int integerAmount = (int) ammount;
                         if(integerAmount <= 0){
-                            TextUtil.sendError(sender, "Cannot Withdraw fractional Player Points");
+                            MessagingUtil.sendError(sender, "Cannot Withdraw fractional Player Points");
                             return true;
                         }
                         if(PlayerPointsHook.getApi().take(player.getUniqueId(), integerAmount)){
                             Asset.distributeAsset(Accounts.getAccount(player), asset.getCode(), 1, integerAmount);
-                            TextUtil.sendCustomMessage(sender, TextUtil.profitablePrefix().append(Component.text("Added ")).append(Component.text(ammount + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" to your wallet")));
+                            MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Added ")).append(Component.text(ammount + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" to your wallet")));
                             return true;
                         }
 
                     }
 
 
-                    TextUtil.sendError(player, "Insufficient funds to deposit this amount");
+                    MessagingUtil.sendError(player, "Insufficient funds to deposit this amount");
                     return true;
                 }else if(args[0].equals("withdraw")){
 
                     if(!sender.hasPermission("profitable.account.funds.withdraw")){
-                        TextUtil.sendGenericMissingPerm(sender);
+                        MessagingUtil.sendGenericMissingPerm(sender);
                         return true;
                     }
 
                     if(args.length < 3){
-                        TextUtil.sendError(player, "/wallet withdraw <Currency> <amount>");
+                        MessagingUtil.sendError(player, "/wallet withdraw <Currency> <amount>");
                         return true;
                     }
 
@@ -119,11 +119,11 @@ public class WalletCommand implements CommandExecutor {
                     try{
                         ammount = Double.parseDouble(args[2]);
                         if(ammount == 0){
-                            TextUtil.sendError(sender, "Invalid amount");
+                            MessagingUtil.sendError(sender, "Invalid amount");
                             return true;
                         }
                     }catch (Exception e){
-                        TextUtil.sendError(sender, "Invalid amount");
+                        MessagingUtil.sendError(sender, "Invalid amount");
                         return true;
                     }
 
@@ -133,9 +133,9 @@ public class WalletCommand implements CommandExecutor {
                         if(Asset.retrieveBalance(player, "Cannot withdraw", asset.getCode(), ammount, false)){
                             EconomyResponse es = VaultHook.getEconomy().depositPlayer(player, ammount);
                             if(es.transactionSuccess()){
-                                TextUtil.sendCustomMessage(sender, TextUtil.profitablePrefix().append(Component.text("Taken ")).append(Component.text(ammount + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" from your wallet")));
+                                MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Taken ")).append(Component.text(ammount + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" from your wallet")));
                             }else{
-                                TextUtil.sendError(sender, es.errorMessage);
+                                MessagingUtil.sendError(sender, es.errorMessage);
                                 Asset.distributeAsset(Accounts.getAccount(player), asset.getCode(), 1, ammount);
                             }
                         }
@@ -144,26 +144,26 @@ public class WalletCommand implements CommandExecutor {
                         Asset asset = PlayerPointsHook.getAsset();
                         int integerAmount = (int) ammount;
                         if(integerAmount <= 0){
-                            TextUtil.sendError(sender, "Cannot Withdraw fractional Player Points");
+                            MessagingUtil.sendError(sender, "Cannot Withdraw fractional Player Points");
                             return true;
                         }
                         if(Asset.retrieveAsset(player, "Withdraw amount to PlayerPoints", asset.getCode(), 1, integerAmount) && PlayerPointsHook.getApi().give(player.getUniqueId(), integerAmount)){
-                            TextUtil.sendCustomMessage(sender, TextUtil.profitablePrefix().append(Component.text("Taken ")).append(Component.text(integerAmount + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" from your wallet")));
+                            MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Taken ")).append(Component.text(integerAmount + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" from your wallet")));
                         }
                     }else{
-                        TextUtil.sendError(sender, "Invalid Currency");
+                        MessagingUtil.sendError(sender, "Invalid Currency");
                         return true;
                     }
 
                     return true;
                 }else{
-                    TextUtil.sendError(sender, "Invalid Subcommand");
+                    MessagingUtil.sendError(sender, "Invalid Subcommand");
                 }
             }
 
             return true;
         }else{
-            TextUtil.sendGenericCantConsole(sender);
+            MessagingUtil.sendGenericCantConsole(sender);
         }
 
 

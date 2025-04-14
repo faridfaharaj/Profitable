@@ -4,7 +4,7 @@ import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -26,7 +26,7 @@ public class Orders {
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
             stmt.setBytes(1, DataBase.getCurrentWorld());
-            stmt.setBytes(2, TextUtil.UUIDtoBytes(uuid));
+            stmt.setBytes(2, MessagingUtil.UUIDtoBytes(uuid));
             stmt.setString(3, owner);
             stmt.setString(4, asset);
             stmt.setBoolean(5, sideBuy);
@@ -53,7 +53,7 @@ public class Orders {
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
             stmt.setDouble(1, newUnits);
             stmt.setBytes(2, DataBase.getCurrentWorld());
-            stmt.setBytes(3, TextUtil.UUIDtoBytes(uuid));
+            stmt.setBytes(3, MessagingUtil.UUIDtoBytes(uuid));
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -127,7 +127,7 @@ public class Orders {
                     double iteratedUnits = rs.getDouble("units");
 
                     Order order = new Order(
-                            TextUtil.UUIDfromBytes(rs.getBytes("order_uuid")),
+                            MessagingUtil.UUIDfromBytes(rs.getBytes("order_uuid")),
                             rs.getString("owner"),
                             rs.getString("asset_id"),
                             rs.getBoolean("sideBuy"),
@@ -205,7 +205,7 @@ public class Orders {
                 while (rs.next()) {
 
                     Order order = new Order(
-                            TextUtil.UUIDfromBytes(rs.getBytes("order_uuid")),
+                            MessagingUtil.UUIDfromBytes(rs.getBytes("order_uuid")),
                             rs.getString("owner"),
                             rs.getString("asset_id"),
                             rs.getBoolean("sideBuy"),
@@ -239,7 +239,7 @@ public class Orders {
                 while (rs.next()) {
 
                     Order order = new Order(
-                            TextUtil.UUIDfromBytes(rs.getBytes("order_uuid")),
+                            MessagingUtil.UUIDfromBytes(rs.getBytes("order_uuid")),
                             rs.getString("owner"),
                             rs.getString("asset_id"),
                             rs.getBoolean("sideBuy"),
@@ -266,13 +266,13 @@ public class Orders {
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
             stmt.setBytes(1, DataBase.getCurrentWorld());
-            stmt.setBytes(2, TextUtil.UUIDtoBytes(uuid));
+            stmt.setBytes(2, MessagingUtil.UUIDtoBytes(uuid));
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
 
                     return new Order(
-                            TextUtil.UUIDfromBytes(rs.getBytes("order_uuid")),
+                            MessagingUtil.UUIDfromBytes(rs.getBytes("order_uuid")),
                             rs.getString("owner"),
                             rs.getString("asset_id"),
                             rs.getBoolean("sideBuy"),
@@ -305,7 +305,7 @@ public class Orders {
 
             while (rs.next()) {
                 Order order = new Order(
-                        TextUtil.UUIDfromBytes(rs.getBytes("order_uuid")),
+                        MessagingUtil.UUIDfromBytes(rs.getBytes("order_uuid")),
                         rs.getString("owner"),
                         rs.getString("asset_id"),
                         rs.getBoolean("sideBuy"),
@@ -334,7 +334,7 @@ public class Orders {
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
             for (UUID uuid : uuids) {
                 stmt.setBytes(1, DataBase.getCurrentWorld());
-                stmt.setBytes(2, TextUtil.UUIDtoBytes(uuid));
+                stmt.setBytes(2, MessagingUtil.UUIDtoBytes(uuid));
                 stmt.addBatch();
             }
 
@@ -352,7 +352,7 @@ public class Orders {
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
             stmt.setBytes(1, DataBase.getCurrentWorld());
-            stmt.setBytes(2, TextUtil.UUIDtoBytes(uuid));
+            stmt.setBytes(2, MessagingUtil.UUIDtoBytes(uuid));
             int rows = stmt.executeUpdate();
             return rows > 0;
 
@@ -397,8 +397,8 @@ public class Orders {
 
         Orders.deleteOrder(order.getUuid());
 
-        TextUtil.sendCustomMessage(player, Component.text("Cancelled ").append(order.toStringSimplified()));
-        TextUtil.sendCustomMessage(player, TextUtil.profitablePrefix().append(Component.text("Sent ")).append(Component.text(ammountToSendBack + " " + asset.getCode(), asset.getColor())).append(Component.text(" back to you")));
+        MessagingUtil.sendCustomMessage(player, Component.text("Cancelled ").append(order.toStringSimplified()));
+        MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Sent ")).append(Component.text(ammountToSendBack + " " + asset.getCode(), asset.getColor())).append(Component.text(" back to you")));
 
         return true;
     }

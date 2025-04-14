@@ -3,7 +3,7 @@ package com.faridfaharaj.profitable.commands;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.tables.Accounts;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
@@ -35,7 +35,7 @@ public class AccountCommand implements CommandExecutor {
         if(args.length == 0){
             if(player != null){
                 String account = Accounts.getAccount(player);
-                TextUtil.sendCustomMessage(sender, Component.text("").append(TextUtil.profitablePrefix()).append(Component.text("Account: "))
+                MessagingUtil.sendCustomMessage(sender, Component.text("").append(MessagingUtil.profitablePrefix()).append(Component.text("Account: "))
                         .append((Objects.equals(account, player.getUniqueId().toString()) ?
                         Component.text("(Default)").color(Configuration.COLOREMPTY):
                         Component.text(account).color(Configuration.COLORINFO))));
@@ -48,29 +48,29 @@ public class AccountCommand implements CommandExecutor {
         if(args[0].equals("register")){
 
             if(!sender.hasPermission("profitable.account.manage.register")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
             if(args.length < 4){
-                TextUtil.sendError(sender, "/account register <Username> <Password> <Repeat Password>");
+                MessagingUtil.sendError(sender, "/account register <Username> <Password> <Repeat Password>");
                 return true;
             }
 
             if(Objects.equals(args[2], args[3])){
                 if(args[2].length() < 32){
                     if(Accounts.registerAccount(args[1], args[2])){
-                        TextUtil.sendSuccsess(sender, "Account " + args[1] + " registered successfully");
+                        MessagingUtil.sendSuccsess(sender, "Account " + args[1] + " registered successfully");
                         return true;
                     }else{
-                        TextUtil.sendError(sender, "Account already exists");
+                        MessagingUtil.sendError(sender, "Account already exists");
                         return true;
                     }
                 }else{
-                    TextUtil.sendError(sender, "Max password length is 32 characters");
+                    MessagingUtil.sendError(sender, "Max password length is 32 characters");
                 }
             }else {
-                TextUtil.sendError(sender, "Passwords don't match");
+                MessagingUtil.sendError(sender, "Passwords don't match");
                 return true;
             }
 
@@ -79,12 +79,12 @@ public class AccountCommand implements CommandExecutor {
         if(args[0].equals("delete")){
 
             if(!sender.hasPermission("profitable.account.manage.delete")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
             if(args.length < 3){
-                TextUtil.sendError(sender, "/account delete <Account> <password>");
+                MessagingUtil.sendError(sender, "/account delete <Account> <password>");
                 return true;
             }
 
@@ -93,33 +93,33 @@ public class AccountCommand implements CommandExecutor {
                 UUID playerid = player.getUniqueId();
 
                 if(Objects.equals(playerid.toString(), args[2])){
-                    TextUtil.sendError(sender, "Cannot delete default account");
+                    MessagingUtil.sendError(sender, "Cannot delete default account");
                 }
 
                 if(Objects.equals(account, Accounts.getAccount(player))){
 
                     if(!Accounts.comparePasswords(account, args[2])){
-                        TextUtil.sendError(sender, "Passwords don't match");
+                        MessagingUtil.sendError(sender, "Passwords don't match");
                         return true;
                     }
 
                     Accounts.logOut(playerid);
                     if(Accounts.getCurrentAccounts().containsValue(account)) {
-                        TextUtil.sendError(sender, "Someone else is still using this account, cannot delete");
+                        MessagingUtil.sendError(sender, "Someone else is still using this account, cannot delete");
                     }else{
                         Accounts.deleteAccount(account);
-                        TextUtil.sendCustomMessage(sender, TextUtil.profitablePrefix().append(Component.text("DELETED account: " + account).color(NamedTextColor.RED)));
+                        MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("DELETED account: " + account).color(NamedTextColor.RED)));
                     }
                     return true;
 
                 }else{
-                    TextUtil.sendError(sender, "Account name doesn't match with active account's");
+                    MessagingUtil.sendError(sender, "Account name doesn't match with active account's");
                 }
 
                 return true;
 
             }else{
-                TextUtil.sendError(sender, "cannot run this from console");
+                MessagingUtil.sendError(sender, "cannot run this from console");
                 return true;
             }
 
@@ -128,30 +128,30 @@ public class AccountCommand implements CommandExecutor {
         if(args[0].equals("login")){
 
             if(!sender.hasPermission("profitable.account.manage.login")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
             if(args.length < 3){
-                TextUtil.sendError(sender, "/account login <Account> <Password>");
+                MessagingUtil.sendError(sender, "/account login <Account> <Password>");
                 return true;
             }
 
             if(player != null){
 
                 if(Objects.equals(args[1], Accounts.getCurrentAccounts().get(player.getUniqueId()))){
-                    TextUtil.sendError(sender, "Already logged in");
+                    MessagingUtil.sendError(sender, "Already logged in");
                     return true;
                 }
 
                 if(Accounts.logIn(player.getUniqueId(), args[1], args[2])){
-                    TextUtil.sendSuccsess(sender,"successfully logged into " + args[1]);
+                    MessagingUtil.sendSuccsess(sender,"successfully logged into " + args[1]);
                 }else{
-                    TextUtil.sendError(sender, "Incorrect account or password");
+                    MessagingUtil.sendError(sender, "Incorrect account or password");
                 }
                 return true;
             }else{
-                TextUtil.sendGenericCantConsole(sender);
+                MessagingUtil.sendGenericCantConsole(sender);
             }
 
         }
@@ -159,20 +159,20 @@ public class AccountCommand implements CommandExecutor {
         if(args[0].equals("logout")){
 
             if(!sender.hasPermission("profitable.account.manage.logout")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
             if(player != null){
                 UUID playerid = player.getUniqueId();
                 if(!Accounts.getCurrentAccounts().containsKey(playerid)){
-                    TextUtil.sendError(sender, "No active account found");
+                    MessagingUtil.sendError(sender, "No active account found");
                     return true;
                 }
 
                 Accounts.logOut(playerid);
 
-                TextUtil.sendSuccsess(sender,"Logged out successfully");
+                MessagingUtil.sendSuccsess(sender,"Logged out successfully");
                 return  true;
 
             }
@@ -182,12 +182,12 @@ public class AccountCommand implements CommandExecutor {
         if(args[0].equals("password")){
 
             if(!sender.hasPermission("profitable.account.manage.password")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
             if(args.length < 3){
-                TextUtil.sendError(sender,"/account password <Old password> <New password>");
+                MessagingUtil.sendError(sender,"/account password <Old password> <New password>");
                 return true;
             }
 
@@ -196,22 +196,22 @@ public class AccountCommand implements CommandExecutor {
                 if(Accounts.comparePasswords(account, args[1])){
                     if(args[2].length() < 32){
                         Accounts.changePassword(account, args[2]);
-                        TextUtil.sendSuccsess(sender, "Password updated successfully");
+                        MessagingUtil.sendSuccsess(sender, "Password updated successfully");
                     }else{
-                        TextUtil.sendError(sender, "Max password length is 32 characters");
+                        MessagingUtil.sendError(sender, "Max password length is 32 characters");
                     }
                 }else{
-                    TextUtil.sendError(sender,"Incorrect password");
+                    MessagingUtil.sendError(sender,"Incorrect password");
                 }
             }else{
-                TextUtil.sendGenericCantConsole(sender);
+                MessagingUtil.sendGenericCantConsole(sender);
             }
             return true;
         }
 
 
 
-        TextUtil.sendError(sender, "Invalid Subcommand");
+        MessagingUtil.sendError(sender, "Invalid Subcommand");
         return true;
     }
 

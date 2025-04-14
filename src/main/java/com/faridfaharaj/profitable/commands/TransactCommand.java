@@ -6,7 +6,7 @@ import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.exchange.Books.Exchange;
 import com.faridfaharaj.profitable.hooks.VaultHook;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,7 +50,7 @@ public class TransactCommand implements CommandExecutor {
                 try{
                     price = Double.parseDouble(args[2]);
                 }catch (Exception e){
-                    TextUtil.sendError(sender, "Invalid Price");
+                    MessagingUtil.sendError(sender, "Invalid Price");
                     return true;
                 }
 
@@ -68,12 +68,12 @@ public class TransactCommand implements CommandExecutor {
 
                 }else if (args[3].equals("market")) {
 
-                    TextUtil.sendWarning(sender, "Ignoring price for market order");
+                    MessagingUtil.sendWarning(sender, "Ignoring price for market order");
                     price = sideBuy?Double.MAX_VALUE:Double.MIN_VALUE;
                     orderType = Order.OrderType.MARKET;
 
                 } else{
-                    TextUtil.sendError(sender,"Invalid Order Type");
+                    MessagingUtil.sendError(sender,"Invalid Order Type");
                     return true;
                 }
             }
@@ -87,7 +87,7 @@ public class TransactCommand implements CommandExecutor {
                 try{
                     units = Double.parseDouble(args[1]);
                 }catch (Exception e){
-                    TextUtil.sendError(sender, "Invalid Units");
+                    MessagingUtil.sendError(sender, "Invalid Units");
                     return true;
                 }
             }

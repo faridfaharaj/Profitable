@@ -6,14 +6,14 @@ import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
 import com.faridfaharaj.profitable.hooks.VaultHook;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
+import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -256,7 +256,7 @@ public class Assets {
             //Base commodity items
             for(String item : Configuration.ALLOWEITEMS){
                 try {
-                    Assets.addAsset(item, 2, Asset.metaData(Configuration.COLOREMPTY.value(), TextUtil.nameCommodity(item)));
+                    Assets.addAsset(item, 2, Asset.metaData(Configuration.COLOREMPTY.value(), NamingUtil.nameCommodity(item)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -265,7 +265,7 @@ public class Assets {
             //Base commodity entities
             for(String entity : Configuration.ALLOWENTITIES){
                 try {
-                    Assets.addAsset(entity, 3, Asset.metaData(Configuration.COLOREMPTY.value(), TextUtil.nameCommodity(entity)));
+                    Assets.addAsset(entity, 3, Asset.metaData(Configuration.COLOREMPTY.value(), NamingUtil.nameCommodity(entity)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

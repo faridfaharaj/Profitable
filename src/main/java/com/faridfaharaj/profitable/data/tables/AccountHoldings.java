@@ -4,7 +4,6 @@ import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
-import com.faridfaharaj.profitable.util.TextUtil;
 import net.kyori.adventure.text.Component;
 
 import java.io.IOException;

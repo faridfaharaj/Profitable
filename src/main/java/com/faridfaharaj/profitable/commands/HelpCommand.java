@@ -1,6 +1,6 @@
 package com.faridfaharaj.profitable.commands;
 
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -202,10 +202,10 @@ public class HelpCommand implements CommandExecutor {
             page = 0;
         }
 
-        TextUtil.sendCustomMessage(sender,
-                TextUtil.profitableTopSeparator().appendNewline()
+        MessagingUtil.sendCustomMessage(sender,
+                MessagingUtil.profitableTopSeparator().appendNewline()
                         .append(Component.text(pages[page])).appendNewline()
-                        .append(TextUtil.profitableBottomSeparator())
+                        .append(MessagingUtil.profitableBottomSeparator())
         );
 
         return true;

@@ -7,7 +7,8 @@ import com.faridfaharaj.profitable.data.tables.Candles;
 import com.faridfaharaj.profitable.data.tables.Orders;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
+import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
@@ -68,7 +69,7 @@ public class TemporalItems {
         Asset asset = Assets.getAssetData(assetid);
 
         if(asset == null){
-            TextUtil.sendError(player, "This asset isn't traded here");
+            MessagingUtil.sendError(player, "This asset isn't traded here");
             return;
         }
 
@@ -81,7 +82,7 @@ public class TemporalItems {
 
 
         String symbol = asset.getAssetType() == 1? Configuration.MAINCURRENCYASSET.getCode() + "/" + asset.getCode():asset.getCode();
-        String footer = TextUtil.nameType(asset.getAssetType())+ " market";
+        String footer = NamingUtil.nameType(asset.getAssetType())+ " market";
         Candle lastestDay = Candles.getLastDay(assetid, player.getWorld().getFullTime());
         double price = lastestDay.getClose(),
                 change = lastestDay.getClose()-lastestDay.getOpen(),
@@ -109,10 +110,10 @@ public class TemporalItems {
 
 
         //summary
-        TextUtil.sendCustomMessage( player,
-                TextUtil.profitableTopSeparator("Overview", "----------------").appendNewline()
+        MessagingUtil.sendCustomMessage( player,
+                MessagingUtil.profitableTopSeparator("Overview", "----------------").appendNewline()
                         .appendNewline()
-                        .append(Component.text("     ")).append(Component.text(symbol, asset.getColor()).decorate(TextDecoration.BOLD).hoverEvent(HoverEvent.showText(Component.text("").append(Component.text(asset.getName(), asset.getColor())).appendNewline().append(Component.text(TextUtil.nameType(asset.getAssetType()), NamedTextColor.GRAY)))))
+                        .append(Component.text("     ")).append(Component.text(symbol, asset.getColor()).decorate(TextDecoration.BOLD).hoverEvent(HoverEvent.showText(Component.text("").append(Component.text(asset.getName(), asset.getColor())).appendNewline().append(Component.text(NamingUtil.nameType(asset.getAssetType()), NamedTextColor.GRAY)))))
 
                         .append( Component.text( "  ").append(Component.text(priceStr).hoverEvent(HoverEvent.showText(Component.text("Last price traded")))).append( Component.text( "  ")))
                         .append(Component.text(dayChange,(change<0?Configuration.COLORBEARISH:Configuration.COLORBULLISH)).hoverEvent(HoverEvent.showText(Component.text("How much the price changed today, both in difference and percentage")))).appendNewline()
@@ -128,7 +129,7 @@ public class TemporalItems {
                                         Component.text("$"+ask).color(Configuration.COLORBEARISH)))).appendNewline()
                         .appendNewline()
                         .append(Component.text("[View graphs]",Configuration.COLORINFO).clickEvent(ClickEvent.runCommand("/asset " + asset.getCode() + " graph")).hoverEvent(HoverEvent.showText(Component.text("/asset " + asset.getCode() + " graph", Configuration.COLORINFO)))).appendNewline()
-                        .append(TextUtil.profitableBottomSeparator())
+                        .append(MessagingUtil.profitableBottomSeparator())
         );
 
         Component bookTitle = Component.text("Encyclopedia of cats");
@@ -146,11 +147,11 @@ public class TemporalItems {
     public static void sendClaimingTag(Player player){
 
         if(player.getInventory().getItemInMainHand().getType() != Material.AIR){
-            TextUtil.sendError(player, "you must have your main hand free");
+            MessagingUtil.sendError(player, "you must have your main hand free");
             return;
         }
 
-        TextUtil.sendWarning(player,"Claiming fees are " + Profitable.getInstance().getConfig().getDouble("exchange.commodities.generation.entity-claiming-fees") + " " + Configuration.MAINCURRENCYASSET.getCode() + " per entity");
+        MessagingUtil.sendWarning(player,"Claiming fees are " + Profitable.getInstance().getConfig().getDouble("exchange.commodities.generation.entity-claiming-fees") + " " + Configuration.MAINCURRENCYASSET.getCode() + " per entity");
 
         TemporalItems.addTemp(player, TemporalItem.CLAIMINGTAG);
 
@@ -171,7 +172,7 @@ public class TemporalItems {
     public static void sendDeliveryStick(Player player, boolean items){
 
         if(player.getInventory().getItemInMainHand().getType() != Material.AIR){
-            TextUtil.sendError(player, "you must have your main hand free");
+            MessagingUtil.sendError(player, "you must have your main hand free");
             return;
         }
 
@@ -194,14 +195,14 @@ public class TemporalItems {
     public static void sendGraphMap(Player player, String assetid, long time, String interval){
 
         if(player.getInventory().getItemInMainHand().getType() != Material.AIR){
-            TextUtil.sendError(player, "you must have your main hand free");
+            MessagingUtil.sendError(player, "you must have your main hand free");
             return;
         }
 
         Asset asset = Assets.getAssetData(assetid);
 
         if(asset == null){
-            TextUtil.sendError(player, "This asset isn't traded here");
+            MessagingUtil.sendError(player, "This asset isn't traded here");
             return;
         }
 
