@@ -55,10 +55,9 @@ Since Profitable is a plugin designed to simulate real trading, which includes s
 
 Players can monitor **prices**, **price movements**, **liquidity**, **supply**, and more stuff using:
 
-``/asset peek <asset>``
+``/asset <asset>``
 
-![Untitled video - Made with Clipchamp (2)](https://github.com/user-attachments/assets/c0f40c8b-6477-47f9-84f1-947d9ac7eff9)
-
+![Screenshot 2025-03-31 172023](https://github.com/user-attachments/assets/abca4ece-a906-47bd-8494-3e19f9007346)
 
 
 Even get some nice fancy candle graphs, so players can predict and profit off of speculation.
@@ -96,3 +95,5 @@ I hope with that i have convinced you to download this wonderful plugin, have a 
 # Final notes
 
 This is an early version of the plugin. Future updates will bring more refined features and improvements.
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V110GP3T)
