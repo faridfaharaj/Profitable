@@ -106,7 +106,7 @@ public class Events implements Listener {
 
             } else {
 
-                double fees = Profitable.getInstance().getConfig().getDouble("exchange.commodities.generation.entity-claiming-fees");
+                double fees = Profitable.getInstance().getConfig().getDouble("exchange.commodities.fees.entity-claiming-fees");
                 if(fees > 0 && !Asset.retrieveAsset(player, "Couldn't claim "+ entity.getName() , Configuration.MAINCURRENCYASSET.getCode(), Configuration.MAINCURRENCYASSET.getAssetType(), fees)){
                     event.setCancelled(true);
                     return;

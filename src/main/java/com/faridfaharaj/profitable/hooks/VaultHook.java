@@ -25,9 +25,10 @@ public class VaultHook {
 
         }
 
-        ASSET = Asset.StringToCurrency(profitable.getConfig().getString("main-currency.vault-currency", "VLT_Vault Currency_#ffbb15"));
-
-        if(isConnected) profitable.getLogger().info("Connected to Vault");
+        if(isConnected) {
+            ASSET = Asset.StringToCurrency(profitable.getConfig().getString("main-currency.vault-currency", "VLT_Vault Currency_#ffbb15"));
+            profitable.getLogger().info("Connected to Vault");
+        }
         return isConnected;
     }
 

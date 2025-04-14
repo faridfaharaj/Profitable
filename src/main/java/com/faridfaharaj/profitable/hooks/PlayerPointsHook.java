@@ -19,31 +19,24 @@ public class PlayerPointsHook {
     }
 
     public static boolean initHook(Profitable profitable){
-        if (Bukkit.getPluginManager().isPluginEnabled("PlayerPoints")) {
-            api = PlayerPoints.getInstance().getAPI();
+        if(profitable.getConfig().getBoolean("player-points-support")){
+            if (Bukkit.getPluginManager().isPluginEnabled("PlayerPoints")) {
+                api = PlayerPoints.getInstance().getAPI();
+                isConnected = api != null;
+            }
+        }else {
+            isConnected = false;
         }
 
-        ASSET = Asset.StringToCurrency(profitable.getConfig().getString("main-currency.playerpoints-currency", "PTS_Player Points_#ff6d92"));
-
-        isConnected = api != null;
-        if(isConnected) profitable.getLogger().info("Connected to PlayerPoints");
-
+        if(isConnected) {
+            ASSET = Asset.StringToCurrency(profitable.getConfig().getString("main-currency.playerpoints-currency", "PTS_Player Points_#ff6d92"));
+            profitable.getLogger().info("Connected to PlayerPoints");
+        }
         return isConnected;
     }
 
     public static Asset getAsset(){
         return ASSET;
-    }
-
-    public static byte[] getCurrencyMeta() throws IOException {
-
-        return Asset.metaData(
-
-                ASSET.getColor().value(),
-                ASSET.getName()
-
-        );
-
     }
 
     public static boolean isConnected(){

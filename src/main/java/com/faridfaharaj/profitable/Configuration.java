@@ -22,8 +22,8 @@ public class Configuration {
     //VISUAL
     public static TextColor COLORPROFITABLE = TextColor.color(0x64FF9D);
 
-    public static TextColor COLORBULLISH = TextColor.color(0x8CD740);
-    public static TextColor COLORBEARISH = TextColor.color(0xFA413B);
+    public static TextColor COLORBULLISH;
+    public static TextColor COLORBEARISH;
 
     public static final TextColor COLORTEXT = NamedTextColor.WHITE;
     public static final TextColor COLORERROR = NamedTextColor.RED;
@@ -53,7 +53,7 @@ public class Configuration {
         profitable.saveDefaultConfig();
         FileConfiguration config = profitable.getConfig();
 
-        MULTIWORLD = config.getBoolean("database.database-per-world");
+        MULTIWORLD = config.getBoolean("database.data-per-world");
         GENERATEASSETS = config.getBoolean("exchange.commodities.generation.active");
 
         if(GENERATEASSETS){
@@ -151,13 +151,17 @@ public class Configuration {
 
         }
 
-        //hooks
+        // hooks
         if(VaultHook.inithook(profitable)){
             HOOKED = true;
         }
         if(PlayerPointsHook.initHook(profitable)){
             HOOKED = true;
         }
+
+        // Colors
+        COLORBULLISH = TextColor.fromHexString(config.getString("colors.bullish", "#8CD740"));
+        COLORBEARISH = TextColor.fromHexString(config.getString("colors.bearish", "#FA413B"));
     }
 
     public static void loadMainCurrency() throws IOException {

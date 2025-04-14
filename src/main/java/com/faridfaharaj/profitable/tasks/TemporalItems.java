@@ -151,7 +151,7 @@ public class TemporalItems {
             return;
         }
 
-        MessagingUtil.sendWarning(player,"Claiming fees are " + Profitable.getInstance().getConfig().getDouble("exchange.commodities.generation.entity-claiming-fees") + " " + Configuration.MAINCURRENCYASSET.getCode() + " per entity");
+        MessagingUtil.sendWarning(player,"Claiming fees are " + Profitable.getInstance().getConfig().getDouble("exchange.commodities.fees.entity-claiming-fees") + " " + Configuration.MAINCURRENCYASSET.getCode() + " per entity");
 
         TemporalItems.addTemp(player, TemporalItem.CLAIMINGTAG);
 

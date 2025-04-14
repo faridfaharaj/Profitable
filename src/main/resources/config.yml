@@ -1,7 +1,19 @@
+# allows Vault currency be added as an asset, withdrawn or deposited to your account
+vault-support: true
+
+# allows PlayerPoints currency be added as an asset, withdrawn or deposited to your account
+player-points-support: true
+
+colors: # Allows customization of command outputs and graphs
+  # Color for prices going up (hex)
+  bullish: "#8CD740"
+
+  # Color for prices going down (hex)
+  bearish: "#FA413B"
 
 database:
   # orders are able to transact across worlds if false
-  database-per-world: false
+  data-per-world: false
 
   # (0)-SQLite (1)-mySQL
   database-type: 0
@@ -14,12 +26,22 @@ database:
     password:
     options: "?useSSL=true&requireSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true"
 
-# allows vault currency be added as an asset, and can be withdrawn or deposited to your account
-vault-support: true
-
 exchange:
+  fees: # Fixed: 23    Percentage: 23%
+    # Fees when you take money from your wallet
+    withdrawal-fees: 0
+    # Fees when you add money to your wallet
+    deposit-fees: 0
 
   commodities:
+    fees: # Fixed: 23    Percentage: 23%
+      # Fees when you transact immediately with another order
+      taker-fees: 0
+      # Fees when you add an order to the order book
+      maker-fees: 0
+
+      # Fees when you use the claiming tag on an entity (fixed only)
+      entity-claiming-fees: 0
 
     # note: commodities are RAW and FUNGIBLE materials traded in BULK that are then processed into different products
     #       crops and building material can be commodities as well:
@@ -40,8 +62,9 @@ exchange:
       # Allows auto-generation of assets for commodities in each world using whitelisting/blacklisting
       active: true
 
+      # Enables whitelist and disables blacklist for items
       item-whitelisting: true
-      commodity-item-whitelist: #having items on whitelist disables blacklist
+      commodity-item-whitelist:
         - COAL
         - CHARCOAL
         - IRON_INGOT
@@ -147,8 +170,9 @@ exchange:
         - STRUCTURE_BLOCK
         - STRUCTURE_VOID
 
+      # Enables whitelist and disables blacklist for items
       entity-whitelisting: true
-      commodity-entity-whitelist: #having items on whitelist disables blacklist
+      commodity-entity-whitelist:
         - PIG
         - SHEEP
         - COW
@@ -161,8 +185,12 @@ exchange:
         - ENDER_DRAGON
         - WARDEN
 
-    entity-claiming-fees: 0
-
+  forex:
+    fees: # Fixed: 23    Percentage: 23%
+      # Fees when you transact immediately with another order
+      taker-fees: 0
+      # Fees when you add an order to the order book
+      maker-fees: 0
 
 main-currency: # setting for the currency used to trade on the exchange (This can be changed in game)
 
