@@ -1,5 +1,6 @@
 package com.faridfaharaj.profitable.data.holderClasses;
 
+import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.Scheduler;
 import com.faridfaharaj.profitable.data.tables.Accounts;
@@ -378,13 +379,28 @@ public class Asset {
 
             if(Objects.equals(asset, VaultHook.getAsset().getCode())){
 
-                if(VaultHook.getEconomy().withdrawPlayer(player, ammount).transactionSuccess()){
+                double fee = Configuration.parseFee(Configuration.DEPOSITFEES, ammount);
+
+                if(VaultHook.getEconomy().withdrawPlayer(player, ammount+fee).transactionSuccess()){
+                    MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Automatically deposited "))
+                            .append(Component.text(ammount+ " " + asset, VaultHook.getAsset().getColor()))
+                            .append(Component.text(fee == 0?"":" (+ fees)", NamedTextColor.RED))
+                    );
                     return true;
                 }
 
             } else if (Objects.equals(asset, PlayerPointsHook.getAsset().getCode())) {
 
-                if(PlayerPointsHook.getApi().take(player.getUniqueId(), (int) Math.ceil(ammount))){
+                double fee = Configuration.parseFee(Configuration.DEPOSITFEES, ammount);
+                double total = Math.ceil(ammount+fee);
+                if(PlayerPointsHook.getApi().take(player.getUniqueId(), (int) total)){
+                    if(total-ammount+fee != 0){
+                        AccountHoldings.setHolding(account, asset, balance+(total-ammount+fee));
+                    }
+                    MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Automatically deposited "))
+                            .append(Component.text(ammount+ " " + asset, PlayerPointsHook.getAsset().getColor()))
+                            .append(Component.text(fee == 0?"":" (+ fees)", NamedTextColor.RED))
+                    );
                     return true;
                 }
 

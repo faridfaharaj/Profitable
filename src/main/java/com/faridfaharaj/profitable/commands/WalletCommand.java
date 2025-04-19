@@ -63,7 +63,7 @@ public class WalletCommand implements CommandExecutor {
                     double ammount;
                     try{
                         ammount = Double.parseDouble(args[2]);
-                        if(ammount == 0){
+                        if(ammount <= 0){
                             MessagingUtil.sendError(sender, "Invalid amount");
                             return true;
                         }
@@ -90,15 +90,15 @@ public class WalletCommand implements CommandExecutor {
                     }
 
                     if (PlayerPointsHook.isConnected() && Objects.equals(PlayerPointsHook.getAsset().getCode(), args[1])){
-                        fee = (int) fee;
+                        fee = Math.ceil(fee);
                         Asset asset = PlayerPointsHook.getAsset();
                         int integerAmount = (int) ammount;
-                        if(integerAmount <= 0){
+                        if(integerAmount < 1){
                             MessagingUtil.sendError(sender, "Cannot Withdraw fractional Player Points");
                             return true;
                         }
                         if(PlayerPointsHook.getApi().take(player.getUniqueId(), integerAmount)){
-                            Asset.distributeAsset(Accounts.getAccount(player), asset, integerAmount- fee);
+                            Asset.distributeAsset(Accounts.getAccount(player), asset, integerAmount-fee);
                             MessagingUtil.sendPaymentNotice(sender, ammount, fee, asset);
                             return true;
                         }
@@ -123,7 +123,7 @@ public class WalletCommand implements CommandExecutor {
                     double ammount;
                     try{
                         ammount = Double.parseDouble(args[2]);
-                        if(ammount == 0){
+                        if(ammount <= 0){
                             MessagingUtil.sendError(sender, "Invalid amount");
                             return true;
                         }
@@ -151,10 +151,10 @@ public class WalletCommand implements CommandExecutor {
                         }
 
                     }else if (args[1].equals(PlayerPointsHook.getAsset().getCode()) && PlayerPointsHook.isConnected()){
-                        fee = (int) fee;
+                        fee = Math.ceil(fee);
                         Asset asset = PlayerPointsHook.getAsset();
                         int integerAmount = (int) ammount;
-                        if(integerAmount <= 0){
+                        if(integerAmount < 1){
                             MessagingUtil.sendError(sender, "Cannot Withdraw fractional Player Points");
                             return true;
                         }

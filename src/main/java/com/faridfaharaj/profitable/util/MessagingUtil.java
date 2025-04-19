@@ -108,17 +108,17 @@ public class MessagingUtil {
 
     public static void sendChargeNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
         if(fee != 0){
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(Component.text(amount + " " + assetCharged.getCode(), assetCharged.getColor())).append(Component.text(" +" + fee + " " + assetCharged.getCode() + " (fees)", NamedTextColor.RED)));
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(Component.text(amount+fee + " " + assetCharged.getCode(), assetCharged.getColor())).append(Component.text(" (incl. " + fee + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
         }else {
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(Component.text(amount + " " + assetCharged.getCode(), assetCharged.getColor())));
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(Component.text(amount+fee + " " + assetCharged.getCode(), assetCharged.getColor())));
         }
     }
 
     public static void sendPaymentNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
         if(fee != 0){
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(Component.text(amount + " " + assetCharged.getCode(), assetCharged.getColor())).append(Component.text(" -" + fee + " " + assetCharged.getCode() + " (fees)", NamedTextColor.RED)));
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(Component.text(amount-fee + " " + assetCharged.getCode(), assetCharged.getColor())).append(Component.text(" (incl. " + fee + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
         }else {
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(Component.text(amount + " " + assetCharged.getCode(), assetCharged.getColor())));
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(Component.text(amount-fee + " " + assetCharged.getCode(), assetCharged.getColor())));
         }
     }
 
