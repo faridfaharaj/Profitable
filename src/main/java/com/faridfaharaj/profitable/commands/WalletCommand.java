@@ -143,7 +143,7 @@ public class WalletCommand implements CommandExecutor {
                         if(Asset.retrieveBalance(player, "Cannot withdraw", asset.getCode(), ammount, false)){
                             EconomyResponse es = VaultHook.getEconomy().depositPlayer(player, ammount);
                             if(es.transactionSuccess()){
-                                MessagingUtil.sendChargeNotice(sender, ammount, fee, asset);
+                                MessagingUtil.sendChargeNotice(sender, ammount-fee, fee, asset);
                             }else{
                                 MessagingUtil.sendError(sender, es.errorMessage);
                                 Asset.distributeAsset(Accounts.getAccount(player), asset, ammount);
@@ -159,7 +159,7 @@ public class WalletCommand implements CommandExecutor {
                             return true;
                         }
                         if(Asset.retrieveAsset(player, "Withdraw amount to PlayerPoints", asset, integerAmount) && PlayerPointsHook.getApi().give(player.getUniqueId(), (int) (integerAmount-fee))){
-                            MessagingUtil.sendChargeNotice(sender, ammount, fee, asset);
+                            MessagingUtil.sendChargeNotice(sender, ammount-fee, fee, asset);
                         }
                     }else{
                         MessagingUtil.sendError(sender, "Invalid Currency");
