@@ -140,7 +140,9 @@ public class Events implements Listener {
 
     @EventHandler
     public void onPlayerChangeWorld(PlayerChangedWorldEvent event){
-        Accounts.logOut(event.getPlayer().getUniqueId());
+        if(Configuration.MULTIWORLD){
+            Accounts.logOut(event.getPlayer().getUniqueId());
+        }
     }
 
     @EventHandler

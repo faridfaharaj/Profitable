@@ -102,13 +102,8 @@ public final class Profitable extends JavaPlugin {
             }
             getLogger().info("Using per-world data");
         }else{
-            try {
-                DataBase.updateWorld(Profitable.getInstance().getServer().getWorlds().getFirst());
-                Assets.generateAssets();
-                Accounts.registerDefaultAccount("server");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            Assets.generateAssets();
+            Accounts.registerDefaultAccount("server");
             getLogger().info("Using single server-wide data");
         }
 

@@ -1,5 +1,6 @@
 package com.faridfaharaj.profitable.data;
 
+import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import org.bukkit.World;
@@ -12,6 +13,7 @@ import java.security.CodeSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -19,6 +21,14 @@ public class DataBase {
 
     private static Connection connection;
     private static byte[] currentWorldid;
+
+    static {
+        try {
+            currentWorldid = MessagingUtil.UUIDtoBytes(UUID.fromString("00000000-0000-0000-0000-000000000000"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static void connectMySQL() throws SQLException{
 
