@@ -1,9 +1,11 @@
 package com.faridfaharaj.profitable.util;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -102,6 +104,10 @@ public class MessagingUtil {
     public static void sendSuccsess(CommandSender sender, String text){
 
         sendCustomMessage(sender, profitablePrefix().append(Component.text(text)));
+    }
+
+    public static void sendFeeNotice(CommandSender sender, double fee, Asset assetCharged){
+        sendCustomMessage(sender, profitablePrefix().append(Component.text("("+fee + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
     }
 
     public static void sendWarning(CommandSender sender, String text){

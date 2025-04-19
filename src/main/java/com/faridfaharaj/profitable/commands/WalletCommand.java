@@ -71,21 +71,28 @@ public class WalletCommand implements CommandExecutor {
                         MessagingUtil.sendError(sender, "Invalid amount");
                         return true;
                     }
-
+                    double fee = Configuration.parseFee(Configuration.DEPOSITFEES, ammount);
+                    if(fee > ammount){
+                        MessagingUtil.sendError(sender, "Amount cannot be lower than " + fee);
+                        return true;
+                    }
 
                     if(VaultHook.isConnected() && Objects.equals(VaultHook.getAsset().getCode(), args[1])){
 
                         Asset asset = VaultHook.getAsset();
                         if(VaultHook.getEconomy().withdrawPlayer(player, ammount).transactionSuccess()){
-                            Asset.distributeAsset(Accounts.getAccount(player), asset.getCode(), 1, ammount);
-                            MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Added ")).append(Component.text(ammount + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" to your wallet")));
+                            Asset.distributeAsset(Accounts.getAccount(player), asset, ammount-fee);
+                            MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Added ")).append(Component.text(ammount-fee + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" to your wallet")));
+                            if(fee != 0){
+                                MessagingUtil.sendFeeNotice(sender, fee, asset);
+                            }
                             return true;
                         }
 
                     }
 
                     if (PlayerPointsHook.isConnected() && Objects.equals(PlayerPointsHook.getAsset().getCode(), args[1])){
-
+                        fee = (int) fee;
                         Asset asset = PlayerPointsHook.getAsset();
                         int integerAmount = (int) ammount;
                         if(integerAmount <= 0){
@@ -93,8 +100,11 @@ public class WalletCommand implements CommandExecutor {
                             return true;
                         }
                         if(PlayerPointsHook.getApi().take(player.getUniqueId(), integerAmount)){
-                            Asset.distributeAsset(Accounts.getAccount(player), asset.getCode(), 1, integerAmount);
+                            Asset.distributeAsset(Accounts.getAccount(player), asset, integerAmount- fee);
                             MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Added ")).append(Component.text(ammount + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" to your wallet")));
+                            if(fee != 0){
+                                MessagingUtil.sendFeeNotice(sender, fee, asset);
+                            }
                             return true;
                         }
 
@@ -126,6 +136,11 @@ public class WalletCommand implements CommandExecutor {
                         MessagingUtil.sendError(sender, "Invalid amount");
                         return true;
                     }
+                    double fee = Configuration.parseFee(Configuration.WITHDRAWALFEES, ammount);
+                    if(fee > ammount){
+                        MessagingUtil.sendError(sender, "Amount cannot be lower than " + fee);
+                        return true;
+                    }
 
                     if(args[1].equals(VaultHook.getAsset().getCode()) && VaultHook.isConnected()){
                         Asset asset = VaultHook.getAsset();
@@ -133,22 +148,29 @@ public class WalletCommand implements CommandExecutor {
                         if(Asset.retrieveBalance(player, "Cannot withdraw", asset.getCode(), ammount, false)){
                             EconomyResponse es = VaultHook.getEconomy().depositPlayer(player, ammount);
                             if(es.transactionSuccess()){
-                                MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Taken ")).append(Component.text(ammount + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" from your wallet")));
+                                MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Withdrawn ")).append(Component.text(ammount-fee + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" from your wallet")));
+                                if(fee != 0){
+                                    MessagingUtil.sendFeeNotice(sender, fee, asset);
+                                }
                             }else{
                                 MessagingUtil.sendError(sender, es.errorMessage);
-                                Asset.distributeAsset(Accounts.getAccount(player), asset.getCode(), 1, ammount);
+                                Asset.distributeAsset(Accounts.getAccount(player), asset, ammount);
                             }
                         }
 
                     }else if (args[1].equals(PlayerPointsHook.getAsset().getCode()) && PlayerPointsHook.isConnected()){
+                        fee = (int) fee;
                         Asset asset = PlayerPointsHook.getAsset();
                         int integerAmount = (int) ammount;
                         if(integerAmount <= 0){
                             MessagingUtil.sendError(sender, "Cannot Withdraw fractional Player Points");
                             return true;
                         }
-                        if(Asset.retrieveAsset(player, "Withdraw amount to PlayerPoints", asset.getCode(), 1, integerAmount) && PlayerPointsHook.getApi().give(player.getUniqueId(), integerAmount)){
-                            MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Taken ")).append(Component.text(integerAmount + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" from your wallet")));
+                        if(Asset.retrieveAsset(player, "Withdraw amount to PlayerPoints", asset, integerAmount) && PlayerPointsHook.getApi().give(player.getUniqueId(), (int) (integerAmount-fee))){
+                            MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Withdrawn ")).append(Component.text(integerAmount-fee + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" from your wallet")));
+                            if(fee != 0){
+                                MessagingUtil.sendFeeNotice(sender, fee, asset);
+                            }
                         }
                     }else{
                         MessagingUtil.sendError(sender, "Invalid Currency");

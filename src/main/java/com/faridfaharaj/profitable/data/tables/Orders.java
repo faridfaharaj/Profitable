@@ -110,16 +110,15 @@ public class Orders {
     }*/
 
 
-    public static List<Order> getBestOrders(String asset, String account , boolean sideBuy, double price, double units) {
+    public static List<Order> getBestOrders(String asset, boolean sideBuy, double price, double units) {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT * FROM orders WHERE world = ? AND asset_id = ? AND sideBuy = ? AND price " + (sideBuy ? "<=" : ">=") + " ? AND owner != ? AND order_type = " + Order.OrderType.LIMIT.getValue() + " ORDER BY price " + (sideBuy ? "ASC" : "DESC") + ";";
+        String sql = "SELECT * FROM orders WHERE world = ? AND asset_id = ? AND sideBuy = ? AND price " + (sideBuy ? "<=" : ">=") + " ? AND order_type = " + Order.OrderType.LIMIT.getValue() + " ORDER BY price " + (sideBuy ? "ASC" : "DESC") + " LIMIT " + Math.ceil(units) +";";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
             stmt.setBytes(1, DataBase.getCurrentWorld());
             stmt.setString(2, asset);
             stmt.setBoolean(3, !sideBuy);
             stmt.setDouble(4, price);
-            stmt.setString(5, account);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 double accumulatedUnits = 0;
@@ -324,17 +323,17 @@ public class Orders {
         return orders;
     }
 
-    public static void deleteOrders(List<UUID> uuids) {
-        if (uuids == null || uuids.isEmpty()) {
+    public static void deleteOrders(List<Order> orders) {
+        if (orders == null || orders.isEmpty()) {
             return;
         }
 
         String sql = "DELETE FROM orders WHERE world = ? AND order_uuid = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            for (UUID uuid : uuids) {
+            for (Order order : orders) {
                 stmt.setBytes(1, DataBase.getCurrentWorld());
-                stmt.setBytes(2, MessagingUtil.UUIDtoBytes(uuid));
+                stmt.setBytes(2, MessagingUtil.UUIDtoBytes(order.getUuid()));
                 stmt.addBatch();
             }
 
@@ -387,11 +386,15 @@ public class Orders {
 
         boolean sideBuy = order.isSideBuy();
 
-        Asset asset = sideBuy? Assets.getAssetData(Configuration.MAINCURRENCYASSET.getCode()) : Assets.getAssetData(order.getAsset());
+        Asset tradedAsset = Assets.getAssetData(order.getAsset());
+        Asset asset = sideBuy? Configuration.MAINCURRENCYASSET : tradedAsset;
 
-        double ammountToSendBack = sideBuy? order.getPrice() * order.getUnits()  : order.getUnits();
+        double ammountToSendBack = sideBuy?
+                order.getPrice() * order.getUnits() + Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][1], order.getPrice() * order.getUnits())
+                :
+                order.getUnits();
 
-        Asset.distributeAsset(account, asset.getCode(), asset.getAssetType(), ammountToSendBack);
+        Asset.distributeAsset(account, asset, ammountToSendBack);
 
         player.playSound(player, Sound.ENTITY_ITEM_BREAK, 1 , 1);
 
@@ -412,11 +415,15 @@ public class Orders {
 
         boolean sideBuy = order.isSideBuy();
 
-        Asset asset = sideBuy? Assets.getAssetData(Configuration.MAINCURRENCYASSET.getCode()) : Assets.getAssetData(order.getAsset());
+        Asset tradedAsset = Assets.getAssetData(order.getAsset());
+        Asset asset = sideBuy? Configuration.MAINCURRENCYASSET : tradedAsset;
 
-        double ammountToSendBack = sideBuy? order.getPrice() * order.getUnits()  : order.getUnits();
+        double ammountToSendBack = sideBuy?
+                order.getPrice() * order.getUnits() + Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][1], order.getPrice() * order.getUnits())
+                :
+                order.getUnits();
 
-        Asset.distributeAsset(order.getOwner(), asset.getCode(), asset.getAssetType(), ammountToSendBack);
+        Asset.distributeAsset(order.getOwner(), asset, ammountToSendBack);
 
         Orders.deleteOrder(order.getUuid());
 

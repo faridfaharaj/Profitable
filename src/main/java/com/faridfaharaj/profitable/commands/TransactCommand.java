@@ -79,7 +79,7 @@ public class TransactCommand implements CommandExecutor {
             }
 
             double units;
-            if(args.length == 1){
+            if(args.length <= 1){
 
                 units = 1d;
 
@@ -128,7 +128,7 @@ public class TransactCommand implements CommandExecutor {
             }
 
             if(args.length == 4){
-                suggestions = List.of("stop-limit","stop-market","limit","market");
+                suggestions = List.of("stop-limit","limit","market");
             }
 
             return suggestions;

@@ -29,9 +29,9 @@ database:
 exchange:
   fees: # Fixed: 23    Percentage: 23%
     # Fees when you take money from your wallet
-    withdrawal-fees: 0
+    withdrawal-fees: 1%
     # Fees when you add money to your wallet
-    deposit-fees: 0
+    deposit-fees: 2%
 
   commodities:
     fees: # Fixed: 23    Percentage: 23%

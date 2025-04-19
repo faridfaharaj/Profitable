@@ -248,17 +248,17 @@ public class Asset {
         }
     }
 
-    public static void distributeAsset(String account, String asset, int assetType, double ammount){
+    public static void distributeAsset(String account, Asset asset, double ammount){
 
-        switch (assetType) {
+        switch (asset.getAssetType()) {
             case 2: // Item
 
-                    sendCommodityItem(account, asset, (int) ammount);
+                    sendCommodityItem(account, asset.getCode(), (int) ammount);
                 break;
 
             case 3: // Entity
 
-                    sendCommodityEntity(account, asset, Accounts.getEntityClaimId(account), (int) ammount);
+                    sendCommodityEntity(account, asset.getCode(), Accounts.getEntityClaimId(account), (int) ammount);
                     break;
 
             case 4: // Fluid
@@ -271,7 +271,7 @@ public class Asset {
 
             default: // numerical value
 
-                    sendBalance(account, asset, ammount);
+                    sendBalance(account, asset.getCode(), ammount);
 
                 break;
         }
@@ -352,20 +352,19 @@ public class Asset {
         });
     }
 
-    public static boolean retrieveAsset(Player player, String notice, String asset, int assetType, double ammount){
+    public static boolean retrieveAsset(Player player, String notice, Asset asset, double ammount){
 
-        switch (assetType) {
+        switch (asset.getAssetType()) {
             case 2: // Item
-                    return retrieveCommodityItem(player, notice, asset, (int) ammount);
+                    return retrieveCommodityItem(player, notice, asset.getCode(), (int) ammount);
             case 3: // Entity
-                    return retrieveCommodityEntity(player, notice, asset, Accounts.getEntityClaimId(Accounts.getAccount(player)), (int) ammount);
+                    return retrieveCommodityEntity(player, notice, asset.getCode(), Accounts.getEntityClaimId(Accounts.getAccount(player)), (int) ammount);
             case 4: // Fluid
                     return false;
-
             case 5: // Energy
                     return false;
             default: // any numerical value
-                    return retrieveBalance(player, notice, asset, ammount);
+                    return retrieveBalance(player, notice, asset.getCode(), ammount);
         }
 
     }
@@ -391,7 +390,7 @@ public class Asset {
 
             }
 
-            MessagingUtil.sendError(player,notice + ", insufficient " + asset + " on your account");
+            MessagingUtil.sendError(player,notice + ", insufficient " + asset);
 
             return false;
         }

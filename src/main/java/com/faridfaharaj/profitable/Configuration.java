@@ -1,6 +1,5 @@
 package com.faridfaharaj.profitable;
 
-import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
@@ -15,7 +14,6 @@ import org.bukkit.entity.LivingEntity;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Logger;
 
 public class Configuration {
 
@@ -33,6 +31,12 @@ public class Configuration {
 
     public static boolean MULTIWORLD;
     public static boolean GENERATEASSETS;
+
+    public static String WITHDRAWALFEES;
+    public static String DEPOSITFEES;
+    public static double ENTITYCLAIMINGFEES;
+
+    public static String[][] ASSETFEES = new String[5][2];
 
 
     //MAINCURRENCY
@@ -147,8 +151,6 @@ public class Configuration {
 
             }
 
-
-
         }
 
         // hooks
@@ -162,6 +164,47 @@ public class Configuration {
         // Colors
         COLORBULLISH = TextColor.fromHexString(config.getString("colors.bullish", "#8CD740"));
         COLORBEARISH = TextColor.fromHexString(config.getString("colors.bearish", "#FA413B"));
+
+        //fees
+        ENTITYCLAIMINGFEES = config.getDouble("exchange.commodities.fees.entity-claiming-fees",0);
+
+        DEPOSITFEES = getFee(config.getString("exchange.fees.deposit-fees","0"));
+        WITHDRAWALFEES = getFee(config.getString("exchange.fees.withdrawal-fees","0"));
+
+        ASSETFEES[1][0] = getFee(config.getString("exchange.forex.fees.taker-fees","0"));
+        ASSETFEES[1][1] = getFee(config.getString("exchange.forex.fees.maker-fees","0"));
+
+        ASSETFEES[2][0] = getFee(config.getString("exchange.commodities.fees.taker-fees","0"));
+        ASSETFEES[2][1] = getFee(config.getString("exchange.commodities.fees.maker-fees","0"));
+
+        ASSETFEES[3][0] = ASSETFEES[2][0];
+        ASSETFEES[3][1] = ASSETFEES[2][1];
+
+    }
+
+    public static String getFee(String string){
+        return string.matches("^(100(\\.0+)?|\\d{1,2}(\\.\\d+)?)(%?)$")?string:"0";
+    }
+
+    public static double parseFee(String stringfee, double amount){
+
+        if(stringfee.endsWith("%")){
+
+            try{
+                return Double.parseDouble(stringfee.replace("%",""))/100*amount;
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }else{
+            try{
+                return Double.parseDouble(stringfee);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+
+        return 0;
     }
 
     public static void loadMainCurrency() throws IOException {

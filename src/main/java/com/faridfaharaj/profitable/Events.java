@@ -7,6 +7,8 @@ import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -106,14 +108,18 @@ public class Events implements Listener {
 
             } else {
 
-                double fees = Profitable.getInstance().getConfig().getDouble("exchange.commodities.fees.entity-claiming-fees");
-                if(fees > 0 && !Asset.retrieveAsset(player, "Couldn't claim "+ entity.getName() , Configuration.MAINCURRENCYASSET.getCode(), Configuration.MAINCURRENCYASSET.getAssetType(), fees)){
+                if(Configuration.ENTITYCLAIMINGFEES > 0 && !Asset.retrieveAsset(player, "Couldn't claim "+ entity.getName() , Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES)){
                     event.setCancelled(true);
                     return;
                 }
 
+                MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName()))
+                        .append(Configuration.ENTITYCLAIMINGFEES == 0?
+                                 Component.text(" FOR FREE", NamedTextColor.GREEN):
+                                 Component.text(" using ").append(Component.text(Configuration.ENTITYCLAIMINGFEES + " " + Configuration.MAINCURRENCYASSET.getCode(), Configuration.MAINCURRENCYASSET.getColor()))
+                        )
+                );
                 entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));
-                MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName() + " using: ")).append(Component.text(fees + " " + Configuration.MAINCURRENCYASSET.getCode(),Configuration.MAINCURRENCYASSET.getColor())));
             }
             event.setCancelled(true);
         }
