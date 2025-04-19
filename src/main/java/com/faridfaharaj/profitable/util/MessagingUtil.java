@@ -106,8 +106,20 @@ public class MessagingUtil {
         sendCustomMessage(sender, profitablePrefix().append(Component.text(text)));
     }
 
-    public static void sendFeeNotice(CommandSender sender, double fee, Asset assetCharged){
-        sendCustomMessage(sender, profitablePrefix().append(Component.text("("+fee + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
+    public static void sendChargeNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
+        if(fee != 0){
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(Component.text(amount + " " + assetCharged.getCode(), assetCharged.getColor())).append(Component.text(" +" + fee + " " + assetCharged.getCode() + " (fees)", NamedTextColor.RED)));
+        }else {
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(Component.text(amount + " " + assetCharged.getCode(), assetCharged.getColor())));
+        }
+    }
+
+    public static void sendPaymentNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
+        if(fee != 0){
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(Component.text(amount + " " + assetCharged.getCode(), assetCharged.getColor())).append(Component.text(" -" + fee + " " + assetCharged.getCode() + " (fees)", NamedTextColor.RED)));
+        }else {
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(Component.text(amount + " " + assetCharged.getCode(), assetCharged.getColor())));
+        }
     }
 
     public static void sendWarning(CommandSender sender, String text){

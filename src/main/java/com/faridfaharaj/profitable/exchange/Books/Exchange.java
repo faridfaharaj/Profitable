@@ -244,9 +244,13 @@ public class Exchange {
                         .append(Component.text(money + " " + Configuration.MAINCURRENCYASSET.getCode(), Configuration.MAINCURRENCYASSET.getColor()))
 
                 );
-        if(fee != 0){
-            MessagingUtil.sendFeeNotice(player, fee, Configuration.MAINCURRENCYASSET);
+
+        if(sideBuy){
+            MessagingUtil.sendChargeNotice(player, money, fee, Configuration.MAINCURRENCYASSET);
+        }else{
+            MessagingUtil.sendPaymentNotice(player, money, fee, Configuration.MAINCURRENCYASSET);
         }
+
         player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
         player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
         player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
@@ -270,9 +274,13 @@ public class Exchange {
                     .append(Component.text(money + " " + Configuration.MAINCURRENCYASSET.getCode(), Configuration.MAINCURRENCYASSET.getColor()))
 
             );
-            if(!sideBuy && fee != 0){
-                MessagingUtil.sendFeeNotice(player, fee, Configuration.MAINCURRENCYASSET);
+
+            if(sideBuy){
+                MessagingUtil.sendChargeNotice(player, money, fee, Configuration.MAINCURRENCYASSET);
+            }else{
+                MessagingUtil.sendPaymentNotice(player, money, fee, Configuration.MAINCURRENCYASSET);
             }
+
             player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
             player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
             player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
@@ -311,13 +319,13 @@ public class Exchange {
 
         if(order.isSideBuy()){
 
-            if(makerFee != 0){
-                MessagingUtil.sendFeeNotice(player, makerFee, collateralAsset);
-            }
+            MessagingUtil.sendChargeNotice(player, cost, makerFee, collateralAsset);
 
         }else{
+            MessagingUtil.sendChargeNotice(player, order.getUnits(), 0, collateralAsset);
+
             if(makerFee >= cost){
-                MessagingUtil.sendWarning(player, "This order is worth less than its fee ($" + makerFee + ") returns will be nullified!");
+                MessagingUtil.sendWarning(player, "This order is worth less than its fee ($" + makerFee + ") there will be no profit!");
             }
         }
     }

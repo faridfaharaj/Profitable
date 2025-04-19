@@ -82,10 +82,8 @@ public class WalletCommand implements CommandExecutor {
                         Asset asset = VaultHook.getAsset();
                         if(VaultHook.getEconomy().withdrawPlayer(player, ammount).transactionSuccess()){
                             Asset.distributeAsset(Accounts.getAccount(player), asset, ammount-fee);
-                            MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Added ")).append(Component.text(ammount-fee + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" to your wallet")));
-                            if(fee != 0){
-                                MessagingUtil.sendFeeNotice(sender, fee, asset);
-                            }
+                            MessagingUtil.sendPaymentNotice(sender, ammount, fee, asset);
+
                             return true;
                         }
 
@@ -101,10 +99,7 @@ public class WalletCommand implements CommandExecutor {
                         }
                         if(PlayerPointsHook.getApi().take(player.getUniqueId(), integerAmount)){
                             Asset.distributeAsset(Accounts.getAccount(player), asset, integerAmount- fee);
-                            MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Added ")).append(Component.text(ammount + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" to your wallet")));
-                            if(fee != 0){
-                                MessagingUtil.sendFeeNotice(sender, fee, asset);
-                            }
+                            MessagingUtil.sendPaymentNotice(sender, ammount, fee, asset);
                             return true;
                         }
 
@@ -148,10 +143,7 @@ public class WalletCommand implements CommandExecutor {
                         if(Asset.retrieveBalance(player, "Cannot withdraw", asset.getCode(), ammount, false)){
                             EconomyResponse es = VaultHook.getEconomy().depositPlayer(player, ammount);
                             if(es.transactionSuccess()){
-                                MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Withdrawn ")).append(Component.text(ammount-fee + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" from your wallet")));
-                                if(fee != 0){
-                                    MessagingUtil.sendFeeNotice(sender, fee, asset);
-                                }
+                                MessagingUtil.sendChargeNotice(sender, ammount, fee, asset);
                             }else{
                                 MessagingUtil.sendError(sender, es.errorMessage);
                                 Asset.distributeAsset(Accounts.getAccount(player), asset, ammount);
@@ -167,10 +159,7 @@ public class WalletCommand implements CommandExecutor {
                             return true;
                         }
                         if(Asset.retrieveAsset(player, "Withdraw amount to PlayerPoints", asset, integerAmount) && PlayerPointsHook.getApi().give(player.getUniqueId(), (int) (integerAmount-fee))){
-                            MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Withdrawn ")).append(Component.text(integerAmount-fee + " " + asset.getCode()).color(asset.getColor())).append(Component.text(" from your wallet")));
-                            if(fee != 0){
-                                MessagingUtil.sendFeeNotice(sender, fee, asset);
-                            }
+                            MessagingUtil.sendChargeNotice(sender, ammount, fee, asset);
                         }
                     }else{
                         MessagingUtil.sendError(sender, "Invalid Currency");

@@ -401,7 +401,7 @@ public class Orders {
         Orders.deleteOrder(order.getUuid());
 
         MessagingUtil.sendCustomMessage(player, Component.text("Cancelled ").append(order.toStringSimplified()));
-        MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Sent ")).append(Component.text(ammountToSendBack + " " + asset.getCode(), asset.getColor())).append(Component.text(" back to you")));
+        MessagingUtil.sendPaymentNotice(player, ammountToSendBack, 0, asset);
 
         return true;
     }
