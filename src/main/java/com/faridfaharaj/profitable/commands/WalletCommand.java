@@ -133,14 +133,14 @@ public class WalletCommand implements CommandExecutor {
                     }
                     double fee = Configuration.parseFee(Configuration.WITHDRAWALFEES, ammount);
                     if(fee > ammount){
-                        MessagingUtil.sendError(sender, "Amount cannot be lower than " + fee);
+                        MessagingUtil.sendError(sender, "Amount cannot be lower than its fee ($" + fee + ")");
                         return true;
                     }
 
                     if(args[1].equals(VaultHook.getAsset().getCode()) && VaultHook.isConnected()){
                         Asset asset = VaultHook.getAsset();
 
-                        if(Asset.retrieveBalance(player, "Cannot withdraw", asset.getCode(), ammount, false)){
+                        if(Asset.retrieveBalance(player, "Withdraw amount to Vault", asset.getCode(), ammount, false)){
                             EconomyResponse es = VaultHook.getEconomy().depositPlayer(player, ammount);
                             if(es.transactionSuccess()){
                                 MessagingUtil.sendChargeNotice(sender, ammount-fee, fee, asset);
@@ -158,7 +158,7 @@ public class WalletCommand implements CommandExecutor {
                             MessagingUtil.sendError(sender, "Cannot Withdraw fractional Player Points");
                             return true;
                         }
-                        if(Asset.retrieveAsset(player, "Withdraw amount to PlayerPoints", asset, integerAmount) && PlayerPointsHook.getApi().give(player.getUniqueId(), (int) (integerAmount-fee))){
+                        if(Asset.retrieveBalance(player, "Withdraw amount to PlayerPoints", asset.getCode(), ammount, false) && PlayerPointsHook.getApi().give(player.getUniqueId(), (int) (integerAmount-fee))){
                             MessagingUtil.sendChargeNotice(sender, ammount-fee, fee, asset);
                         }
                     }else{

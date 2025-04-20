@@ -37,6 +37,22 @@ public class AccountHoldings {
         return false;
     }
 
+    public static void deleteHolding(String account, String asset) {
+        String sql = "DELETE FROM account_assets WHERE world = ? AND account_name = ? AND asset_id = ?;";
+
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setString(2, account);
+            stmt.setString(3, asset);
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public static double getAccountAssetBalance(String account, String asset) {
         String sql = "SELECT * FROM account_assets WHERE world = ? AND account_name = ? AND asset_id = ?;";
 
@@ -102,7 +118,7 @@ public class AccountHoldings {
                 if(totalValue == 0){
                     component = Component.text("Empty").color(Configuration.COLOREMPTY);
                 }else{
-                    component = component.appendNewline().appendNewline().appendNewline().append(Component.text("Portfolio Value: ")).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, totalValue));
+                    component = component.appendNewline().appendNewline().append(Component.text("Portfolio Value: ")).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, totalValue));
                 }
 
             }

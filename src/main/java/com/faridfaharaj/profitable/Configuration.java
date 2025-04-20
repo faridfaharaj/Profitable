@@ -32,6 +32,10 @@ public class Configuration {
     public static boolean MULTIWORLD;
     public static boolean GENERATEASSETS;
 
+    public static boolean PHYSICALDELIVERY;
+    public static boolean[] ALLOWEDCOMMODITYCOLLATERAL = new boolean[3];
+
+
     public static String WITHDRAWALFEES;
     public static String DEPOSITFEES;
     public static double ENTITYCLAIMINGFEES;
@@ -152,6 +156,10 @@ public class Configuration {
             }
 
         }
+        PHYSICALDELIVERY = config.getBoolean("exchange.commodities.physical-delivery");
+        ALLOWEDCOMMODITYCOLLATERAL[0] = config.getBoolean("exchange.commodities.take-wallet");
+        ALLOWEDCOMMODITYCOLLATERAL[1] = config.getBoolean("exchange.commodities.take-inventory");
+        ALLOWEDCOMMODITYCOLLATERAL[2] = config.getBoolean("exchange.commodities.take-world");
 
         // hooks
         if(VaultHook.inithook(profitable)){

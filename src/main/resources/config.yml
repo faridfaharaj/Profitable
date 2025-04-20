@@ -43,6 +43,18 @@ exchange:
       # Fees when you use the claiming tag on an entity (fixed only)
       entity-claiming-fees: 0
 
+    # Commodities spawn on account's delivery location when transacting (commodities are added to wallet when false)
+    physical-delivery: true
+
+    # Allow taking commodities from your wallet for transactions
+    take-wallet: true
+
+    # Allow taking items from your inventory for transactions
+    take-inventory: true
+
+    # Allow taking claimed entities from world for transactions
+    take-world: false
+
     # note: commodities are RAW and FUNGIBLE materials traded in BULK that are then processed into different products
     #       crops and building material can be commodities as well:
     #
