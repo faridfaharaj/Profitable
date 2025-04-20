@@ -241,7 +241,7 @@ public class Exchange {
                         .append(sideBuy?Component.text("Bought ", Configuration.COLORBULLISH):Component.text("Sold ", Configuration.COLORBEARISH))
                         .append(Component.text(units + " " + tradedAsset.getCode(), tradedAsset.getColor()))
                         .append(Component.text(" for "))
-                        .append(Component.text(money + " " + Configuration.MAINCURRENCYASSET.getCode(), Configuration.MAINCURRENCYASSET.getColor()))
+                        .append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, money))
 
                 );
 
@@ -271,7 +271,7 @@ public class Exchange {
                     .append(sideBuy?Component.text("Bought ", Configuration.COLORBULLISH):Component.text("Sold ", Configuration.COLORBEARISH))
                     .append(Component.text(units + " " + tradedAsset.getCode(), tradedAsset.getColor()))
                     .append(Component.text(" for "))
-                    .append(Component.text(money + " " + Configuration.MAINCURRENCYASSET.getCode(), Configuration.MAINCURRENCYASSET.getColor()))
+                    .append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, money))
 
             );
 
@@ -312,9 +312,10 @@ public class Exchange {
         player.playSound(player, Sound.ITEM_BOOK_PAGE_TURN, 1 , 1);
         MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix()
                 .append(Component.text("New " + order.getType().toString().replace("_","-").toLowerCase() + " order ")).append(order.isSideBuy()?Component.text("Buy ", Configuration.COLORBULLISH):Component.text("Sell ", Configuration.COLORBEARISH))
-                .append(Component.text(order.getUnits() + " " + tradedasset.getCode(), tradedasset.getColor()))
+                .append(MessagingUtil.assetAmmount(tradedasset, order.getUnits()))
                 .append(Component.text(" at "))
-                .append(Component.text(order.getPrice() + " " + currency.getCode(), currency.getColor()))
+                .append(MessagingUtil.assetAmmount(currency, order.getPrice()))
+                .append(Component.text(" each"))
         );
 
         if(order.isSideBuy()){

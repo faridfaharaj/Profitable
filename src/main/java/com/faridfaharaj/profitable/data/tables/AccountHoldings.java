@@ -4,6 +4,7 @@ import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 
 import java.io.IOException;
@@ -66,19 +67,18 @@ public class AccountHoldings {
             try (ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    String asset = rs.getString("asset_id");
-                    double quantity = rs.getDouble("quantity");
+                    String assetCode = rs.getString("asset_id");
                     byte[] meta = rs.getBytes("meta");
 
-                    component = component.appendNewline().append(Asset.holdingToChat(asset, quantity, meta));
+                    Asset asset = Asset.assetFromMeta(assetCode, assetType, meta);
+
+                    double quantity = rs.getDouble("quantity");
+                    component = component.appendNewline().append(MessagingUtil.assetAmmount(asset, quantity));
                 }
 
                 if(component.children().isEmpty()){
                     component = Component.text("Empty").color(Configuration.COLOREMPTY);
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                component = Component.text("ERROR").color(Configuration.COLORERROR);
             }
 
         } catch (SQLException e) {

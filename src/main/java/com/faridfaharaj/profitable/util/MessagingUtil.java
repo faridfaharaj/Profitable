@@ -13,9 +13,12 @@ import org.bukkit.command.CommandSender;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.DecimalFormat;
 import java.util.UUID;
 
 public class MessagingUtil {
+
+    static DecimalFormat decimalFormat = new DecimalFormat("0.0####");
 
     public static void sendButton(CommandSender sender, String text, String command){
 
@@ -23,6 +26,32 @@ public class MessagingUtil {
                 .clickEvent(ClickEvent.runCommand(command))
                 .hoverEvent(HoverEvent.showText(Component.text(command).color(Configuration.COLORINFO))));
 
+    }
+
+    public static Component assetAmmount(Asset asset, double amount){
+        return Component.text(decimalFormat.format(amount) + " " + asset.getCode(), asset.getColor()).hoverEvent(assetSummary(asset));
+    }
+
+    public static Component assetSummary(Asset asset){
+        Component component = Component.text("").append(Component.text(asset.getName(), asset.getColor())).appendNewline()
+                .append(Component.text(NamingUtil.nameType(asset.getAssetType()), NamedTextColor.BLUE));
+
+        if(!asset.getStringData().isEmpty()){
+            component = component.appendNewline();
+
+            String[] words = asset.getStringData().getFirst().split(" ");
+            int linelen = 0;
+            for (String word : words) {
+                linelen += word.length();
+                if (linelen >= 26) {
+                    linelen = 0;
+                    component = component.appendNewline();
+                }
+                component = component.append(Component.text(word)).appendSpace();
+            }
+        }
+
+        return  component;
     }
 
     public static Component profitablePrefix(){
@@ -108,17 +137,17 @@ public class MessagingUtil {
 
     public static void sendChargeNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
         if(fee != 0){
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(Component.text(amount+fee + " " + assetCharged.getCode(), assetCharged.getColor())).append(Component.text(" (incl. " + fee + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(assetAmmount(assetCharged, amount+fee)).append(Component.text(" (incl. " + decimalFormat.format(fee) + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
         }else {
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(Component.text(amount+fee + " " + assetCharged.getCode(), assetCharged.getColor())));
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(assetAmmount(assetCharged, amount+fee)));
         }
     }
 
     public static void sendPaymentNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
         if(fee != 0){
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(Component.text(amount-fee + " " + assetCharged.getCode(), assetCharged.getColor())).append(Component.text(" (incl. " + fee + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(assetAmmount(assetCharged, amount-fee)).append(Component.text(" (incl. " + decimalFormat.format(fee) + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
         }else {
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(Component.text(amount-fee + " " + assetCharged.getCode(), assetCharged.getColor())));
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(assetAmmount(assetCharged, amount-fee)));
         }
     }
 

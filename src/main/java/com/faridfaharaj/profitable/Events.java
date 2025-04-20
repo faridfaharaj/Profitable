@@ -116,7 +116,7 @@ public class Events implements Listener {
                 MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName()))
                         .append(Configuration.ENTITYCLAIMINGFEES == 0?
                                  Component.text(" FOR FREE", NamedTextColor.GREEN):
-                                 Component.text(" using ").append(Component.text(Configuration.ENTITYCLAIMINGFEES + " " + Configuration.MAINCURRENCYASSET.getCode(), Configuration.MAINCURRENCYASSET.getColor()))
+                                 Component.text(" using ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
                         )
                 );
                 entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));

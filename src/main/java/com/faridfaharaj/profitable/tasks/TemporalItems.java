@@ -113,7 +113,7 @@ public class TemporalItems {
         MessagingUtil.sendCustomMessage( player,
                 MessagingUtil.profitableTopSeparator("Overview", "----------------").appendNewline()
                         .appendNewline()
-                        .append(Component.text("     ")).append(Component.text(symbol, asset.getColor()).decorate(TextDecoration.BOLD).hoverEvent(HoverEvent.showText(Component.text("").append(Component.text(asset.getName(), asset.getColor())).appendNewline().append(Component.text(NamingUtil.nameType(asset.getAssetType()), NamedTextColor.GRAY)))))
+                        .append(Component.text("     ")).append(Component.text(symbol, asset.getColor()).decorate(TextDecoration.BOLD).hoverEvent(HoverEvent.showText(MessagingUtil.assetSummary(asset))))
 
                         .append( Component.text( "  ").append(Component.text(priceStr).hoverEvent(HoverEvent.showText(Component.text("Last price traded")))).append( Component.text( "  ")))
                         .append(Component.text(dayChange,(change<0?Configuration.COLORBEARISH:Configuration.COLORBULLISH)).hoverEvent(HoverEvent.showText(Component.text("How much the price changed today, both in difference and percentage")))).appendNewline()

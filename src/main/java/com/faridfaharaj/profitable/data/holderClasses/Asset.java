@@ -152,23 +152,6 @@ public class Asset {
         return numericalData;
     }
 
-    public static Component holdingToChat(String code, double ammount, byte[] meta) throws IOException {
-
-        TextColor color;
-
-        try (ByteArrayInputStream bis = new ByteArrayInputStream(meta);
-             DataInputStream dis = new DataInputStream(bis)) {
-
-            color = TextColor.color(dis.readInt());
-
-        } catch (IOException e) {
-            color = NamedTextColor.WHITE;
-        }
-
-
-        return Component.text( ammount + " " + code).color(color);
-    }
-
     public static byte[] metaData(int color, String name) throws IOException {
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
              DataOutputStream dos = new DataOutputStream(bos)) {
@@ -383,7 +366,7 @@ public class Asset {
 
                 if(VaultHook.getEconomy().withdrawPlayer(player, ammount+fee).transactionSuccess()){
                     MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Automatically deposited "))
-                            .append(Component.text(ammount+ " " + asset, VaultHook.getAsset().getColor()))
+                            .append(MessagingUtil.assetAmmount(VaultHook.getAsset(), ammount))
                             .append(Component.text(fee == 0?"":" (+ fees)", NamedTextColor.RED))
                     );
                     return true;
@@ -398,7 +381,7 @@ public class Asset {
                         AccountHoldings.setHolding(account, asset, balance+(total-ammount+fee));
                     }
                     MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Automatically deposited "))
-                            .append(Component.text(ammount+ " " + asset, PlayerPointsHook.getAsset().getColor()))
+                            .append(MessagingUtil.assetAmmount(PlayerPointsHook.getAsset(), ammount))
                             .append(Component.text(fee == 0?"":" (+ fees)", NamedTextColor.RED))
                     );
                     return true;
