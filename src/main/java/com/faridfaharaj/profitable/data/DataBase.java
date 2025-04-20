@@ -1,6 +1,5 @@
 package com.faridfaharaj.profitable.data;
 
-import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import org.bukkit.World;
@@ -9,11 +8,14 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.CodeSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -23,11 +25,7 @@ public class DataBase {
     private static byte[] currentWorldid;
 
     static {
-        try {
-            currentWorldid = MessagingUtil.UUIDtoBytes(UUID.fromString("00000000-0000-0000-0000-000000000000"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        currentWorldid = "_____server_____".getBytes(StandardCharsets.US_ASCII);
     }
 
     public static void connectMySQL() throws SQLException{
@@ -51,6 +49,13 @@ public class DataBase {
     }
 
     public static void connectSQLite() throws SQLException {
+
+        // TEMPORAL ######
+        try{
+            Files.move(Paths.get(Profitable.getInstance().getDataPath()+"/data/server_Wide.db"), Paths.get(Profitable.getInstance().getDataFolder().getAbsolutePath() + "/Data.db"), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException ignored) {
+        }
+        // TEMPORAL ######
 
         String data = "jdbc:sqlite:" + Profitable.getInstance().getDataFolder().getAbsolutePath() + "/Data.db";
         connection = DriverManager.getConnection(data);
@@ -97,17 +102,22 @@ public class DataBase {
         }
     }
 
-    public static void migrateDatabase(Connection connection) throws SQLException, IOException {
+    public static void migrateDatabase(Connection connection) throws IOException {
         Profitable.getInstance().getLogger().info("Migrating database...");
 
-        int currentVersion;
-        Statement stmt = connection.createStatement();
+        int currentVersion = 0;
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("CREATE TABLE IF NOT EXISTS profitable_database_version(version INT NOT NULL PRIMARY KEY);");
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
 
-        String tables = "CREATE TABLE IF NOT EXISTS profitable_database_version(version INT NOT NULL PRIMARY KEY);";
-        stmt.execute(tables);
-
-        ResultSet rs = stmt.executeQuery("SELECT version FROM profitable_database_version");
-        currentVersion = rs.next() ? rs.getInt("version") : 0;
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT version FROM profitable_database_version")) {
+            currentVersion = rs.next() ? rs.getInt("version") : 0;
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
 
         List<String> migrationFiles = getMigrationFiles().stream()
                 .sorted().toList();
@@ -117,16 +127,47 @@ public class DataBase {
             return;
         }
 
-        for(int i = currentVersion; i < migrationFiles.size(); i++){
-            String file = migrationFiles.get(i);
-            String[] sqls = new String(Profitable.getInstance().getResource(file).readAllBytes()).split(";");
+        // vvvv ##################################### TEMPORAL ##################################### vvvv
+        boolean hasTables = false;
+        try (ResultSet tables = connection.getMetaData().getTables(null, null, "%", new String[]{"TABLE"})) {
+            hasTables = tables.next();
+        }catch (SQLException ignored){}
 
-            for(String sql: sqls){
-                stmt.execute(sql);
+        if (hasTables) {
+            String temporalSql = new String(Profitable.getInstance().getResource("db/migration/temporal_migration.tmp").readAllBytes());
+            String[] sqls = temporalSql.split(";");
+
+            try (Statement stmt = connection.createStatement()) {
+                for (String sql : sqls) {
+                    if (!sql.isBlank()) stmt.execute(sql.trim());
+                }
+
+                stmt.execute("INSERT INTO profitable_database_version (version) VALUES (1)");
+            }catch (SQLException e){
+                e.printStackTrace();
             }
 
-            String version = file.substring(file.indexOf("V")+1, file.indexOf("__"));
-            stmt.execute("INSERT INTO profitable_database_version (version) VALUES (" + version + ")");
+            Profitable.getInstance().getLogger().info("Partially Migrated Pre-0.2.0 database");
+            Profitable.getInstance().getLogger().warning("ORDERS and PER-WORLD DATA weren't migrated!");
+            return;
+        }
+        // ^^^^ ##################################### TEMPORAL ##################################### ^^^^
+
+        for (int i = currentVersion; i < migrationFiles.size(); i++) {
+            String file = migrationFiles.get(i);
+            String fileContent = new String(Profitable.getInstance().getResource(file).readAllBytes());
+            String[] sqls = fileContent.split(";");
+
+            try (Statement stmt = connection.createStatement()) {
+                for (String sql : sqls) {
+                    if (!sql.isBlank()) stmt.execute(sql.trim());
+                }
+
+                String version = file.substring(file.indexOf("V") + 1, file.indexOf("__"));
+                stmt.execute("INSERT INTO profitable_database_version (version) VALUES (" + version + ")");
+            }catch (SQLException ignored){
+
+            }
         }
 
         Profitable.getInstance().getLogger().info("Migrated database successfully!");
