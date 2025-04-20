@@ -152,7 +152,7 @@ public class AssetCommand  implements CommandExecutor {
         String[] durations = {"1M", "3M", "6M", "1Y", "2Y"};
         String[] durationsText = {"1 Month", "3 Months", "6 Months", "1 Year", "2 Years"};
 
-        Component component = MessagingUtil.profitableTopSeparator().appendNewline()
+        Component component = MessagingUtil.profitableTopSeparator("Graphs", "-----------------").appendNewline()
                 .append(Component.text("Graphs for " + asset + " (In Minecraft time):")).appendNewline();
         for (int i = 0; i < durations.length; i++) {
             String cmnd = "/asset " + asset + " graph " + durations[i];

@@ -716,7 +716,7 @@ public class AdminCommand implements CommandExecutor {
                 }
 
                 MessagingUtil.sendCustomMessage(sender,
-                        MessagingUtil.profitableTopSeparator().appendNewline()
+                        MessagingUtil.profitableTopSeparator("Wallet","------------------").appendNewline()
                                 .append(AccountHoldings.AssetBalancesToString( account)).appendNewline()
                                 .append(MessagingUtil.profitableBottomSeparator())
                         );

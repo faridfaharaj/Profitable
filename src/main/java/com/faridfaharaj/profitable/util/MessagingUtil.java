@@ -60,12 +60,6 @@ public class MessagingUtil {
                 .append(Component.text("] ",Configuration.COLORPROFITABLE));
     }
 
-    public static Component profitableTopSeparator(){
-        return Component.text("").append(Component.text("--------------- [",Configuration.COLORPROFITABLE))
-                .append(Component.text("Profitable",Configuration.COLORPROFITABLE).decorate(TextDecoration.BOLD))
-                .append(Component.text("] ----------------",Configuration.COLORPROFITABLE));
-    }
-
     public static Component profitableTopSeparator(String text, String sides){
         return Component.text("").append(Component.text(sides + " [",Configuration.COLORPROFITABLE))
                 .append(Component.text(text,Configuration.COLORPROFITABLE).decorate(TextDecoration.BOLD))

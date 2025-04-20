@@ -21,24 +21,23 @@ public class HelpCommand implements CommandExecutor {
 > /help admin
 §e Sends a list of commands meant for administrators and ops §r
 -----
------
-> /sell <Asset> <Units>
-§e Sends an order to buy an asset at an specified price §r
------
 > /sell <Asset> <Units>
 §e Sends an order to sell an asset immediately at the lowest price §r
+-----
+> /sell <Asset> <Units> <Price>
+§e Sends an order to sell an asset at an specified price §r
+-----
+> /sell <Asset> <Units> <Price> stop-limit
+§e Sends an order that turns into a limit order when market reaches its price §r
+-----
+> /buy <Asset> <Units>
+§e Sends an order to buy an asset immediately at the lowest price §r
 -----
 > /buy <Asset> <Units> <Price>
 §e Sends an order to buy an asset at an specified price §r
 -----
-> /buy <Asset> <Units> <Price>
-§e Sends an order to sell an asset immediately at the lowest price §r
------
 > /buy <Asset> <Units> <Price> stop-limit
-§e Sends an order to buy an asset at an specified price §r
------
-> /buy <Asset> <Units> <Price> stop-limit
-§e Sends an order that turns into a limit order when market reaches this price §r
+§e Sends an order that turns into a limit order when market reaches its price §r
 -----
 > /account
 §e Returns current active account §r
@@ -105,6 +104,9 @@ public class HelpCommand implements CommandExecutor {
 -----
 > /asset <Asset> graph <Time frame>
 §e Gives you a map containing a candles graph showcasing price movements across a certain time frame §r""", """
+> /admin config reload
+§e Reloads and updates most config changes §r
+-----
 > /admin getplayeracc <player>
 §e shows player's current active account §r
 -----
@@ -171,14 +173,8 @@ public class HelpCommand implements CommandExecutor {
 > /admin assets fromid <asset> newtransaction <price> <volume>
 §e fakes transactions to make the illusion of market movement on an asset §r
 -----
-> /admin assets fromid <asset> resettransactions
-§e deletes all records of transactions from an asset (this kills graphs) §r
------
 > /admin assets fromid <asset> edit <New symbol> <New name> <New Color>
-§e Allows you to edit the appearance and identifier of assets §r
------
-> /admin config reload
-§e Reloads and updates most config changes §r
+§e Allows you to edit the appearance and identifier of registered assets §r
 -----
 > /admin assets fromid <asset> resettransactions
 §e deletes all records of transactions from an asset (this kills graphs) §r"""
@@ -203,7 +199,7 @@ public class HelpCommand implements CommandExecutor {
         }
 
         MessagingUtil.sendCustomMessage(sender,
-                MessagingUtil.profitableTopSeparator().appendNewline()
+                MessagingUtil.profitableTopSeparator("Help", "-------------------").appendNewline()
                         .append(Component.text(pages[page])).appendNewline()
                         .append(MessagingUtil.profitableBottomSeparator())
         );

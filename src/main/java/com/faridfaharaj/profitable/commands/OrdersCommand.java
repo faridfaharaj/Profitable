@@ -66,7 +66,7 @@ public class OrdersCommand  implements CommandExecutor {
                 MessagingUtil.sendEmptyNotice(player, "No active orders on this account");
             }else {
                 int totalPages = (orders.size()-1)/2;
-                Component component = MessagingUtil.profitableTopSeparator();
+                Component component = MessagingUtil.profitableTopSeparator("Orders", "-----------------");
                 for(int i = page*2; i<Math.min(page*2+2,orders.size()); i++){
                     Order order = orders.get(i);
                     String cmnd = "/orders cancel " + order.getUuid();
