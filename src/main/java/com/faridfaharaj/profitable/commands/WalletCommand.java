@@ -40,7 +40,7 @@ public class WalletCommand implements CommandExecutor {
                 String account = Accounts.getAccount(player);
                 MessagingUtil.sendCustomMessage(sender,
                         MessagingUtil.profitableTopSeparator("Wallet","------------------").appendNewline()
-                                .append(AccountHoldings.AssetBalancesToString(account, 1)).appendNewline()
+                                .append(AccountHoldings.AssetBalancesToString(account)).appendNewline()
                                 .append(MessagingUtil.profitableBottomSeparator())
                 );
 
