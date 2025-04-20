@@ -74,7 +74,7 @@ public class OrdersCommand  implements CommandExecutor {
                             .append(Component.text("[Click to cancel]",Configuration.COLORINFO)
                                     .clickEvent(ClickEvent.runCommand(cmnd))
                                     .hoverEvent(HoverEvent.showText(Component.text(cmnd,Configuration.COLORINFO))))
-                    ;
+                            .appendNewline();
                 }
                 component = component.appendNewline().append(MessagingUtil.profitablePaginator(page, totalPages, "/orders"));
                 MessagingUtil.sendCustomMessage(sender, component);

@@ -79,8 +79,7 @@ public class Order{
     //Asset: VLT Side: buy
     //Price: 23 Units: 32
     public Component toComponent(){
-        return Component.text("ID: ").append(Component.text(uuid.toString(), NamedTextColor.GRAY)).appendNewline()
-                .append(Component.text("Asset: ")).append(Component.text(asset,NamedTextColor.GRAY)).append(Component.text(" Side: ")).append((sideBuy? Component.text("buy",Configuration.COLORBULLISH) : Component.text("sell",Configuration.COLORBEARISH))).append(Component.text(" Type: ")).append(Component.text(type.toString().replace("_", "-"), NamedTextColor.GRAY)).appendNewline()
+        return  Component.text("Asset: ").append(Component.text(asset,NamedTextColor.GRAY)).append(Component.text(" Side: ")).append((sideBuy? Component.text("buy",Configuration.COLORBULLISH) : Component.text("sell",Configuration.COLORBEARISH))).append(Component.text(" Type: ")).append(Component.text(type.toString().replace("_", "-"), NamedTextColor.GRAY)).appendNewline()
                 .append(Component.text("Price: ")).append(Component.text(price,NamedTextColor.GRAY)).append(Component.text(" Units: ")).append(Component.text(units,NamedTextColor.GRAY));
     }
 
