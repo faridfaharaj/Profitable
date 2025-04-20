@@ -64,7 +64,7 @@ public class Orders {
     }
 
     public static void updateStopLimit(double old, double actual) {
-        String sql = "UPDATE orders SET order_type = " + Order.OrderType.LIMIT.getValue() + " WHERE world = ? AND order_type == " + Order.OrderType.STOP_LIMIT.getValue() + " AND price <= ? AND price >= ?;";
+        String sql = "UPDATE orders SET order_type = " + Order.OrderType.LIMIT.getValue() + " WHERE world = ? AND order_type = " + Order.OrderType.STOP_LIMIT.getValue() + " AND price <= ? AND price >= ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
             stmt.setBytes(1, DataBase.getCurrentWorld());

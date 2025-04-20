@@ -64,19 +64,13 @@ public class Assets {
 
     public static boolean updateAsset(String assetID, Asset updatedAsset){
         String sql = "UPDATE assets SET asset_id = ?, meta = ? WHERE world = ? AND asset_id = ?;";
-        System.out.println("updateasset");
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-
-            System.out.println("dsoasod");
 
             stmt.setString(1,updatedAsset.getCode());
             stmt.setBytes(2, Asset.metaData(updatedAsset));
             stmt.setBytes(3, DataBase.getCurrentWorld());
             stmt.setString(4, assetID);
-
-            System.out.println("Updating asset: " + assetID + " to " + updatedAsset.getCode());
-            System.out.println("World: " + Arrays.toString(DataBase.getCurrentWorld()));
 
             return stmt.executeUpdate() > 0;
 
@@ -86,7 +80,6 @@ public class Assets {
             throw new RuntimeException(e);
         }
 
-        System.out.println("error");
         return false;
     }
 

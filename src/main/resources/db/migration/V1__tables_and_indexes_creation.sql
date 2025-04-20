@@ -8,6 +8,11 @@ CREATE TABLE IF NOT EXISTS assets
     PRIMARY KEY(world ,asset_id)
 );
 
+CREATE INDEX idx_asset_type ON assets (world, asset_type);
+
+
+
+
 CREATE TABLE IF NOT EXISTS accounts
 (
     world BINARY(16),
@@ -20,6 +25,9 @@ CREATE TABLE IF NOT EXISTS accounts
 
     PRIMARY KEY (world, account_name)
 );
+CREATE INDEX idx_entity_claim_id ON accounts(entity_claim_id DESC);
+
+
 
 CREATE TABLE IF NOT EXISTS account_assets
 (
@@ -33,6 +41,10 @@ CREATE TABLE IF NOT EXISTS account_assets
     FOREIGN KEY (world, asset_id) REFERENCES assets(world, asset_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (world, account_name) REFERENCES accounts(world, account_name) ON DELETE CASCADE
 );
+CREATE INDEX idx_account_asset_lookup ON account_assets (world, account_name);
+
+
+
 
 CREATE TABLE IF NOT EXISTS orders
 (
@@ -50,6 +62,13 @@ CREATE TABLE IF NOT EXISTS orders
     FOREIGN KEY (world, asset_id) REFERENCES assets(world, asset_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (world, owner) REFERENCES accounts(world, account_name) ON DELETE CASCADE
 );
+CREATE INDEX idx_order_uuid ON orders(world, order_uuid);
+CREATE INDEX idx_orders_owner ON orders (world, owner);
+CREATE INDEX idx_orders_best_price ON orders (world, asset_id, sideBuy, price, order_type);
+CREATE INDEX idx_orders_stop_update ON orders(world, order_type, price);
+
+
+
 
 CREATE TABLE IF NOT EXISTS candles_day
 (
@@ -66,6 +85,7 @@ CREATE TABLE IF NOT EXISTS candles_day
 
     FOREIGN KEY (world, asset_id) REFERENCES assets(world, asset_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+CREATE INDEX idx_candles_lookup ON candles_day (world, asset_id, time DESC);
 
 CREATE TABLE IF NOT EXISTS candles_week
 (
@@ -98,15 +118,3 @@ CREATE TABLE IF NOT EXISTS candles_month
 
     FOREIGN KEY (world, asset_id) REFERENCES assets(world, asset_id) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
-
-CREATE INDEX idx_assets_type ON assets (world, asset_type);
-
-CREATE INDEX idx_account_assets_account_name_asset_id ON account_assets (world, account_name, asset_id);
-
-CREATE INDEX idx_orders_asset_id_sideBuy_price ON orders (world, asset_id, sideBuy, price);
-CREATE INDEX idx_orders_owner ON orders (world, owner);
-
-CREATE INDEX idx_candles_day_asset_id_time ON candles_day (world, asset_id, time);
-CREATE INDEX idx_candles_week_asset_id_time ON candles_week (world, asset_id, time);
-CREATE INDEX idx_candles_month_asset_id_time ON candles_month (world, asset_id, time);
