@@ -97,8 +97,8 @@ public final class Profitable extends JavaPlugin {
                     DataBase.updateWorld(world);
                     Assets.generateAssets();
                     Accounts.registerDefaultAccount("server");
-                    Accounts.changeEntityDelivery("server", Location.BLOCK_ZERO.toLocation(world));
-                    Accounts.changeItemDelivery("server", Location.BLOCK_ZERO.toLocation(world));
+                    Accounts.changeEntityDelivery("server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
+                    Accounts.changeItemDelivery("server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
