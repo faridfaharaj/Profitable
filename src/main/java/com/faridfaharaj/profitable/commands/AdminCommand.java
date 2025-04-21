@@ -78,16 +78,17 @@ public class AdminCommand implements CommandExecutor {
 
         if(Objects.equals(args[0], "config")){
 
-            if(!sender.hasPermission("profitable.admin.accounts.manage.forcelogout")){
-                MessagingUtil.sendGenericMissingPerm(sender);
-                return true;
-            }
-
             if(args.length == 1){
                 MessagingUtil.sendError(sender, "/admin config <property>");
             }
 
             if(Objects.equals(args[1], "reloadconfig")){
+
+                if(!sender.hasPermission("profitable.admin.config.reloadconfig")){
+                    MessagingUtil.sendGenericMissingPerm(sender);
+                    return true;
+                }
+
                 Configuration.reloadConfig(Profitable.getInstance());
                 MessagingUtil.sendSuccsess(sender, "Successfully reloaded config file");
                 MessagingUtil.sendWarning(sender, "Some properties require restarting the server");

@@ -37,36 +37,40 @@ public class Exchange {
             return;
         }
 
-        String assetTypeName = NamingUtil.nameType(tradedAsset.getAssetType());
-        if(tradedAsset.getAssetType() == 2){
-            if(!player.hasPermission("profitable.market.trade.asset.item")){
-                MessagingUtil.sendError(player, "You don't have permission to trade items");
-                return;
-            }
-            if(Accounts.getItemDelivery(order.getOwner()) == null){
-                MessagingUtil.sendWarning(player, "You must set a location for delivery");
-                MessagingUtil.sendButton(player, "[/delivery set item]", "/delivery set item");
-                TemporalItems.sendDeliveryStick(player, true);
+        if(Configuration.PHYSICALDELIVERY){
+            String assetTypeName = NamingUtil.nameType(tradedAsset.getAssetType());
+
+            if(tradedAsset.getAssetType() == 2){
+                if(!player.hasPermission("profitable.market.trade.asset.item")){
+                    MessagingUtil.sendError(player, "You don't have permission to trade items");
+                    return;
+                }
+                if(Accounts.getItemDelivery(order.getOwner()) == null){
+                    MessagingUtil.sendWarning(player, "You must set a location for delivery");
+                    MessagingUtil.sendButton(player, "[/delivery set item]", "/delivery set item");
+                    TemporalItems.sendDeliveryStick(player, true);
+                    return;
+                }
+
+
+            }else if(tradedAsset.getAssetType() == 3){
+                if(!player.hasPermission("profitable.market.trade.asset.entity")){
+                    MessagingUtil.sendError(player, "You don't have permission to trade entities");
+                    return;
+                }
+                if(Accounts.getEntityDelivery(order.getOwner()) == null){
+                    MessagingUtil.sendWarning(player, "You must set a location for delivery");
+                    MessagingUtil.sendButton(player, "[/delivery set entity]", "/delivery set entity");
+                    TemporalItems.sendDeliveryStick(player, false);
+                    return;
+                }
+
+
+            }else if(!player.hasPermission("profitable.market.trade.asset."+ assetTypeName.toLowerCase())){
+                MessagingUtil.sendError(player, "You don't have permission to trade assets from type: " + assetTypeName);
                 return;
             }
 
-
-        }else if(tradedAsset.getAssetType() == 3){
-            if(!player.hasPermission("profitable.market.trade.asset.entity")){
-                MessagingUtil.sendError(player, "You don't have permission to trade entities");
-                return;
-            }
-            if(Accounts.getEntityDelivery(order.getOwner()) == null){
-                MessagingUtil.sendWarning(player, "You must set a location for delivery");
-                MessagingUtil.sendButton(player, "[/delivery set entity]", "/delivery set entity");
-                TemporalItems.sendDeliveryStick(player, false);
-                return;
-            }
-
-
-        }else if(!player.hasPermission("profitable.market.trade.asset."+ assetTypeName.toLowerCase())){
-            MessagingUtil.sendError(player, "You don't have permission to trade assets from type: " + assetTypeName);
-            return;
         }
 
         if(tradedAsset.getAssetType() == 2 || tradedAsset.getAssetType() == 3) order.setUnits((int) order.getUnits());
