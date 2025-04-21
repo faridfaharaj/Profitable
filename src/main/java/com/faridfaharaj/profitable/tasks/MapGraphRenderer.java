@@ -117,7 +117,7 @@ public class MapGraphRenderer extends MapRenderer {
 
 
             if(volume > 0){
-                volume = bottom - (int) Math.ceil(volume / candles.getLast().getVolume() * ((double) top /2));
+                volume = bottom - (int) Math.ceil(volume / candles.getLast().getVolume() * ((double) top /3));
                 shadedRectangle(canvas, offset+spacing, bottom,offset+wideness-1, (int) volume, volumeColor);
             }
 
