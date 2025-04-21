@@ -4,10 +4,10 @@
 
 
 ## About
-Profitable is a Minecraft Economy plugin that adds real supply and demand to the game using an exchange!
+Profitable is a Minecraft Economy plugin that adds **real** supply and demand to the game using an exchange!
 
 This means that prices arent pre-set, nor just go up +1 when someone buys something,
-Prices are placed by the players by using orders, which transact whenever two orders agree on certain price range, and thus turning into the current value of the asset.
+Prices are **placed by the players** by using orders, which transact whenever two orders agree on certain price range, and thus turning into the current value of the asset.
 
 # 🔖 New features - `0.2.0-beta`
 ## ⭐️ Highlights
@@ -44,7 +44,7 @@ Useful if you think Prices will keep going up after a certain price
 
 ## ⚠️ Important
 
-This Update had major changes on the way databases are managed, meaning databases from pre 0.2.0 versions will only migrate partially as Orders and Multi-World data cannot be migrated, cancel all orders and back-up your data before runing this new version.
+This Update had major changes on the way databases are managed, meaning databases from pre 0.2.0 versions will only migrate partially as **Orders and Multi-World data cannot be migrated**, cancel all orders and back-up your data **before** runing this new version.
 
 # 📌 Features
 
