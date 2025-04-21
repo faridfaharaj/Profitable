@@ -38,10 +38,13 @@ A **Stop-Limit Order** becomes a **Limit Order** once the market reaches the spe
 
 ``/buy <Asset> <Units> <Price> stop-limit`` or ``/sell <Asset> <Price> stop-limit``
 
-Useful when You think Prices will keep going up after a certain price
+Useful if you think Prices will keep going up after a certain price
 
 ![bii](https://github.com/user-attachments/assets/79c4bc07-290e-42e7-a194-05c332c7d328)
 
+## ⚠️ Important
+
+This Update had major changes on the way databases are managed, meaning databases from pre 0.2.0 versions will only migrate partially as Orders and Multi-World data cannot be migrated, cancel all orders and back-up your data before runing this new version.
 
 # 📌 Features
 
