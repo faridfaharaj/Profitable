@@ -7,6 +7,7 @@ import net.kyori.adventure.platform.bukkit.*;
 
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,7 +39,7 @@ import java.util.regex.Pattern;
  *                                                                            *
  *   You should have received a copy of the GNU General Public License        *
  *   along with this program.  If not, see <https://www.gnu.org/licenses/>.   *
-*/
+ */
 public final class Profitable extends JavaPlugin {
 
     private static Profitable instance;
@@ -96,6 +97,8 @@ public final class Profitable extends JavaPlugin {
                     DataBase.updateWorld(world);
                     Assets.generateAssets();
                     Accounts.registerDefaultAccount("server");
+                    Accounts.changeEntityDelivery("server", Location.BLOCK_ZERO.toLocation(world));
+                    Accounts.changeItemDelivery("server", Location.BLOCK_ZERO.toLocation(world));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -104,6 +107,8 @@ public final class Profitable extends JavaPlugin {
         }else{
             Assets.generateAssets();
             Accounts.registerDefaultAccount("server");
+            Accounts.changeEntityDelivery("server", Location.BLOCK_ZERO.toLocation(Profitable.getInstance().getServer().getWorlds().getFirst()));
+            Accounts.changeItemDelivery("server", Location.BLOCK_ZERO.toLocation(Profitable.getInstance().getServer().getWorlds().getFirst()));
             getLogger().info("Using single server-wide data");
         }
 

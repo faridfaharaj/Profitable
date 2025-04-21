@@ -52,7 +52,7 @@ public class DataBase {
 
         // TEMPORAL ######
         try{
-            Files.move(Paths.get(Profitable.getInstance().getDataPath()+"/data/server_Wide.db"), Paths.get(Profitable.getInstance().getDataFolder().getAbsolutePath() + "/Data.db"), StandardCopyOption.REPLACE_EXISTING);
+            Files.move(Paths.get(Profitable.getInstance().getDataFolder().getAbsolutePath()+"/data/server_Wide.db"), Paths.get(Profitable.getInstance().getDataFolder().getAbsolutePath() + "/Data.db"), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ignored) {
         }
         // TEMPORAL ######
@@ -128,12 +128,12 @@ public class DataBase {
         }
 
         // vvvv ##################################### TEMPORAL ##################################### vvvv
-        boolean hasTables = false;
-        try (ResultSet tables = connection.getMetaData().getTables(null, null, "%", new String[]{"TABLE"})) {
-            hasTables = tables.next();
-        }catch (SQLException ignored){}
+        boolean isOld = false;
+        try (ResultSet tables = connection.getMetaData().getTables(null, null, "assets", new String[]{"TABLE"})) {
+            isOld = tables.next();
+        } catch (SQLException ignored) {}
 
-        if (hasTables) {
+        if (isOld) {
             String temporalSql = new String(Profitable.getInstance().getResource("db/migration/temporal_migration.tmp").readAllBytes());
             String[] sqls = temporalSql.split(";");
 

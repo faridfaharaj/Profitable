@@ -8,7 +8,6 @@ import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -132,6 +131,8 @@ public class Events implements Listener {
                 DataBase.updateWorld(event.getWorld());
                 Assets.generateAssets();
                 Accounts.registerDefaultAccount("server");
+                Accounts.changeEntityDelivery("server", Location.BLOCK_ZERO.toLocation(event.getWorld()));
+                Accounts.changeItemDelivery("server", Location.BLOCK_ZERO.toLocation(event.getWorld()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
