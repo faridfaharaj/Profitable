@@ -57,7 +57,7 @@ A **Stop-Limit Order** becomes a **Limit Order** once the market reaches the spe
 This plugin uses **Orders** to trade.
 Orders are instructions to sell or buy an asset (item, entity, currency, etc...) under specified conditions
 
-## 🔸 Market Order
+## 📗 Market Order
 
 A **Market order** lets you transact immediately with the best available price in the order book.
 
@@ -71,33 +71,30 @@ or
 
 ![Untitled video - Made with Clipchamp (1)](https://github.com/user-attachments/assets/79305223-eb12-4910-af62-429dc131a6dd)
 
-## 🔸 Limit Order
+## 📘 Limit Order
 
-**Limit Orders** lets you choose the price you will transact, but may not execute right away as it needs some other order to agree on the price waiting on the order book
+**Limit Orders** lets you choose the price you will transact, but may not execute right away as it needs some other order to agree on the price waiting on the order book, Players can place an order to trade stuff at the price they think fair, actually influencing the market.
 
 ``/buy <Asset> <Units> <Price>`` or ``/sell <Asset> <Units> <Price>``
 
 ![Untitled video - Made with Clipchamp](https://github.com/user-attachments/assets/c091b8f5-9f20-44d2-bd6f-17b3ca0171b3)
 
 
-Players can place an order to trade stuff at the price they think fair, actually influencing the market.
 
 
-
-# Market Data & Analysis
+# 📊 Market Data & Analysis
 
 Since Profitable is a plugin designed to simulate real trading, which includes speculation and market data tracking,
-
 Players can monitor **prices**, **price movements**, **liquidity**, **supply**, and more stuff using a single command:
 
 ``/asset <asset>``
 
-![Screenshot 2025-03-31 172023](https://github.com/user-attachments/assets/abca4ece-a906-47bd-8494-3e19f9007346)
-
-
 Even some nice fancy candle graphs, so players can predict and profit off of speculation.
 
-# Why?
+![2025-04-20_20 30 33](https://github.com/user-attachments/assets/7a7d318c-c17d-4f68-b403-386a3527d711)
+
+
+# 💸 Why?
 
 **Put it like this**, 
 
