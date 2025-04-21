@@ -32,7 +32,7 @@ Prices are **placed by the players** by using orders, which transact whenever tw
 - **Command to reload configuration**
 - **Console update notice**
 
-## 📑 Limit-Order
+## 📑 Stop-Limit Order
 
 A **Stop-Limit Order** becomes a **Limit Order** once the market reaches the specified trigger price
 
