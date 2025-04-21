@@ -1,4 +1,8 @@
 # Profitable
+
+![wideboy profitable](https://github.com/user-attachments/assets/ba556248-c80e-4241-91cd-cc5accb431d5)
+
+
 ## About
 Profitable is a Minecraft Economy plugin that adds real supply and demand to the game using an exchange!
 
@@ -33,6 +37,10 @@ Prices are placed by the players by using orders, which transact whenever two or
 A **Stop-Limit Order** becomes a **Limit Order** once the market reaches the specified trigger price
 
 ``/buy <Asset> <Units> <Price> stop-limit`` or ``/sell <Asset> <Price> stop-limit``
+
+Useful when You think Prices will keep going up after a certain price
+
+![bii](https://github.com/user-attachments/assets/79c4bc07-290e-42e7-a194-05c332c7d328)
 
 
 # 📌 Features
