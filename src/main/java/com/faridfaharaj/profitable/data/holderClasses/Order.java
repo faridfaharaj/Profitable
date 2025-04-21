@@ -4,31 +4,69 @@ import com.faridfaharaj.profitable.Configuration;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
+import java.util.UUID;
+
 public class Order{
 
-    private final String uuid;
+    private final UUID uuid;
     private final String owner;
     private final String asset;
     private final boolean sideBuy;
     private final double price;
     private double units;
+    private OrderType type;
 
-    public Order(String uuid, String owner, String asset, boolean sideBuy, double price, double units) {
+    public Order(UUID uuid, String owner, String asset, boolean sideBuy, double price, double units, OrderType type) {
         this.uuid = uuid;
         this.owner = owner;
         this.asset = asset;
         this.sideBuy = sideBuy;
         this.price = price;
         this.units = units;
+        this.type = type;
+    }
+
+    public enum OrderType {
+        LIMIT(0),
+        MARKET(1),
+        STOP_LIMIT(2),
+        STOP_MARKET(3);
+
+        private final int value;
+
+        OrderType(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public static OrderType fromValue(int value) {
+            for (OrderType t : OrderType.values()) {
+                if (t.value == value) return t;
+            }
+            throw new IllegalArgumentException("Invalid OrderType code: " + value);
+        }
+
     }
 
     // Getters
-    public String getUuid() { return uuid; }
+    public UUID getUuid() { return uuid; }
     public String getOwner() { return owner; }
     public String getAsset() { return asset; }
     public boolean isSideBuy() { return sideBuy; }
     public double getPrice() { return price; }
     public double getUnits() { return units; }
+    public OrderType getType() { return type; }
+
+    public void setUnits(double units){
+        this.units = units;
+    }
+
+    public void setType(OrderType type){
+        this.type = type;
+    }
 
     @Override
     public String toString() {
@@ -41,14 +79,13 @@ public class Order{
     //Asset: VLT Side: buy
     //Price: 23 Units: 32
     public Component toComponent(){
-        return Component.text("ID: ").append(Component.text(uuid, NamedTextColor.GRAY)).appendNewline()
-                .append(Component.text("Asset: ")).append(Component.text(asset,NamedTextColor.GRAY)).append(Component.text(" Side: ")).append((sideBuy? Component.text("buy",Configuration.COLORBULLISH) : Component.text("sell",Configuration.COLORBEARISH))).appendNewline()
+        return  Component.text("Asset: ").append(Component.text(asset,NamedTextColor.GRAY)).append(Component.text(" Side: ")).append((sideBuy? Component.text("buy",Configuration.COLORBULLISH) : Component.text("sell",Configuration.COLORBEARISH))).append(Component.text(" Type: ")).append(Component.text(type.toString().replace("_", "-"), NamedTextColor.GRAY)).appendNewline()
                 .append(Component.text("Price: ")).append(Component.text(price,NamedTextColor.GRAY)).append(Component.text(" Units: ")).append(Component.text(units,NamedTextColor.GRAY));
     }
 
     // [ sell 32 VLT $23 ]
     public Component toStringSimplified() {
-        return Component.text("[ "+(sideBuy? "buy " : "sell ") + units + " " + asset + " $" + price + " ]", NamedTextColor.GRAY);
+        return Component.text("[ "+ type.toString().replace("_", "-") +(sideBuy? " buy " : " sell ") + units + " " + asset + " $" + price + " ]", NamedTextColor.GRAY);
     }
 
 }

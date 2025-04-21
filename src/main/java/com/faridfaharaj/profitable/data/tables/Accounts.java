@@ -3,8 +3,7 @@ package com.faridfaharaj.profitable.data.tables;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
-import com.faridfaharaj.profitable.util.TextUtil;
-import com.faridfaharaj.profitable.util.RandomUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -12,6 +11,7 @@ import org.bukkit.entity.Player;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -35,7 +35,7 @@ public class Accounts {
                 k -> {
             String uuidString = k.toString();
             registerDefaultAccount(uuidString);
-            TextUtil.sendSuccsess(player, "Logged into default account");
+            MessagingUtil.sendSuccsess(player, "Logged into default account");
             return uuidString;
         }
 
@@ -43,19 +43,44 @@ public class Accounts {
 
     }
 
+    public static int nextClaimID(){
+
+        String sql = "SELECT COALESCE(MAX(entity_claim_id), 99) + 1 FROM accounts;";
+
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+
+    }
+
     public static boolean registerAccount(String name, String password) {
-        String sql = "INSERT INTO accounts (account_name, password, salt, item_delivery_pos, entity_delivery_pos, entity_claim_id) VALUES (?, ?, ?, ?, ?, (SELECT COALESCE(MAX(entity_claim_id), 99) + 1 FROM accounts))";
+        String sql = "INSERT INTO accounts (world ,account_name, password, salt, item_delivery_pos, entity_delivery_pos, entity_claim_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
+        int claimid = nextClaimID();
 
-            Map.Entry<byte[], byte[]> hashedpassword = hashPassword(password);
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
 
-            stmt.setString(1, name);
-            stmt.setBytes(2, hashedpassword.getKey());
-            stmt.setBytes(3, hashedpassword.getValue());
+            byte[][] hashedpassword = hashPassword(password);
 
-            stmt.setObject(4, null, Types.BLOB);
-            stmt.setObject(5, null, Types.BLOB);
+            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setString(2, name);
+            stmt.setBytes(3, hashedpassword[0]);
+            stmt.setBytes(4, hashedpassword[1]);
+
+            stmt.setObject(5, null, Types.BINARY);
+            stmt.setObject(6, null, Types.BINARY);
+
+            stmt.setInt(7, claimid);
 
             stmt.executeUpdate();
 
@@ -69,16 +94,21 @@ public class Accounts {
     }
 
     public static boolean registerDefaultAccount(String name) {
-        String sql = "INSERT OR IGNORE INTO accounts (account_name, password, salt, item_delivery_pos, entity_delivery_pos, entity_claim_id) VALUES (?, ?, ?, ?, ?, (SELECT COALESCE(MAX(entity_claim_id), 99) + 1 FROM accounts))";
+        String sql = "INSERT " + (Profitable.getInstance().getConfig().getInt("database.database-type") == 0 ? "OR ": "") + "IGNORE INTO accounts (world, account_name, password, salt, item_delivery_pos, entity_delivery_pos, entity_claim_id) VALUES (? ,?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
+        int claimid = nextClaimID();
 
-            stmt.setString(1, name);
-            stmt.setString(2, RandomUtil.RANDOM.nextInt(10000)+"sd");
-            stmt.setString(3, RandomUtil.RANDOM.nextInt(10000)+"sd");
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
 
-            stmt.setObject(4, null, Types.BLOB);
+            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setString(2, name);
+            stmt.setString(3, "un-passwordable");
+            stmt.setString(4, "password1234");
+
             stmt.setObject(5, null, Types.BLOB);
+            stmt.setObject(6, null, Types.BLOB);
+
+            stmt.setInt(7, claimid);
 
             if(stmt.executeUpdate() > 0){
                 double initialBalance = Profitable.getInstance().getConfig().getDouble("main-currency.initial-balance");
@@ -93,6 +123,193 @@ public class Accounts {
             e.printStackTrace();
         }
 
+        return false;
+    }
+
+    public static Map.Entry<byte[], byte[]> getPasswordHash(String name){
+
+        String sql = "SELECT * FROM accounts WHERE world = ? AND account_name = ?;";
+
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setString(2, name);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    byte[] pasword = rs.getBytes("password");
+                    byte[] salt = rs.getBytes("salt");
+                    if(pasword == null || salt == null){
+                        return null;
+                    }
+
+                    return Map.entry(pasword, salt);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+
+    public static boolean changePassword(String name, String password) {
+        String sql = "UPDATE accounts SET password = ?, salt = ? WHERE world = ? AND account_name = ?;";
+
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+
+            byte[][] hashedpassword = hashPassword(password);
+
+            stmt.setBytes(1, hashedpassword[0]);
+            stmt.setBytes(2, hashedpassword[1]);
+
+            stmt.setBytes(3, DataBase.getCurrentWorld());
+            stmt.setString(4, name);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public static boolean changeItemDelivery(String name, Location location) {
+
+        String sql = "UPDATE accounts SET item_delivery_pos = ? WHERE world = ? AND account_name = ?;";
+
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+
+            stmt.setBytes(1, encodeLocation(location));
+
+            stmt.setBytes(2, DataBase.getCurrentWorld());
+            stmt.setString(3, name);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return false;
+    }
+
+    public static boolean changeEntityDelivery(String name, Location location) {
+        String sql = "UPDATE accounts SET entity_delivery_pos = ? WHERE world = ? AND account_name = ?;";
+
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+
+            stmt.setBytes(1, encodeLocation(location));
+
+            stmt.setBytes(2, DataBase.getCurrentWorld());
+            stmt.setString(3, name);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return false;
+    }
+
+    public static String getEntityClaimId(String name) {
+        String sql = "SELECT * FROM accounts WHERE world = ? AND account_name = ?;";
+
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setString(2, name);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+
+                    return ("§eE "+rs.getInt("entity_claim_id"));
+
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static Location getItemDelivery(String name) {
+        String sql = "SELECT * FROM accounts WHERE world = ? AND account_name = ?;";
+
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setString(2, name);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    byte[] itemDeliveryPos = rs.getBytes("item_delivery_pos");
+
+                    if (!rs.wasNull()) {
+
+                        return decodeLocation(itemDeliveryPos);
+
+                    }
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static Location getEntityDelivery(String name) {
+        String sql = "SELECT * FROM accounts WHERE world = ? AND account_name = ?;";
+
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setString(2, name);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    byte[] itemDeliveryPos = rs.getBytes("entity_delivery_pos");
+
+                    if (!rs.wasNull()) {
+
+                        return decodeLocation(itemDeliveryPos);
+
+                    }
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static boolean deleteAccount(String asset) {
+        String sql = "DELETE FROM accounts WHERE world = ? AND account_name = ?;";
+
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setString(2, asset);
+            int affected = stmt.executeUpdate();
+
+            return 0 < affected;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
@@ -131,7 +348,7 @@ public class Accounts {
         return true;
     }
 
-    public static Map.Entry<byte[], byte[]> hashPassword(String password) {
+    public static byte[][] hashPassword(String password) {
         int iterations = 10000;
         int keyLength = 128;
         char[] chars = password.toCharArray();
@@ -143,7 +360,14 @@ public class Accounts {
             PBEKeySpec spec = new PBEKeySpec(chars, salt, iterations, keyLength);
             SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             byte[] hash = skf.generateSecret(spec).getEncoded();
-            return Map.entry(hash, salt);
+
+            byte[][] hashes = new byte[2][];
+
+            hashes[0] = hash;
+            hashes[1] = salt;
+
+            return hashes;
+
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException("Error hashing password", e);
         }
@@ -163,238 +387,17 @@ public class Accounts {
         }
     }
 
-    public static Map.Entry<byte[], byte[]> getPasswordHash(String name){
-
-        String sql = "SELECT * FROM accounts WHERE account_name = ?;";
-
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-            stmt.setString(1, name);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    byte[] pasword = rs.getBytes("password");
-                    byte[] salt = rs.getBytes("salt");
-                    if(pasword == null || salt == null){
-                        return null;
-                    }
-
-                    return Map.entry(pasword, salt);
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-
-    }
-
-    public static boolean changePassword(String name, String password) {
-        String sql = "UPDATE accounts SET password = ?, salt = ? WHERE account_name = ?;";
-
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-
-            Map.Entry<byte[], byte[]> hashedpassword = hashPassword(password);
-
-            stmt.setBytes(1, hashedpassword.getKey());
-            stmt.setBytes(2, hashedpassword.getValue());
-
-            stmt.setString(3, name);
-
-            return stmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    public static boolean changeItemDelivery(String name, Location location) {
-
-        String sql = "UPDATE accounts SET item_delivery_pos = ? WHERE account_name = ?;";
-
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-
-            stmt.setBytes(1, encodeLocation(location));
-
-            stmt.setString(2, name);
-
-            return stmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return false;
-    }
-
-    public static boolean changeEntityDelivery(String name, Location location) {
-        String sql = "UPDATE accounts SET entity_delivery_pos = ? WHERE account_name = ?;";
-
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-
-            stmt.setBytes(1, encodeLocation(location));
-
-            stmt.setString(2, name);
-
-            return stmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return false;
-    }
-
-    public static boolean isItemDeliveryNull(String account) {
-
-
-        String sql = "SELECT 1 FROM accounts WHERE account_name = ? AND item_delivery_pos IS NULL LIMIT 1";
-
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-
-            stmt.setString(1, account);
-            ResultSet rs = stmt.executeQuery();
-
-            return rs.next();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-
-    }
-
-    public static boolean isEntityDeliveryNull(String account) {
-
-
-        String sql = "SELECT 1 FROM accounts WHERE account_name = ? AND entity_delivery_pos IS NULL LIMIT 1";
-
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-
-            stmt.setString(1, account);
-            ResultSet rs = stmt.executeQuery();
-
-            return rs.next();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-
-    }
-
-    public static String getEntityClaimId(String name) {
-        String sql = "SELECT * FROM accounts WHERE account_name = ?;";
-
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-            stmt.setString(1, name);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-
-                    return ("§eE "+rs.getInt("entity_claim_id"));
-
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return "null";
-    }
-
-    public static Location getItemDelivery(String name) {
-        String sql = "SELECT * FROM accounts WHERE account_name = ?;";
-
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-            stmt.setString(1, name);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    byte[] itemDeliveryPos = rs.getBytes("item_delivery_pos");
-
-                    if (!rs.wasNull()) {
-
-                        return decodeLocation(itemDeliveryPos);
-
-                    }
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static Location getEntityDelivery(String name) {
-        String sql = "SELECT * FROM accounts WHERE account_name = ?;";
-
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-            stmt.setString(1, name);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    byte[] itemDeliveryPos = rs.getBytes("entity_delivery_pos");
-
-                    if (!rs.wasNull()) {
-
-                        return decodeLocation(itemDeliveryPos);
-
-                    }
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static boolean deleteAccount(String asset) {
-        String sql = "DELETE FROM accounts WHERE account_name = ?;";
-
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-            stmt.setString(1, asset);
-            int affected = stmt.executeUpdate();
-
-            return 0 < affected;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     public static byte[] encodeLocation(Location location) throws IOException {
+        UUID worlduid = location.getWorld().getUID();
+        ByteBuffer buffer = ByteBuffer.allocate(40); // 16 bytes for UUID + 3 doubles (8 bytes each)
 
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
-             DataOutputStream dos = new DataOutputStream(bos)) {
+        buffer.putLong(worlduid.getMostSignificantBits());
+        buffer.putLong(worlduid.getLeastSignificantBits());
+        buffer.putDouble(location.getX());
+        buffer.putDouble(location.getY());
+        buffer.putDouble(location.getZ());
 
-            dos.writeUTF(location.getWorld().getName());
-            dos.writeDouble(location.getX());
-            dos.writeDouble(location.getY());
-            dos.writeDouble(location.getZ());
-
-            return bos.toByteArray();
-        }
-
+        return buffer.array();
     }
 
     public static Location decodeLocation(byte[] locationBytes) throws IOException {
@@ -404,13 +407,15 @@ public class Accounts {
             return null;
         }
 
-        try (ByteArrayInputStream bis = new ByteArrayInputStream(locationBytes);
-             DataInputStream dis = new DataInputStream(bis)) {
+        ByteBuffer buffer = ByteBuffer.wrap(locationBytes);
 
-            World world = Profitable.getInstance().getServer().getWorld(dis.readUTF());
-            return new Location(world, dis.readDouble(), dis.readDouble(), dis.readDouble());
+        World world = Profitable.getInstance().getServer().getWorld(new UUID(buffer.getLong(),buffer.getLong()));
 
+        if(world == null){
+            return null;
         }
+
+        return new Location(world, buffer.getDouble(), buffer.getDouble(), buffer.getDouble());
 
     }
 

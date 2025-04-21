@@ -8,6 +8,7 @@ description: "Real supply and demand in minecraft!"
 website: "https://github.com/faridfaharaj/Profitable"
 softdepend:
   - Vault
+  - PlayerPoints
 folia-supported: true
 
 commands:
@@ -54,7 +55,7 @@ commands:
   wallet:
     description: Displays all asset balances on your account
     usage: /wallet or /wallet <Subcommand>
-    aliases: [bal,balance,wal]
+    aliases: [wal]
 
   delivery:
     description: Displays and sets where should your items and entities arrive
@@ -197,6 +198,10 @@ permissions:
       profitable.account.info.wallet: true
 
 
+  profitable.admin.config.reloadconfig:
+    description: "Grants the ability to reload most configuration file values"
+    default: op
+
   profitable.admin.accounts.info.getplayeracc:
     description: "Grants the ability to get the active account on a player"
     default: op
@@ -267,6 +272,7 @@ permissions:
     description: "Allows to view, edit, create, and delete everything on the exchange"
     default: op
     children:
+      profitable.admin.config.reloadconfig: true
       profitable.admin.accounts.info.getplayeracc: true
       profitable.admin.accounts.info.wallet: true
       profitable.admin.accounts.info.delivery: true
@@ -397,6 +403,7 @@ permissions:
     description: "Grants access needed to create assets and initial supply"
     default: op
     children:
+      profitable.admin.config.reloadconfig: true
       profitable.admin.assets.manage.register: true
       profitable.admin.assets.manage.newtransaction: true
       profitable.admin.assets.manage.delete: true

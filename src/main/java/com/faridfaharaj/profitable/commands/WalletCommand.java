@@ -1,12 +1,15 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.data.tables.Accounts;
-import com.faridfaharaj.profitable.util.TextUtil;
-import com.faridfaharaj.profitable.util.VaultCompat;
+import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
+import com.faridfaharaj.profitable.util.MessagingUtil;
+import com.faridfaharaj.profitable.hooks.VaultHook;
 import net.kyori.adventure.text.Component;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,10 +23,13 @@ public class WalletCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
 
         if(!sender.hasPermission("profitable.account.info.wallet")){
-            TextUtil.sendGenericMissingPerm(sender);
+            MessagingUtil.sendGenericMissingPerm(sender);
             return true;
         }
 
+        if(Configuration.MULTIWORLD){
+            DataBase.universalUpdateWorld(sender);
+        }
 
         if(sender instanceof Player player){
 
@@ -32,75 +38,143 @@ public class WalletCommand implements CommandExecutor {
             if(args.length == 0){
 
                 String account = Accounts.getAccount(player);
-                TextUtil.sendCustomMessage(sender,
-                        TextUtil.profitableTopSeparator().appendNewline()
-                                .append(AccountHoldings.AssetBalancesToString(account, 1)).appendNewline()
-                                .append(TextUtil.profitableBottomSeparator())
+                MessagingUtil.sendCustomMessage(sender,
+                        MessagingUtil.profitableTopSeparator("Wallet","------------------").appendNewline()
+                                .append(AccountHoldings.AssetBalancesToString(account)).appendNewline()
+                                .append(MessagingUtil.profitableBottomSeparator())
                 );
 
                 return true;
             }
 
-            if(Configuration.VAULTENABLED){
+            if(Configuration.HOOKED){
                 if(args[0].equals("deposit")){
 
                     if(!sender.hasPermission("profitable.account.funds.deposit")){
-                        TextUtil.sendGenericMissingPerm(sender);
+                        MessagingUtil.sendGenericMissingPerm(sender);
                         return true;
                     }
 
-                    if(args.length < 2){
-                        TextUtil.sendError(player, "/wallet deposit <amount>");
+                    if(args.length < 3){
+                        MessagingUtil.sendError(player, "/wallet deposit <Currency> <amount>");
                         return true;
                     }
 
                     double ammount;
                     try{
-                        ammount = Double.parseDouble(args[1]);
+                        ammount = Double.parseDouble(args[2]);
+                        if(ammount <= 0){
+                            MessagingUtil.sendError(sender, "Invalid amount");
+                            return true;
+                        }
                     }catch (Exception e){
-                        TextUtil.sendError(sender, "Invalid amount");
+                        MessagingUtil.sendError(sender, "Invalid amount");
+                        return true;
+                    }
+                    double fee = Configuration.parseFee(Configuration.DEPOSITFEES, ammount);
+                    if(fee > ammount){
+                        MessagingUtil.sendError(sender, "Amount cannot be lower than " + fee);
                         return true;
                     }
 
-                    if(Configuration.ECONOMY.withdrawPlayer(player, ammount).transactionSuccess()){
-                        Asset.distributeAsset(Accounts.getAccount(player), "VLT", 1, ammount);
-                        TextUtil.sendCustomMessage(sender, TextUtil.profitablePrefix().append(Component.text("Added ")).append(Component.text(ammount + " VLT").color(VaultCompat.getVaultColor())).append(Component.text(" to your wallet")));
-                    }else{
-                        TextUtil.sendError(player, "Not enough funds");
-                    }
-                    return true;
-                }
+                    if(VaultHook.isConnected() && Objects.equals(VaultHook.getAsset().getCode(), args[1])){
 
-                if(args[0].equals("withdraw")){
+                        Asset asset = VaultHook.getAsset();
+                        if(VaultHook.getEconomy().withdrawPlayer(player, ammount).transactionSuccess()){
+                            Asset.distributeAsset(Accounts.getAccount(player), asset, ammount-fee);
+                            MessagingUtil.sendPaymentNotice(sender, ammount, fee, asset);
+
+                            return true;
+                        }
+
+                    }
+
+                    if (PlayerPointsHook.isConnected() && Objects.equals(PlayerPointsHook.getAsset().getCode(), args[1])){
+                        fee = Math.ceil(fee);
+                        Asset asset = PlayerPointsHook.getAsset();
+                        int integerAmount = (int) ammount;
+                        if(integerAmount < 1){
+                            MessagingUtil.sendError(sender, "Cannot Withdraw fractional Player Points");
+                            return true;
+                        }
+                        if(PlayerPointsHook.getApi().take(player.getUniqueId(), integerAmount)){
+                            Asset.distributeAsset(Accounts.getAccount(player), asset, integerAmount-fee);
+                            MessagingUtil.sendPaymentNotice(sender, ammount, fee, asset);
+                            return true;
+                        }
+
+                    }
+
+
+                    MessagingUtil.sendError(player, "Insufficient funds to deposit this amount");
+                    return true;
+                }else if(args[0].equals("withdraw")){
 
                     if(!sender.hasPermission("profitable.account.funds.withdraw")){
-                        TextUtil.sendGenericMissingPerm(sender);
+                        MessagingUtil.sendGenericMissingPerm(sender);
                         return true;
                     }
 
-                    if(args.length < 2){
-                        TextUtil.sendError(player, "/wallet withdraw <amount>");
+                    if(args.length < 3){
+                        MessagingUtil.sendError(player, "/wallet withdraw <Currency> <amount>");
                         return true;
                     }
 
                     double ammount;
                     try{
-                        ammount = Double.parseDouble(args[1]);
+                        ammount = Double.parseDouble(args[2]);
+                        if(ammount <= 0){
+                            MessagingUtil.sendError(sender, "Invalid amount");
+                            return true;
+                        }
                     }catch (Exception e){
-                        TextUtil.sendError(sender, "Invalid amount");
+                        MessagingUtil.sendError(sender, "Invalid amount");
+                        return true;
+                    }
+                    double fee = Configuration.parseFee(Configuration.WITHDRAWALFEES, ammount);
+                    if(fee > ammount){
+                        MessagingUtil.sendError(sender, "Amount cannot be lower than its fee ($" + fee + ")");
                         return true;
                     }
 
-                    if(Asset.retrieveAsset(player, "Withdraw amount to Vault", "VLT", 1, ammount) && Configuration.ECONOMY.depositPlayer(player, ammount).transactionSuccess()){
-                        TextUtil.sendCustomMessage(sender, TextUtil.profitablePrefix().append(Component.text("Taken ")).append(Component.text(ammount + " VLT").color(VaultCompat.getVaultColor())).append(Component.text(" from your wallet")));
+                    if(args[1].equals(VaultHook.getAsset().getCode()) && VaultHook.isConnected()){
+                        Asset asset = VaultHook.getAsset();
+
+                        if(Asset.retrieveBalance(player, "Withdraw amount to Vault", asset.getCode(), ammount, false)){
+                            EconomyResponse es = VaultHook.getEconomy().depositPlayer(player, ammount);
+                            if(es.transactionSuccess()){
+                                MessagingUtil.sendChargeNotice(sender, ammount-fee, fee, asset);
+                            }else{
+                                MessagingUtil.sendError(sender, es.errorMessage);
+                                Asset.distributeAsset(Accounts.getAccount(player), asset, ammount);
+                            }
+                        }
+
+                    }else if (args[1].equals(PlayerPointsHook.getAsset().getCode()) && PlayerPointsHook.isConnected()){
+                        fee = Math.ceil(fee);
+                        Asset asset = PlayerPointsHook.getAsset();
+                        int integerAmount = (int) ammount;
+                        if(integerAmount < 1){
+                            MessagingUtil.sendError(sender, "Cannot Withdraw fractional Player Points");
+                            return true;
+                        }
+                        if(Asset.retrieveBalance(player, "Withdraw amount to PlayerPoints", asset.getCode(), ammount, false) && PlayerPointsHook.getApi().give(player.getUniqueId(), (int) (integerAmount-fee))){
+                            MessagingUtil.sendChargeNotice(sender, ammount-fee, fee, asset);
+                        }
+                    }else{
+                        MessagingUtil.sendError(sender, "Invalid Currency");
+                        return true;
                     }
+
                     return true;
+                }else{
+                    MessagingUtil.sendError(sender, "Invalid Subcommand");
                 }
             }
 
             return true;
         }else{
-            TextUtil.sendGenericCantConsole(sender);
+            MessagingUtil.sendGenericCantConsole(sender);
         }
 
 
@@ -116,26 +190,44 @@ public class WalletCommand implements CommandExecutor {
 
             List<String> suggestions = new ArrayList<>();
 
-            if(Configuration.VAULTENABLED){
+            if(args.length == 1 && Configuration.HOOKED){
+                suggestions = List.of("deposit", "withdraw");
+            }else{
 
-                if(args.length == 1){
-                    suggestions = List.of("deposit", "withdraw");
-                }else{
+                if(Objects.equals(args[0], "deposit")){
 
-                    if(Objects.equals(args[0], "deposit")){
-
-                        if(args.length == 2){
-                            suggestions = List.of("[<Amount>]");
+                    if(args.length == 2){
+                        Set<String> currencies = new HashSet<>();
+                        if(VaultHook.isConnected()){
+                            currencies.add(VaultHook.getAsset().getCode());
                         }
-
+                        if(PlayerPointsHook.isConnected()){
+                            currencies.add(PlayerPointsHook.getAsset().getCode());
+                        }
+                        suggestions.addAll(currencies);
                     }
 
-                    if(Objects.equals(args[0], "withdraw")){
+                    if(args.length == 3){
+                        suggestions = List.of("[<Amount>]");
+                    }
 
-                        if(args.length == 2){
-                            suggestions = List.of("[<Amount>]");
+                }
+
+                if(Objects.equals(args[0], "withdraw")){
+
+                    if(args.length == 2){
+                        Set<String> currencies = new HashSet<>();
+                        if(VaultHook.isConnected()){
+                            currencies.add(VaultHook.getAsset().getCode());
                         }
+                        if(PlayerPointsHook.isConnected()){
+                            currencies.add(PlayerPointsHook.getAsset().getCode());
+                        }
+                        suggestions.addAll(currencies);
+                    }
 
+                    if(args.length == 3){
+                        suggestions = List.of("[<Amount>]");
                     }
 
                 }

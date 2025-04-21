@@ -1,0 +1,193 @@
+ALTER TABLE assets
+  ADD COLUMN world BINARY(16) DEFAULT X'5F5F5F5F5F7365727665725F5F5F5F5F';
+ALTER TABLE accounts
+  ADD COLUMN world BINARY(16) DEFAULT X'5F5F5F5F5F7365727665725F5F5F5F5F';
+ALTER TABLE account_assets
+  ADD COLUMN world BINARY(16) DEFAULT X'5F5F5F5F5F7365727665725F5F5F5F5F';
+ALTER TABLE orders
+  ADD COLUMN world BINARY(16) DEFAULT X'5F5F5F5F5F7365727665725F5F5F5F5F';
+ALTER TABLE candles_day
+  ADD COLUMN world BINARY(16) DEFAULT X'5F5F5F5F5F7365727665725F5F5F5F5F';
+ALTER TABLE candles_week
+  ADD COLUMN world BINARY(16) DEFAULT X'5F5F5F5F5F7365727665725F5F5F5F5F';
+ALTER TABLE candles_month
+  ADD COLUMN world BINARY(16) DEFAULT X'5F5F5F5F5F7365727665725F5F5F5F5F';
+
+
+DROP INDEX IF EXISTS idx_assets_type;
+DROP INDEX IF EXISTS idx_account_assets_account_name_asset_id;
+DROP INDEX IF EXISTS idx_orders_asset_id_sideBuy_price;
+DROP INDEX IF EXISTS idx_orders_owner;
+DROP INDEX IF EXISTS idx_candles_day_asset_id_time;
+DROP INDEX IF EXISTS idx_candles_week_asset_id_time;
+DROP INDEX IF EXISTS idx_candles_month_asset_id_time;
+
+
+CREATE TABLE IF NOT EXISTS new_assets
+(
+    world BINARY(16),
+    asset_id VARCHAR(20),
+    asset_type INT,
+    meta BLOB,
+
+    PRIMARY KEY(world ,asset_id)
+);
+
+CREATE INDEX idx_asset_type ON new_assets (world, asset_type);
+
+
+
+
+CREATE TABLE IF NOT EXISTS new_accounts
+(
+    world BINARY(16),
+    account_name VARCHAR(36),
+    password BINARY(16),
+    salt BINARY(16),
+    item_delivery_pos BINARY(40),
+    entity_delivery_pos BINARY(40),
+    entity_claim_id INT,
+
+    PRIMARY KEY (world, account_name)
+);
+CREATE INDEX idx_entity_claim_id ON new_accounts(entity_claim_id DESC);
+
+
+
+CREATE TABLE IF NOT EXISTS new_account_assets
+(
+    world BINARY(16),
+    account_name VARCHAR(36),
+    asset_id VARCHAR(20),
+    quantity DOUBLE,
+
+    PRIMARY KEY (world, account_name, asset_id),
+
+    FOREIGN KEY (world, asset_id) REFERENCES new_assets(world, asset_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (world, account_name) REFERENCES new_accounts(world, account_name) ON DELETE CASCADE
+);
+CREATE INDEX idx_account_asset_lookup ON new_account_assets (world, account_name);
+
+
+
+
+CREATE TABLE IF NOT EXISTS new_orders
+(
+    world BINARY(16),
+    order_uuid BINARY(16),
+    owner VARCHAR(36),
+    asset_id VARCHAR(20),
+    sideBuy BOOLEAN,
+    price DOUBLE,
+    units DOUBLE,
+    order_type TINYINT,
+
+    PRIMARY KEY(world, order_uuid),
+
+    FOREIGN KEY (world, asset_id) REFERENCES new_assets(world, asset_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (world, owner) REFERENCES new_accounts(world, account_name) ON DELETE CASCADE
+);
+CREATE INDEX idx_order_uuid ON new_orders(world, order_uuid);
+CREATE INDEX idx_orders_owner ON new_orders (world, owner);
+CREATE INDEX idx_orders_best_price ON new_orders (world, asset_id, sideBuy, price, order_type);
+CREATE INDEX idx_orders_stop_update ON new_orders(world, order_type, price);
+
+
+
+
+CREATE TABLE IF NOT EXISTS new_candles_day
+(
+    world BINARY(16),
+    time BIGINT,
+    open DOUBLE,
+    close DOUBLE,
+    high DOUBLE,
+    low DOUBLE,
+    volume DOUBLE,
+    asset_id VARCHAR(20),
+
+    PRIMARY KEY (world, time, asset_id),
+
+    FOREIGN KEY (world, asset_id) REFERENCES new_assets(world, asset_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+CREATE INDEX idx_candles_lookup ON new_candles_day (world, asset_id, time DESC);
+
+CREATE TABLE IF NOT EXISTS new_candles_week
+(
+    world BINARY(16),
+    time BIGINT,
+    open DOUBLE,
+    close DOUBLE,
+    high DOUBLE,
+    low DOUBLE,
+    volume DOUBLE,
+    asset_id VARCHAR(20),
+
+    PRIMARY KEY (world, time, asset_id),
+
+    FOREIGN KEY (world, asset_id) REFERENCES new_assets(world, asset_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS new_candles_month
+(
+    world BINARY(16),
+    time BIGINT,
+    open DOUBLE,
+    close DOUBLE,
+    high DOUBLE,
+    low DOUBLE,
+    volume DOUBLE,
+    asset_id VARCHAR(20),
+
+    PRIMARY KEY (world, time, asset_id),
+
+    FOREIGN KEY (world, asset_id) REFERENCES new_assets(world, asset_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+
+
+
+
+INSERT INTO new_assets  (world, asset_id, asset_type, meta)
+  SELECT world, asset_id, asset_type, meta
+    FROM assets;
+
+INSERT INTO new_accounts (world, account_name, password, salt, item_delivery_pos, entity_delivery_pos, entity_claim_id)
+  SELECT world, account_name, password, salt, item_delivery_pos, entity_delivery_pos, entity_claim_id
+    FROM accounts;
+
+INSERT INTO new_account_assets (world, account_name, asset_id, quantity)
+  SELECT world, account_name, asset_id, quantity
+    FROM account_assets;
+
+INSERT INTO new_candles_day  (world, time, open, close, high, low, volume, asset_id)
+  SELECT world, time, open, close, high, low, volume, asset_id
+    FROM candles_day;
+
+INSERT INTO new_candles_week  (world, time, open, close, high, low, volume, asset_id)
+  SELECT world, time, open, close, high, low, volume, asset_id
+    FROM candles_week;
+
+INSERT INTO new_candles_month (world, time, open, close, high, low, volume, asset_id)
+  SELECT world, time, open, close, high, low, volume, asset_id
+    FROM candles_month;
+
+PRAGMA foreign_keys = OFF;
+
+DROP TABLE account_assets;
+DROP TABLE orders;
+DROP TABLE accounts;
+DROP TABLE assets;
+DROP TABLE candles_day;
+DROP TABLE candles_week;
+DROP TABLE candles_month;
+
+PRAGMA foreign_keys = ON;
+
+ALTER TABLE new_assets        RENAME TO assets;
+ALTER TABLE new_accounts      RENAME TO accounts;
+ALTER TABLE new_account_assets RENAME TO account_assets;
+ALTER TABLE new_orders        RENAME TO orders;
+ALTER TABLE new_candles_day   RENAME TO candles_day;
+ALTER TABLE new_candles_week  RENAME TO candles_week;
+ALTER TABLE new_candles_month RENAME TO candles_month;

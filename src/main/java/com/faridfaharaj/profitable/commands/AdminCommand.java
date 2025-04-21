@@ -2,20 +2,26 @@ package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
+import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.data.tables.*;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
+import com.faridfaharaj.profitable.hooks.VaultHook;
+import com.faridfaharaj.profitable.util.MessagingUtil;
+import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
@@ -33,6 +39,10 @@ public class AdminCommand implements CommandExecutor {
             player = got;
         }
 
+        if(Configuration.MULTIWORLD){
+            DataBase.universalUpdateWorld(sender);
+        }
+
         if(args.length == 0){
             return false;
         }
@@ -40,29 +50,64 @@ public class AdminCommand implements CommandExecutor {
         if(Objects.equals(args[0], "forcelogout")){
 
             if(!sender.hasPermission("profitable.admin.accounts.manage.forcelogout")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
             if(args.length < 2){
-                TextUtil.sendError(sender, "/admin forcelogout <player>");
+                MessagingUtil.sendError(sender, "/admin forcelogout <player>");
                 return true;
             }
 
             Player gotPlayer = Profitable.getInstance().getServer().getPlayer(args[1]);
             if(gotPlayer == null){
-                TextUtil.sendError(sender, args[1] + " isn't online");
+                MessagingUtil.sendError(sender, args[1] + " isn't online");
                 return true;
             }
 
             UUID playerid = player.getUniqueId();
             if(!Accounts.getCurrentAccounts().containsKey(playerid)){
-                TextUtil.sendError(sender, "No active account found");
+                MessagingUtil.sendError(sender, "No active account found");
                 return true;
             }
             Accounts.logOut(playerid);
 
-            TextUtil.sendSuccsess(sender, "Logged "+ player.getName() + " out");
+            MessagingUtil.sendSuccsess(sender, "Logged "+ player.getName() + " out");
+            return true;
+        }
+
+        if(Objects.equals(args[0], "config")){
+
+            if(args.length == 1){
+                MessagingUtil.sendError(sender, "/admin config <property>");
+            }
+
+            if(Objects.equals(args[1], "reloadconfig")){
+
+                if(!sender.hasPermission("profitable.admin.config.reloadconfig")){
+                    MessagingUtil.sendGenericMissingPerm(sender);
+                    return true;
+                }
+
+                Configuration.reloadConfig(Profitable.getInstance());
+                MessagingUtil.sendSuccsess(sender, "Successfully reloaded config file");
+                MessagingUtil.sendWarning(sender, "Some properties require restarting the server");
+            }else{
+                MessagingUtil.sendError(sender, "Invalid Subcommand");
+                return true;
+            }
+
+            if(Configuration.MULTIWORLD){
+                for(World world:Profitable.getInstance().getServer().getWorlds()){
+                    try {
+                        DataBase.updateWorld(world);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    Assets.generateAssets();
+                }
+            }
+
             return true;
         }
 
@@ -72,11 +117,11 @@ public class AdminCommand implements CommandExecutor {
             if(args.length == 1){
 
                 if(!sender.hasPermission("profitable.admin.assets.info.getallassets")){
-                    TextUtil.sendGenericMissingPerm(sender);
+                    MessagingUtil.sendGenericMissingPerm(sender);
                     return true;
                 }
 
-                TextUtil.sendCustomMessage(sender,
+                MessagingUtil.sendCustomMessage(sender,
 
                         Component.text("Showing all registered assets in Profitable:").color(Configuration.COLORINFO).appendNewline()
                                 .append(Component.text("--------------------------------------------")).appendNewline()
@@ -92,13 +137,13 @@ public class AdminCommand implements CommandExecutor {
             if(Objects.equals(args[1], "register")){
 
                 if(!sender.hasPermission("profitable.admin.assets.manage.register")){
-                    TextUtil.sendGenericMissingPerm(sender);
+                    MessagingUtil.sendGenericMissingPerm(sender);
                     return true;
                 }
 
                 if(args.length < 4){
 
-                    TextUtil.sendError(sender, "/admin register currency <Asset Type> <Symbol>");
+                    MessagingUtil.sendError(sender, "/admin register currency <Asset Type> <Symbol>");
 
                     return true;
                 }
@@ -110,18 +155,29 @@ public class AdminCommand implements CommandExecutor {
                     case "currency":
 
                         if(asset.length() > 3){
-                            TextUtil.sendError(sender, "Currencies must only have 3 letters");
+                            MessagingUtil.sendError(sender, "Currencies must only have 3 letters");
                             return true;
                         }
 
-                        String name = args.length  == 5? args[4]:asset.toLowerCase();
+                        String generator = asset;
+
+                        if(args.length > 4){
+                            generator += "_" + args[4].replace("_", " ");
+                        }
+
+                        if(args.length > 5){
+                            generator += "_" + args[5];
+                        }
+
 
                         try {
-                            if(Assets.registerAsset(asset, 1, Asset.metaData(name))){
-                                TextUtil.sendSuccsess(sender, "Registered: " + asset);
+
+                            if(Assets.registerAsset(asset, 1, Asset.metaData(Asset.StringToCurrency(generator)))){
+                                MessagingUtil.sendSuccsess(sender, "Registered: " + asset);
                             }else{
-                                TextUtil.sendError(sender, "There is already an asset with Symbol: " + asset);
+                                MessagingUtil.sendError(sender, "There is already an asset with Symbol: " + asset);
                             }
+
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
@@ -132,49 +188,87 @@ public class AdminCommand implements CommandExecutor {
                         if(Material.getMaterial(asset) != null){
 
                             try {
-                                if(Assets.registerAsset(asset, 2, Asset.metaData(Configuration.COLOREMPTY.value(), TextUtil.nameCommodity(asset)))){
-                                    Configuration.ALLOWEITEMS.add(asset);
-                                    TextUtil.sendSuccsess(sender, "Registered: " + asset);
-                                    TextUtil.sendWarning(sender, "You should add theese to the config file");
+                                if(Assets.registerAsset(asset, 2, Asset.metaData(Configuration.COLOREMPTY.value(), NamingUtil.nameCommodity(asset)))){
+
+                                    if(Configuration.GENERATEASSETS){
+                                        if(!Profitable.getInstance().getConfig().getBoolean("exchange.commodities.generation.item-whitelisting")){
+                                            //blacklist
+                                            List<String> itemlist = Profitable.getInstance().getConfig().getStringList("exchange.commodities.generation.commodity-item-blacklist");
+                                            itemlist.remove(asset);
+                                            Profitable.getInstance().getConfig().set("exchange.commodities.generation.commodity-item-blacklist", itemlist);
+                                        }else{
+                                            //whitelist
+                                            List<String> itemlist = Profitable.getInstance().getConfig().getStringList("exchange.commodities.generation.commodity-item-whitelist");
+                                            itemlist.add(asset);
+                                            Profitable.getInstance().getConfig().set("exchange.commodities.generation.commodity-item-whitelist", itemlist);
+                                        }
+                                        Configuration.ALLOWEITEMS.add(asset);
+                                        Profitable.getInstance().saveConfig();
+                                    }
+
+                                    MessagingUtil.sendSuccsess(sender, "Registered: " + asset);
 
                                 }else{
-                                    TextUtil.sendError(sender, asset + " is already registered");
+                                    MessagingUtil.sendError(sender, asset + " is already registered");
                                 }
                             } catch (IOException e) {
-                                TextUtil.sendError(sender, "Error registering " + asset);
+                                MessagingUtil.sendError(sender, "Error registering " + asset);
                                 throw new RuntimeException(e);
                             }
 
                         }else{
-                            TextUtil.sendError(sender, "Commodities must come from an existing item");
+                            MessagingUtil.sendError(sender, "Commodities must come from an existing item");
                             return true;
                         }
 
                         break;
                     case "commodityentity":
 
-                        if(EntityType.fromName(asset) != null){
+
+                        EntityType entity = EntityType.fromName(asset);
+                        if(entity != null){
+
+                            Class<?> entityClass = entity.getEntityClass();
+                            if (!LivingEntity.class.isAssignableFrom(entityClass) || entity.name().equals("PLAYER")) {
+                                MessagingUtil.sendError(sender, "Invalid asset");
+                                return true;
+                            }
 
                             try {
-                                if(Assets.registerAsset(asset, 3, Asset.metaData(Configuration.COLOREMPTY.value(), TextUtil.nameCommodity(asset)))){
-                                    Configuration.ALLOWENTITIES.add(asset);
-                                    TextUtil.sendSuccsess(sender, "Registered: " + asset);
-                                    TextUtil.sendWarning(sender, "You should add theese to the config file");
+                                if(Assets.registerAsset(asset, 3, Asset.metaData(Configuration.COLOREMPTY.value(), NamingUtil.nameCommodity(asset)))){
+                                    if(Configuration.GENERATEASSETS){
+                                        if(!Profitable.getInstance().getConfig().getBoolean("exchange.commodities.generation.entity-whitelisting")){
+                                            //blacklist
+                                            List<String> entitylist = Profitable.getInstance().getConfig().getStringList("exchange.commodities.generation.commodity-entity-blacklist");
+                                            entitylist.remove(asset);
+                                            Profitable.getInstance().getConfig().set("exchange.commodities.generation.commodity-entity-blacklist", entitylist);
+                                        }else{
+                                            //whitelist
+                                            List<String> entitylist = Profitable.getInstance().getConfig().getStringList("exchange.commodities.generation.commodity-entity-whitelist");
+                                            entitylist.add(asset);
+                                            Profitable.getInstance().getConfig().set("exchange.commodities.generation.commodity-entity-whitelist", entitylist);
+                                        }
+                                        Configuration.ALLOWENTITIES.add(asset);
+
+                                        Profitable.getInstance().saveConfig();
+                                    }
+                                    MessagingUtil.sendSuccsess(sender, "Registered: " + asset);
                                 }else{
-                                    TextUtil.sendError(sender, asset + " is already registered");
+                                    MessagingUtil.sendError(sender, asset + " is already registered");
+                                    return true;
                                 }
                             } catch (IOException e) {
-                                TextUtil.sendError(sender, "Error");
+                                MessagingUtil.sendError(sender, "Error");
                                 return true;
                             }
 
                         }else{
-                            TextUtil.sendError(sender, "Commodities must come from an existing entity");
+                            MessagingUtil.sendError(sender, "Commodities must come from an existing entity");
                         }
 
                         break;
                     default:
-                        TextUtil.sendError(sender, asset + "Invalid asset type");
+                        MessagingUtil.sendError(sender, asset + "Invalid asset type");
                         break;
                 }
                 return true;
@@ -190,12 +284,12 @@ public class AdminCommand implements CommandExecutor {
                 if(Objects.equals(args[3], "newtransaction")){
 
                     if(!sender.hasPermission("profitable.admin.assets.manage.newtransaction")){
-                        TextUtil.sendGenericMissingPerm(sender);
+                        MessagingUtil.sendGenericMissingPerm(sender);
                         return true;
                     }
 
                     if(args.length < 6){
-                        TextUtil.sendError(sender, "/admin assets fromid " + args[2] + " newtransaction <price> <volume>");
+                        MessagingUtil.sendError(sender, "/admin assets fromid " + args[2] + " newtransaction <price> <volume>");
                         return true;
                     }
 
@@ -203,7 +297,7 @@ public class AdminCommand implements CommandExecutor {
                     if(player == null){
 
                         if(args.length == 6){
-                            TextUtil.sendError(sender, "Must specify world on console: /admin <assets> " + args[1] + " newtransaction <price> <volume> <world>");
+                            MessagingUtil.sendError(sender, "Must specify world on console: /admin <assets> " + args[1] + " newtransaction <price> <volume> <world>");
                             return true;
                         }
 
@@ -215,43 +309,173 @@ public class AdminCommand implements CommandExecutor {
 
 
                     if(Candles.updateDay(args[2], world, Double.parseDouble(args[4]), Double.parseDouble(args[5]))){
-                        TextUtil.sendSuccsess(sender, "inserted transaction in " + args[2]);
+                        MessagingUtil.sendSuccsess(sender, "inserted transaction in " + args[2]);
                     }else {
-                        TextUtil.sendError(sender, "Could not insert transaction on " + args[2]);
+                        MessagingUtil.sendError(sender, "Could not insert transaction on " + args[2]);
                     }
 
                     return true;
 
-                }else if(Objects.equals(args[3], "resettransactions")){
+                }
+
+                if(Objects.equals(args[3], "resettransactions")){
 
                     if(!sender.hasPermission("profitable.admin.assets.manage.resettransactions")){
-                        TextUtil.sendGenericMissingPerm(sender);
+                        MessagingUtil.sendGenericMissingPerm(sender);
                         return true;
                     }
 
                     Candles.assetDeleteAllCandles(args[2]);
-                    TextUtil.sendSuccsess(sender, "Wiped all " + args[2] + "'s transactions");
+                    MessagingUtil.sendSuccsess(sender, "Wiped all " + args[2] + "'s transactions");
 
+                    return true;
 
-                } else if (Objects.equals(args[3], "delete")) {
+                }
 
-                    if(args.length < 5){
-                        TextUtil.sendError(sender, "/admin assets fromid <asset> delete <asset>");
-                    }
-
-                    if(args[2] != args[4]){
-                        TextUtil.sendError(sender, "Assets dont match");
-                    }
+                if (Objects.equals(args[3], "delete")) {
 
                     if(!sender.hasPermission("profitable.admin.assets.manage.delete")){
-                        TextUtil.sendGenericMissingPerm(sender);
+                        MessagingUtil.sendGenericMissingPerm(sender);
                         return true;
                     }
 
+                    if(args.length < 5){
+                        MessagingUtil.sendError(sender, "/admin assets fromid <asset> delete <asset again>");
+                        return true;
+                    }
+
+                    if(!Objects.equals(args[2], args[4])){
+                        MessagingUtil.sendError(sender, "Assets don't match");
+                        return true;
+                    }
+
+                    if(Objects.equals(args[2], Configuration.MAINCURRENCYASSET.getCode())){
+                        MessagingUtil.sendError(sender, "Cannot remove main currency");
+                        return true;
+                    }
+
+                    Asset asset = Assets.getAssetData(args[2]);
+                    if(asset == null){
+                        MessagingUtil.sendError(sender, "This asset does not exist");
+                        return true;
+                    }
                     if(Assets.deleteAsset(args[2])){
-                        TextUtil.sendCustomMessage(sender, TextUtil.profitablePrefix().append(Component.text("DELETED " + args[2], NamedTextColor.RED)));
+                        if(Configuration.GENERATEASSETS){
+
+                            if(asset.getAssetType() == 2){
+
+
+                                if(!Profitable.getInstance().getConfig().getBoolean("exchange.commodities.generation.item-whitelisting")){
+                                    //blacklist
+                                    List<String> itemlist = Profitable.getInstance().getConfig().getStringList("exchange.commodities.generation.commodity-item-blacklist");
+                                    itemlist.add(asset.getCode());
+                                    Profitable.getInstance().getConfig().set("exchange.commodities.generation.commodity-item-blacklist", itemlist);
+                                }else{
+                                    //whitelist
+                                    List<String> itemlist = Profitable.getInstance().getConfig().getStringList("exchange.commodities.generation.commodity-item-whitelist");
+                                    itemlist.remove(asset.getCode());
+                                    Profitable.getInstance().getConfig().set("exchange.commodities.generation.commodity-item-whitelist", itemlist);
+                                }
+                                Configuration.ALLOWEITEMS.remove(asset.getCode());
+
+                            }else if(asset.getAssetType() == 3){
+
+                                if(!Profitable.getInstance().getConfig().getBoolean("exchange.commodities.generation.entity-whitelisting")){
+                                    //blacklist
+                                    List<String> entitylist = Profitable.getInstance().getConfig().getStringList("exchange.commodities.generation.commodity-entity-blacklist");
+                                    entitylist.add(asset.getCode());
+                                    Profitable.getInstance().getConfig().set("exchange.commodities.generation.commodity-entity-blacklist", entitylist);
+                                }else{
+                                    //whitelist
+                                    List<String> entitylist = Profitable.getInstance().getConfig().getStringList("exchange.commodities.generation.commodity-entity-whitelist");
+                                    entitylist.remove(asset.getCode());
+                                    Profitable.getInstance().getConfig().set("exchange.commodities.generation.commodity-entity-whitelist", entitylist);
+                                }
+                                Configuration.ALLOWENTITIES.remove(asset.getCode());
+                            }
+                            Profitable.getInstance().saveConfig();
+
+                        }
+                        MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("DELETED " + args[2], NamedTextColor.RED)));
+                    }else{
+                        MessagingUtil.sendError(sender, "Could not delete that asset");
                     }
                     return true;
+
+                }
+
+                if(Objects.equals(args[3], "edit")){
+
+                    if(!sender.hasPermission("profitable.admin.assets.manage.edit")){
+                        MessagingUtil.sendGenericMissingPerm(sender);
+                        return true;
+                    }
+
+                    if(args.length == 4){
+                        MessagingUtil.sendError(sender, "/admin assets fromid <Asset> edit <New symbol> <New name> <New hexcolor>");
+                        return true;
+                    }
+
+                    String code = args[4].toUpperCase();
+                    Asset asset = Assets.getAssetData(args[2]);
+
+                    if(asset == null){
+                        MessagingUtil.sendError(sender, "Couldn't find asset: " + args[2]);
+                        return true;
+                    }
+
+                    if(asset.getAssetType() == 3 || asset.getAssetType() == 2){
+                        MessagingUtil.sendError(sender, "Cannot edit commodities");
+                        return true;
+                    }
+
+                    if(!Objects.equals(args[4], asset.getCode())){
+                        if(Assets.getAssetData(args[4]) != null){
+                            MessagingUtil.sendError(sender, "There is already an asset with Symbol: " + args[4]);
+                            return true;
+                        }
+                    }
+
+                    if(args[4].length() > 3){
+                        MessagingUtil.sendError(sender, "Currencies must only have 3 letters");
+                        return true;
+                    }
+
+                    String name;
+                    if(args.length > 5){
+                        name = args[5];
+                    }else{
+                        name = asset.getName();
+                    }
+
+                    TextColor color = null;
+                    if(args.length > 6){
+                        color = TextColor.fromHexString(args[6]);
+                    }
+                    if(color == null){
+                        color = asset.getColor();
+                    }
+
+                    if(Objects.equals(asset.getCode(), Configuration.MAINCURRENCYASSET.getCode())){
+                        MessagingUtil.sendError(sender, "Cannot edit the main currency");
+                        return true;
+                    }
+
+                    if(Objects.equals(asset.getCode(), VaultHook.getAsset().getCode())){
+                        MessagingUtil.sendError(sender, "Cannot edit Vault output currency, Change on config!");
+                        return true;
+                    }
+
+                    if(Objects.equals(asset.getCode(), PlayerPointsHook.getAsset().getCode())){
+                        MessagingUtil.sendError(sender, "Cannot edit the PlayerPoints output currency, Change on config!");
+                        return true;
+                    }
+
+                    if(Assets.updateAsset(asset.getCode(), new Asset(code, asset.getAssetType(), color, name))){
+                        MessagingUtil.sendSuccsess(sender, "Updated " + args[4]);
+                    }else {
+                        MessagingUtil.sendError(sender, "Couldn't edit this asset");
+                    }
 
                 }
 
@@ -262,20 +486,20 @@ public class AdminCommand implements CommandExecutor {
         if(Objects.equals(args[0], "orders")){
 
             if(args.length == 1){
-                TextUtil.sendError(sender, "/profitable:admin <subcommand> <args>...");
+                MessagingUtil.sendError(sender, "/profitable:admin <subcommand> <args>...");
                 return true;
             }
 
             if(Objects.equals(args[1], "findbyasset")){
 
                 if(!sender.hasPermission("profitable.admin.orders.info.findbyasset")){
-                    TextUtil.sendGenericMissingPerm(sender);
+                    MessagingUtil.sendGenericMissingPerm(sender);
                     return true;
                 }
 
                 if(args.length < 3){
 
-                    TextUtil.sendError(sender, "/profitable:admin orders findbyasset <asset>");
+                    MessagingUtil.sendError(sender, "/profitable:admin orders findbyasset <asset>");
                     return true;
                 }
 
@@ -295,7 +519,7 @@ public class AdminCommand implements CommandExecutor {
                     ;
                 }
                 component = component.append(Component.text("--------------------------------------------"));
-                TextUtil.sendCustomMessage(sender, component);
+                MessagingUtil.sendCustomMessage(sender, component);
 
                 return true;
 
@@ -305,14 +529,14 @@ public class AdminCommand implements CommandExecutor {
 
                 if(args.length < 3){
 
-                    TextUtil.sendError(sender, "/admin orders getbyid <ID> <Action>");
+                    MessagingUtil.sendError(sender, "/admin orders getbyid <ID> <Action>");
                     return true;
 
                 }
 
                 if(args.length < 4){
 
-                    TextUtil.sendError(sender, "/admin orders getbyid <ID> <Action>");
+                    MessagingUtil.sendError(sender, "/admin orders getbyid <ID> <Action>");
                     return true;
 
                 }
@@ -320,15 +544,15 @@ public class AdminCommand implements CommandExecutor {
                 if(Objects.equals(args[3], "cancel")){
 
                     if(!sender.hasPermission("profitable.admin.orders.manage.cancel")){
-                        TextUtil.sendGenericMissingPerm(sender);
+                        MessagingUtil.sendGenericMissingPerm(sender);
                         return true;
                     }
 
-                    if(Orders.cancelOrder(args[2])){
-                        TextUtil.sendSuccsess(sender,"Canceled: "+ args[2]);
+                    if(Orders.cancelOrder(UUID.fromString(args[2]))){
+                        MessagingUtil.sendSuccsess(sender,"Canceled: "+ args[2]);
                         return true;
                     }else{
-                        TextUtil.sendError(sender, "Couldn't cancel that order");
+                        MessagingUtil.sendError(sender, "Couldn't cancel that order");
                         return true;
                     }
 
@@ -337,14 +561,14 @@ public class AdminCommand implements CommandExecutor {
                 if(Objects.equals(args[3], "delete")){
 
                     if(!sender.hasPermission("profitable.admin.orders.manage")){
-                        TextUtil.sendGenericMissingPerm(sender);
+                        MessagingUtil.sendGenericMissingPerm(sender);
                         return true;
                     }
 
-                    if(Orders.deleteOrder(args[2])){
-                        TextUtil.sendCustomMessage(sender, TextUtil.profitablePrefix().append(Component.text("DELETED order " + args[2], NamedTextColor.RED)));
+                    if(Orders.deleteOrder(UUID.fromString(args[2]))){
+                        MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("DELETED order " + args[2], NamedTextColor.RED)));
                     }else {
-                        TextUtil.sendError(sender, "Couldn't delete that order");
+                        MessagingUtil.sendError(sender, "Couldn't delete that order");
                     }
 
                     return true;
@@ -356,14 +580,14 @@ public class AdminCommand implements CommandExecutor {
             if (Objects.equals(args[1], "deleteall")) {
 
                 if(!sender.hasPermission("profitable.admin.orders.manage.deleteall")){
-                    TextUtil.sendGenericMissingPerm(sender);
+                    MessagingUtil.sendGenericMissingPerm(sender);
                     return true;
                 }
 
                 if(Orders.deleteAllOrders()){
-                    TextUtil.sendCustomMessage(sender, TextUtil.profitablePrefix().append(Component.text("DELETED all orders from all assets", NamedTextColor.RED)));
+                    MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("DELETED all orders from all assets", NamedTextColor.RED)));
                 }else{
-                    TextUtil.sendError(sender, "Couldnt find any");
+                    MessagingUtil.sendError(sender, "Couldn't find any");
                 }
                 return true;
 
@@ -372,7 +596,7 @@ public class AdminCommand implements CommandExecutor {
             if (Objects.equals(args[1], "cancelall")) {
 
                 if(!sender.hasPermission("profitable.admin.orders.manage.cancelall")){
-                    TextUtil.sendGenericMissingPerm(sender);
+                    MessagingUtil.sendGenericMissingPerm(sender);
                     return true;
                 }
 
@@ -380,7 +604,7 @@ public class AdminCommand implements CommandExecutor {
 
                 if(orders.isEmpty()){
 
-                    TextUtil.sendError(sender, "Couldnt find any");
+                    MessagingUtil.sendError(sender, "Couldn't find any");
 
                 }else{
 
@@ -388,7 +612,7 @@ public class AdminCommand implements CommandExecutor {
                         Orders.cancelOrder(order.getUuid());
                     }
 
-                    TextUtil.sendSuccsess(sender, "Cancelled all orders from all assets");
+                    MessagingUtil.sendSuccsess(sender, "Cancelled all orders from all assets");
                 }
 
                 return true;
@@ -398,12 +622,12 @@ public class AdminCommand implements CommandExecutor {
             if (Objects.equals(args[1], "newlimitorder")) {
 
                 if(!sender.hasPermission("profitable.admin.orders.manage.newlimitorder")){
-                    TextUtil.sendGenericMissingPerm(sender);
+                    MessagingUtil.sendGenericMissingPerm(sender);
                     return true;
                 }
 
                 if(args.length < 6){
-                    TextUtil.sendError(sender, "/admin orders newlimitorder <asset> <side> <price> <units>");
+                    MessagingUtil.sendError(sender, "/admin orders newlimitorder <asset> <side> <price> <units>");
 
                     return true;
                 }
@@ -419,23 +643,24 @@ public class AdminCommand implements CommandExecutor {
                     price = Double.parseDouble(args[5]);
 
                 } catch (Exception e) {
-                    TextUtil.sendError(sender, "Invalid Price/Units");
+                    MessagingUtil.sendError(sender, "Invalid Price/Units");
                     return true;
                 }
 
 
                 if(player != null){
-                    String account = Accounts.getAccount(player);
-                    if(Orders.insertOrder(UUID.randomUUID().toString(), account, args[2], sidebuy, price, units)){
-                        TextUtil.sendSuccsess(sender, "Inserted new limit order " + (sidebuy?"buy":"sell") + " " + units + " " + args[2] + " at $" + price + " in " + account);
-                    };
+                    if(Orders.insertOrder(UUID.randomUUID(), "server", args[2], sidebuy, price, units, Order.OrderType.LIMIT)){
+                        MessagingUtil.sendSuccsess(sender, "Inserted new limit order " + (sidebuy?"buy":"sell") + " " + units + " " + args[2] + " at $" + price + " on server's account");
+                    }else{
+                        MessagingUtil.sendError(sender, "Couldn't add order for " + args[2]);
+                    }
 
                     return true;
                 }
 
             }
 
-            TextUtil.sendError(sender, "Invalid Subcommand");
+            MessagingUtil.sendError(sender, "Invalid Subcommand");
             return true;
 
         }
@@ -448,32 +673,32 @@ public class AdminCommand implements CommandExecutor {
         if(Objects.equals(args[0], "getplayeracc")){
 
             if(!sender.hasPermission("profitable.admin.accounts.info.getplayeracc")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
             if(args.length < 2){
-                TextUtil.sendError(sender, "/admin getplayeracc <player>");
+                MessagingUtil.sendError(sender, "/admin getplayeracc <player>");
                 return true;
             }
 
             Player gotPlayer = Profitable.getInstance().getServer().getPlayer(args[1]);
             if(gotPlayer == null){
-                TextUtil.sendError(sender, args[1] + " isn't online");
+                MessagingUtil.sendError(sender, args[1] + " isn't online");
                 return true;
             }
 
-            account = Accounts.getAccount(player);
+            account = Accounts.getAccount(gotPlayer);
             if(args.length == 2){
 
-                TextUtil.sendCustomMessage(sender, TextUtil.profitablePrefix().append(Component.text(player.getName() + "'s active account is: " + account)));
+                MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text(player.getName() + "'s active account is: " + account)));
                 return true;
             }
 
         }else if (Objects.equals(args[0], "account")){
 
             if(args.length < 3){
-                TextUtil.sendError(sender, "/admin account <account> <subcommand> <args>");
+                MessagingUtil.sendError(sender, "/admin account <account> <subcommand> <args>");
                 return false;
             }
             account = args[1];
@@ -487,26 +712,26 @@ public class AdminCommand implements CommandExecutor {
             if(args.length == 3){
 
                 if(!sender.hasPermission("profitable.admin.accounts.info.wallet")){
-                    TextUtil.sendGenericMissingPerm(sender);
+                    MessagingUtil.sendGenericMissingPerm(sender);
                     return true;
                 }
 
-                TextUtil.sendCustomMessage(sender,
-                        TextUtil.profitableTopSeparator().appendNewline()
-                                .append(AccountHoldings.AssetBalancesToString(account, 1)).appendNewline()
-                                .append(TextUtil.profitableBottomSeparator())
+                MessagingUtil.sendCustomMessage(sender,
+                        MessagingUtil.profitableTopSeparator("Wallet","------------------").appendNewline()
+                                .append(AccountHoldings.AssetBalancesToString( account)).appendNewline()
+                                .append(MessagingUtil.profitableBottomSeparator())
                         );
 
                 return true;
             }
 
             if(args.length < 5){
-                TextUtil.sendError(sender,"/admin account <Account> wallet <Asset> <Amount>");
+                MessagingUtil.sendError(sender,"/admin account <Account> wallet <Asset> <Amount>");
                 return true;
             }
 
             if(!sender.hasPermission("profitable.admin.accounts.manage.wallet")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
@@ -514,26 +739,35 @@ public class AdminCommand implements CommandExecutor {
             try{
                 ammount = Double.parseDouble(args[4]);
             }catch (Exception e){
-                TextUtil.sendError(sender,"Invalid ammount");
+                MessagingUtil.sendError(sender,"Invalid ammount");
                 return true;
             }
 
-            AccountHoldings.setHolding(account, args[3], ammount);
-            TextUtil.sendSuccsess(sender,"Set " + args[3]+ " to "+ ammount + ", on " + account + "'s wallet");
+
+            if(AccountHoldings.setHolding(account, args[3], ammount)){
+                MessagingUtil.sendSuccsess(sender,"Set " + args[3]+ " to "+ ammount + ", on " + account + "'s wallet");
+            }else{
+                MessagingUtil.sendError(sender, "Could not add " + args[3]);
+            }
             return true;
         }
 
         if(Objects.equals(args[2], "passwordreset")){
 
+            if(Objects.equals(args[1], "server")){
+                MessagingUtil.sendError(sender, "Not a good idea");
+                return true;
+            }
+
             if(!sender.hasPermission("profitable.admin.accounts.manage.passwordreset")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
             if(Accounts.changePassword(account, "1234")){
-                TextUtil.sendSuccsess(sender,account+ "'s password set to '1234' for recovery");
+                MessagingUtil.sendSuccsess(sender,account+ "'s password set to '1234' for recovery");
             }else {
-                TextUtil.sendError(sender, "Account couldnt be found");
+                MessagingUtil.sendError(sender, "Account couldn't be found");
             }
 
 
@@ -544,13 +778,13 @@ public class AdminCommand implements CommandExecutor {
         if(Objects.equals(args[2], "orders")){
 
             if(!sender.hasPermission("profitable.admin.accounts.info.orders")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
             List<Order> orders = Orders.getAccountOrders(account);
             if(orders.isEmpty()){
-                TextUtil.sendEmptyNotice(sender, "No active orders on this account");
+                MessagingUtil.sendEmptyNotice(sender, "No active orders on this account");
             }else {
 
 
@@ -566,7 +800,7 @@ public class AdminCommand implements CommandExecutor {
                 component = component.append(Component.text("--------------------------------------------"));
 
 
-                TextUtil.sendCustomMessage(sender, component);
+                MessagingUtil.sendCustomMessage(sender, component);
             }
             return true;
         }
@@ -576,14 +810,14 @@ public class AdminCommand implements CommandExecutor {
             if(args.length == 3){
 
                 if(!sender.hasPermission("profitable.admin.accounts.info.delivery")){
-                    TextUtil.sendGenericMissingPerm(sender);
+                    MessagingUtil.sendGenericMissingPerm(sender);
                     return true;
                 }
 
                 Location entityDelivery = Accounts.getEntityDelivery(account);
                 Location itemDelivery = Accounts.getItemDelivery(account);
 
-                TextUtil.sendCustomMessage(sender,
+                MessagingUtil.sendCustomMessage(sender,
                         Component.text("Delivery " + account + ":").color(Configuration.COLORINFO).appendNewline()
                                 .append(Component.text("--------------------------------------------")).appendNewline()
                                 .append(Component.text("Item Delivery Location:").color(Configuration.COLORTEXT)).appendNewline()
@@ -601,13 +835,13 @@ public class AdminCommand implements CommandExecutor {
 
             if(args.length < 7){
 
-                TextUtil.sendError(sender, "/admin account <account> delivery setitem <x> <y> <z> <world (optional)>");
+                MessagingUtil.sendError(sender, "/admin account <account> delivery setitem <x> <y> <z> <world (optional)>");
 
                 return true;
             }
 
             if(!sender.hasPermission("profitable.admin.accounts.manage.delivery")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
@@ -616,7 +850,7 @@ public class AdminCommand implements CommandExecutor {
                 if(player != null){
                     world = player.getWorld();
                 } else {
-                    TextUtil.sendError(sender, "Must specify world when running command from console");
+                    MessagingUtil.sendError(sender, "Must specify world when running command from console");
                     return true;
                 }
             }else {
@@ -625,7 +859,7 @@ public class AdminCommand implements CommandExecutor {
 
             if(world == null){
 
-                TextUtil.sendError(sender, "Invalid world");
+                MessagingUtil.sendError(sender, "Invalid world");
 
                 return true;
             }
@@ -637,7 +871,7 @@ public class AdminCommand implements CommandExecutor {
                 y = Double.parseDouble(args[5]);
                 z = Double.parseDouble(args[6]);
             }catch (Exception e){
-                TextUtil.sendError(sender,"Invalid coordinates");
+                MessagingUtil.sendError(sender,"Invalid coordinates");
                 return  true;
             }
 
@@ -646,9 +880,9 @@ public class AdminCommand implements CommandExecutor {
             if(Objects.equals(args[3], "setitem")){
 
                 if(Accounts.changeItemDelivery(account, location)){
-                    TextUtil.sendSuccsess(sender,"changed " + account + " item delivery to:" + location.toVector());
+                    MessagingUtil.sendSuccsess(sender,"changed " + account + " item delivery to:" + location.toVector());
                 }else {
-                    TextUtil.sendError(sender, "couldn't change item delivery location");
+                    MessagingUtil.sendError(sender, "couldn't change item delivery location");
                 }
 
 
@@ -657,9 +891,9 @@ public class AdminCommand implements CommandExecutor {
             if(Objects.equals(args[3], "setentity")){
 
                 if(Accounts.changeEntityDelivery(account, location)){
-                    TextUtil.sendSuccsess(sender, "changed " + account + " entity delivery to:" + location.toVector());
+                    MessagingUtil.sendSuccsess(sender, "changed " + account + " entity delivery to:" + location.toVector());
                 }else {
-                    TextUtil.sendError(sender, "couldn't change entity delivery location");
+                    MessagingUtil.sendError(sender, "couldn't change entity delivery location");
                 }
 
             }
@@ -671,15 +905,15 @@ public class AdminCommand implements CommandExecutor {
         if(Objects.equals(args[2], "claimid")){
 
             if(!sender.hasPermission("profitable.admin.accounts.info.claimid")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
             String claimId = Accounts.getEntityClaimId(account);
-            if(claimId == null){
-                TextUtil.sendCustomMessage(sender, TextUtil.profitablePrefix().append(Component.text(account + "'s Entity claim id: ")).append(Component.text().color(Configuration.COLORINFO)));
+            if(claimId != null){
+                MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text(account + "'s Entity claim id: ")).append(Component.text(claimId).color(Configuration.COLORINFO)));
             }else{
-                TextUtil.sendError(sender, "Could not get this claim id");
+                MessagingUtil.sendError(sender, "Could not get this claim id");
             }
 
             return true;
@@ -689,29 +923,29 @@ public class AdminCommand implements CommandExecutor {
         if(Objects.equals(args[2], "delete")){
 
             if(!sender.hasPermission("profitable.admin.accounts.manage.delete")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
             if(args.length < 4){
 
-                TextUtil.sendError(sender, "Must write account name again as confirmation");
+                MessagingUtil.sendError(sender, "Must write account name again as confirmation");
 
                 return true;
             }
 
             if(Objects.equals(account, args[3])){
                 if(Accounts.getCurrentAccounts().containsValue(account)){
-                    TextUtil.sendError(sender, "Someone is still using this account");
+                    MessagingUtil.sendError(sender, "Someone is still using this account");
                 }else {
                     if(Accounts.deleteAccount(account)){
-                        TextUtil.sendCustomMessage(sender, TextUtil.profitablePrefix().append(Component.text("DELETED account: " + account, NamedTextColor.RED)));
+                        MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("DELETED account: " + account, NamedTextColor.RED)));
                     }else {
-                        TextUtil.sendError(sender, "Couldnt delete " + account);
+                        MessagingUtil.sendError(sender, "Couldnt delete " + account);
                     }
                 }
             }else {
-                TextUtil.sendError(sender, "Account names dont match");
+                MessagingUtil.sendError(sender, "Account names don't match");
             }
 
             return true;
@@ -729,12 +963,18 @@ public class AdminCommand implements CommandExecutor {
             List<String> suggestions = new ArrayList<>();
 
             if (args.length == 1) {
-                suggestions = List.of("account", "orders", "assets", "getplayeracc","forcelogout");
+                suggestions = List.of("account", "orders", "assets", "getplayeracc","forcelogout", "config");
             }
 
             if(Objects.equals(args[0], "getplayeracc") || Objects.equals(args[0], "forcelogout")){
                 if (args.length == 2) {
                     return null;
+                }
+            }
+
+            if(Objects.equals(args[0], "config")){
+                if (args.length == 2) {
+                    suggestions = List.of("reloadconfig");
                 }
             }
 
@@ -885,6 +1125,10 @@ public class AdminCommand implements CommandExecutor {
                             suggestions = List.of("[<Name>]");
                         }
 
+                        if(args.length == 6){
+                            suggestions = List.of("[<Hex Color>]");
+                        }
+
                     }
 
                     if (Objects.equals(args[1], "fromid")) {
@@ -894,7 +1138,7 @@ public class AdminCommand implements CommandExecutor {
                         }
 
                         if(args.length == 4){
-                            suggestions = List.of("delete", "newtransaction", "resettransactions");
+                            suggestions = List.of("delete", "newtransaction", "resettransactions", "edit");
                         }
 
                         if(args.length > 4){
@@ -906,6 +1150,30 @@ public class AdminCommand implements CommandExecutor {
 
                                 if(args.length == 6){
                                     suggestions = List.of("[<volume>]");
+                                }
+
+                            }
+
+                            if(Objects.equals(args[3], "delete")){
+
+                                if(args.length == 5){
+                                    suggestions = List.of("[<Asset again>]");
+                                }
+
+                            }
+
+                            if(Objects.equals(args[3], "edit")){
+
+                                if(args.length == 5){
+                                    suggestions = List.of("[<New symbol>]");
+                                }
+
+                                if(args.length == 6){
+                                    suggestions = List.of("[<New name>]");
+                                }
+
+                                if(args.length == 7){
+                                    suggestions = List.of("[<New color>]");
                                 }
 
                             }

@@ -1,44 +1,30 @@
 package com.faridfaharaj.profitable.data.tables;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.util.MessagingUtil;
+import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class AccountHoldings {
 
-    public static void createHolding(String account, String asset, double quantity) {
-        String sql = "INSERT INTO assets (asset_id) VALUES (?) " +
-                "ON CONFLICT (asset_id) DO NOTHING; " +
-                "INSERT INTO account_assets (account_name, asset_id, quantity) " +
-                "VALUES (?, ?, ?) " +
-                "ON CONFLICT (account_name, asset_id) DO UPDATE " +
-                "SET quantity = excluded.quantity;";
+    public static boolean setHolding(String account, String asset, double quantity) {
+        String sql = "INSERT INTO account_assets (world , account_name, asset_id, quantity) VALUES (?, ?, ?, ?) " + (Profitable.getInstance().getConfig().getInt("database.database-type") == 0? "ON CONFLICT(world, account_name, asset_id) DO UPDATE SET quantity = excluded.quantity;" : "ON DUPLICATE KEY UPDATE quantity = VALUES(quantity);");
 
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-            stmt.setString(1, asset);
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+            stmt.setBytes(1, DataBase.getCurrentWorld());
             stmt.setString(2, account);
             stmt.setString(3, asset);
             stmt.setDouble(4, quantity);
-
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static boolean setHolding(String account, String asset, double quantity) {
-        String sql = "INSERT INTO account_assets (account_name, asset_id, quantity) VALUES (?, ?, ?) ON CONFLICT(account_name, asset_id) DO UPDATE SET quantity = excluded.quantity;";
-
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-            stmt.setString(1, account);
-            stmt.setString(2, asset);
-            stmt.setDouble(3, quantity);
 
             int rows = stmt.executeUpdate();
 
@@ -51,12 +37,29 @@ public class AccountHoldings {
         return false;
     }
 
-    public static double getAccountAssetBalance(String account, String asset) {
-        String sql = "SELECT * FROM account_assets WHERE account_name = ? AND asset_id = ?;";
+    public static void deleteHolding(String account, String asset) {
+        String sql = "DELETE FROM account_assets WHERE world = ? AND account_name = ? AND asset_id = ?;";
 
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-            stmt.setString(1, account);
-            stmt.setString(2, asset);
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setString(2, account);
+            stmt.setString(3, asset);
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static double getAccountAssetBalance(String account, String asset) {
+        String sql = "SELECT * FROM account_assets WHERE world = ? AND account_name = ? AND asset_id = ?;";
+
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setString(2, account);
+            stmt.setString(3, asset);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -71,30 +74,53 @@ public class AccountHoldings {
         return 0;
     }
 
-    public static Component AssetBalancesToString(String account, int assetType) {
-        String sql = "SELECT pa.asset_id, pa.quantity, a.meta FROM account_assets pa JOIN assets a ON pa.asset_id = a.asset_id WHERE pa.account_name = ? AND a.asset_type = ?;";
+    public static Component AssetBalancesToString(String account) {
+        String sql = "SELECT aa.asset_id, a.asset_type, aa.quantity, a.meta, " +
+                "IFNULL(c.close, 0) AS price, " +
+                "(aa.quantity * IFNULL(c.close, 0)) AS value " +
+                "FROM account_assets aa " +
+                "JOIN assets a ON aa.world = a.world AND aa.asset_id = a.asset_id " +
+                "LEFT JOIN candles_day c ON aa.world = c.world AND aa.asset_id = c.asset_id " +
+                "AND c.time = (SELECT MAX(time) FROM candles_day WHERE world = aa.world AND asset_id = aa.asset_id) " +
+                "WHERE aa.world = ? AND aa.account_name = ? " +
+                "ORDER BY a.asset_type";
 
-        Component component = Component.text("Currencies:");
-        try (PreparedStatement stmt = DataBase.getCurrentConnection().prepareStatement(sql)) {
-            stmt.setString(1, account);
-            stmt.setInt(2, assetType);
+        Component component = Component.text("Currency:");
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setString(2, account);
 
             try (ResultSet rs = stmt.executeQuery()) {
 
+                double totalValue = 0;
+                int type = 1;
                 while (rs.next()) {
-                    String asset = rs.getString("asset_id");
-                    double quantity = rs.getDouble("quantity");
+                    String assetCode = rs.getString("asset_id");
                     byte[] meta = rs.getBytes("meta");
+                    int iteratedType = rs.getInt("asset_type");
+                    if(type != iteratedType){
+                        type = iteratedType;
+                        component = component.appendNewline().appendNewline().append(Component.text(NamingUtil.nameType(iteratedType)+ ":"));
+                    }
 
-                    component = component.appendNewline().append(Asset.holdingToChat(asset, quantity, meta));
+                    Asset asset = Asset.assetFromMeta(assetCode, iteratedType, meta);
+
+                    double quantity = rs.getDouble("quantity");
+                    component = component.appendNewline().append(MessagingUtil.assetAmmount(asset, quantity));
+
+                    if(!Objects.equals(assetCode, Configuration.MAINCURRENCYASSET.getCode())){
+                        totalValue += rs.getDouble("value");
+                    }else {
+                        totalValue += quantity;
+                    }
                 }
 
-                if(component.children().isEmpty()){
+                if(totalValue == 0){
                     component = Component.text("Empty").color(Configuration.COLOREMPTY);
+                }else{
+                    component = component.appendNewline().appendNewline().append(Component.text("Portfolio Value: ")).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, totalValue));
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                component = Component.text("ERROR").color(Configuration.COLORERROR);
+
             }
 
         } catch (SQLException e) {

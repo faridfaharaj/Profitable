@@ -4,6 +4,8 @@
     <option name="VM_PARAMETERS" value="-Xms4G -Xmx4G -jar" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$\Testing" />
     <option name="ALTERNATIVE_JRE_PATH" />
-    <method v="2" />
+    <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="prepareTest" run_configuration_type="ShConfigurationType" />
+    </method>
   </configuration>
 </component>

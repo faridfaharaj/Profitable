@@ -1,8 +1,11 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.data.DataBase;
+import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
+import com.faridfaharaj.profitable.hooks.VaultHook;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -27,14 +30,18 @@ public class AssetCommand  implements CommandExecutor {
         }
 
         if(!sender.hasPermission("profitable.asset.info")){
-            TextUtil.sendGenericMissingPerm(sender);
+            MessagingUtil.sendGenericMissingPerm(sender);
             return true;
+        }
+
+        if(Configuration.MULTIWORLD){
+            DataBase.universalUpdateWorld(sender);
         }
 
         if(args.length == 1){
 
             if(Objects.equals(args[0], Configuration.MAINCURRENCYASSET.getCode())) {
-                TextUtil.sendError(sender, "This is the Main currency");
+                MessagingUtil.sendError(sender, "This is the Main currency");
                 return true;
             }
 
@@ -49,12 +56,12 @@ public class AssetCommand  implements CommandExecutor {
             if(sender instanceof Player player){
 
                 if(!sender.hasPermission("profitable.asset.graphs")){
-                    TextUtil.sendGenericMissingPerm(sender);
+                    MessagingUtil.sendGenericMissingPerm(sender);
                     return true;
                 }
 
                 if(Objects.equals(args[0], Configuration.MAINCURRENCYASSET.getCode())) {
-                    TextUtil.sendError(sender, "This is the Main currency");
+                    MessagingUtil.sendError(sender, "This is the Main currency");
                     return true;
                 }
 
@@ -89,7 +96,7 @@ public class AssetCommand  implements CommandExecutor {
                         break;
 
                     default:
-                        TextUtil.sendError(sender, "Invalid time frame");
+                        MessagingUtil.sendError(sender, "Invalid time frame");
                         return true;
 
 
@@ -102,7 +109,7 @@ public class AssetCommand  implements CommandExecutor {
 
 
         }else{
-            TextUtil.sendError(sender, "/asset <asset> graph <Time frame>");
+            MessagingUtil.sendError(sender, "/asset <asset> graph <Time frame>");
             return true;
         }
 
@@ -118,8 +125,11 @@ public class AssetCommand  implements CommandExecutor {
             if(args.length == 1){
                 List<String> options = new ArrayList<>(Configuration.ALLOWEITEMS);
                 options.addAll(Configuration.ALLOWENTITIES);
-                if(Configuration.VAULTENABLED){
-                    options.add("VLT");
+                if(VaultHook.isConnected()){
+                    options.add(VaultHook.getAsset().getCode());
+                }
+                if(PlayerPointsHook.isConnected()){
+                    options.add(PlayerPointsHook.getAsset().getCode());
                 }
 
                 StringUtil.copyPartialMatches(args[0], options, suggestions);
@@ -142,15 +152,15 @@ public class AssetCommand  implements CommandExecutor {
         String[] durations = {"1M", "3M", "6M", "1Y", "2Y"};
         String[] durationsText = {"1 Month", "3 Months", "6 Months", "1 Year", "2 Years"};
 
-        Component component = TextUtil.profitableTopSeparator().appendNewline()
+        Component component = MessagingUtil.profitableTopSeparator("Graphs", "-----------------").appendNewline()
                 .append(Component.text("Graphs for " + asset + " (In Minecraft time):")).appendNewline();
         for (int i = 0; i < durations.length; i++) {
             String cmnd = "/asset " + asset + " graph " + durations[i];
             component = component.append(Component.text("[" + durationsText[i] + "]", Configuration.COLORINFO).clickEvent(ClickEvent.runCommand(cmnd)).hoverEvent(HoverEvent.showText(Component.text(cmnd, Configuration.COLORINFO)))).appendNewline();
         }
-        component = component.append(TextUtil.profitableBottomSeparator());
+        component = component.append(MessagingUtil.profitableBottomSeparator());
 
-        TextUtil.sendCustomMessage(player, component);
+        MessagingUtil.sendCustomMessage(player, component);
     }
 
 }

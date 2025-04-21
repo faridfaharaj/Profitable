@@ -3,9 +3,12 @@ package com.faridfaharaj.profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,17 +23,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public class Events implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-
-
 
     }
 
@@ -41,13 +43,6 @@ public class Events implements Listener {
         if (TemporalItems.holdingTemp.containsKey(player.getUniqueId())) {
             TemporalItems.removeTempItem(player);
         }
-
-    }
-
-    @EventHandler
-    public void onWorldUnload(WorldUnloadEvent event) {
-
-        DataBase.closeWorldConnection(event.getWorld().getName());
 
     }
 
@@ -106,19 +101,47 @@ public class Events implements Listener {
         if(Objects.equals(TemporalItems.holdingTemp.get(player.getUniqueId()), TemporalItems.TemporalItem.CLAIMINGTAG)){
             Entity entity = event.getRightClicked();
             if(entity.getCustomName() != null){
-                TextUtil.sendError(player, "Cannot claim named entities");
-            }else {
+                MessagingUtil.sendError(player, "Cannot claim named entities");
+            }else if(!Configuration.ALLOWENTITIES.contains(entity.getType().name())){
 
-                double fees = Profitable.getInstance().getConfig().getDouble("exchange.commodities.claiming-fees");
-                if(fees > 0 && !Asset.retrieveAsset(player, "Couldn't claim "+ entity.getName() , Configuration.MAINCURRENCYASSET.getCode(), Configuration.MAINCURRENCYASSET.getAssetType(), fees)){
+                MessagingUtil.sendError(player, "Owning this entity isn't allowed");
+
+            } else {
+
+                if(Configuration.ENTITYCLAIMINGFEES > 0 && !Asset.retrieveAsset(player, "Couldn't claim "+ entity.getName() , Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES)){
                     event.setCancelled(true);
                     return;
                 }
 
-                TextUtil.sendCustomMessage(player, TextUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName() + " using: ")).append(Component.text(fees + " " + Configuration.MAINCURRENCYASSET.getCode(),Configuration.MAINCURRENCYASSET.getColor())));
+                MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName()))
+                        .append(Configuration.ENTITYCLAIMINGFEES == 0?
+                                 Component.text(" FOR FREE", NamedTextColor.GREEN):
+                                 Component.text(" using ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
+                        )
+                );
                 entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));
             }
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onWorldInit(WorldInitEvent event) {
+        if(Configuration.MULTIWORLD){
+            try {
+                DataBase.updateWorld(event.getWorld());
+                Assets.generateAssets();
+                Accounts.registerDefaultAccount("server");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerChangeWorld(PlayerChangedWorldEvent event){
+        if(Configuration.MULTIWORLD){
+            Accounts.logOut(event.getPlayer().getUniqueId());
         }
     }
 
@@ -135,16 +158,16 @@ public class Events implements Listener {
                     Block block = event.getClickedBlock();
                     if(block != null){
                         if(!(block.getState() instanceof Container)){
-                            TextUtil.sendError(player, "Item delivery location must be a container");
+                            MessagingUtil.sendError(player, "Item delivery location must be a container");
                             return;
                         }
                         Location correctedlocation = block.getLocation();
                         if(Accounts.changeItemDelivery(Accounts.getAccount(player), correctedlocation)){
-                            TextUtil.sendSuccsess(player,"Updated item delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
+                            MessagingUtil.sendSuccsess(player,"Updated item delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
 
                             TemporalItems.removeTempItem(player);
                         }else {
-                            TextUtil.sendError(player, "Could not update Item delivery");
+                            MessagingUtil.sendError(player, "Could not update Item delivery");
                         }
                     }
 
@@ -164,7 +187,7 @@ public class Events implements Listener {
                         correctedlocation = correctedlocation.add(event.getBlockFace().getDirection());
 
                         Accounts.changeEntityDelivery(Accounts.getAccount(player), correctedlocation);
-                        TextUtil.sendSuccsess(player,"Updated item delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
+                        MessagingUtil.sendSuccsess(player,"Updated entity delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
                         TemporalItems.removeTempItem(player);
                     }
 

@@ -1,10 +1,11 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.Orders;
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -16,35 +17,39 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class OrdersCommand  implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
 
+        if(Configuration.MULTIWORLD){
+            DataBase.universalUpdateWorld(sender);
+        }
         if(sender instanceof Player player){
 
             if(args.length > 0 && args[0].equals("cancel")){
 
                 if(!sender.hasPermission("profitable.account.manage.orders.cancel")){
-                    TextUtil.sendGenericMissingPerm(sender);
+                    MessagingUtil.sendGenericMissingPerm(sender);
                     return true;
                 }
 
                 if(args.length == 1){
 
-                    TextUtil.sendError(sender, "/orders cancel <Order ID>");
+                    MessagingUtil.sendError(sender, "/orders cancel <Order ID>");
                     return true;
 
                 }
 
-                if(!Orders.cancelOrder(args[1], player)){
-                    TextUtil.sendError(sender, "Couldn't cancel that order");
+                if(!Orders.cancelOrder(UUID.fromString(args[1]), player)){
+                    MessagingUtil.sendError(sender, "Couldn't cancel that order");
                 }
                 return true;
             }
 
             if(!sender.hasPermission("profitable.account.info.orders")){
-                TextUtil.sendGenericMissingPerm(sender);
+                MessagingUtil.sendGenericMissingPerm(sender);
                 return true;
             }
 
@@ -52,16 +57,16 @@ public class OrdersCommand  implements CommandExecutor {
             try {
                 page = args.length == 0? 0 : Integer.parseInt(args[0]);
             }catch (Exception e){
-                TextUtil.sendError(sender, "Invalid page number");
+                MessagingUtil.sendError(sender, "Invalid page number");
                 return true;
             }
 
             List<Order> orders = Orders.getAccountOrders(Accounts.getAccount(player));
             if(orders.isEmpty()){
-                TextUtil.sendEmptyNotice(player, "No active orders on this account");
+                MessagingUtil.sendEmptyNotice(player, "No active orders on this account");
             }else {
                 int totalPages = (orders.size()-1)/2;
-                Component component = TextUtil.profitableTopSeparator();
+                Component component = MessagingUtil.profitableTopSeparator("Orders", "-----------------");
                 for(int i = page*2; i<Math.min(page*2+2,orders.size()); i++){
                     Order order = orders.get(i);
                     String cmnd = "/orders cancel " + order.getUuid();
@@ -69,14 +74,14 @@ public class OrdersCommand  implements CommandExecutor {
                             .append(Component.text("[Click to cancel]",Configuration.COLORINFO)
                                     .clickEvent(ClickEvent.runCommand(cmnd))
                                     .hoverEvent(HoverEvent.showText(Component.text(cmnd,Configuration.COLORINFO))))
-                    ;
+                            .appendNewline();
                 }
-                component = component.appendNewline().append(TextUtil.profitablePaginator(page, totalPages, "/orders"));
-                TextUtil.sendCustomMessage(sender, component);
+                component = component.appendNewline().append(MessagingUtil.profitablePaginator(page, totalPages, "/orders"));
+                MessagingUtil.sendCustomMessage(sender, component);
 
             }
         }else{
-            TextUtil.sendGenericCantConsole(sender);
+            MessagingUtil.sendGenericCantConsole(sender);
         }
         return true;
     }
@@ -88,12 +93,8 @@ public class OrdersCommand  implements CommandExecutor {
 
             List<String> suggestions = new ArrayList<>();
             if(args.length == 1){
-                suggestions = List.of("[<Page>]","cancel");
+                suggestions = List.of("[<Page>]");
 
-            }
-
-            if(args.length == 2){
-                suggestions = List.of("[<Order ID>]");
             }
 
             return suggestions;

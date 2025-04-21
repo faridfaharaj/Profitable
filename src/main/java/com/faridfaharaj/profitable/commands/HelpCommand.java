@@ -1,6 +1,6 @@
 package com.faridfaharaj.profitable.commands;
 
-import com.faridfaharaj.profitable.util.TextUtil;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,17 +21,23 @@ public class HelpCommand implements CommandExecutor {
 > /help admin
 §e Sends a list of commands meant for administrators and ops §r
 -----
-> /buy <Asset> limit <Units> <Price>
-§e Sends an order to buy an asset at an specified price §r
------
-> /buy <Asset> market <Units> <Price>
+> /sell <Asset> <Units>
 §e Sends an order to sell an asset immediately at the lowest price §r
 -----
-> /sell <Asset> limit <Units> <Price>
+> /sell <Asset> <Units> <Price>
+§e Sends an order to sell an asset at an specified price §r
+-----
+> /sell <Asset> <Units> <Price> stop-limit
+§e Sends an order that turns into a limit order when market reaches its price §r
+-----
+> /buy <Asset> <Units>
+§e Sends an order to buy an asset immediately at the lowest price §r
+-----
+> /buy <Asset> <Units> <Price>
 §e Sends an order to buy an asset at an specified price §r
 -----
-> /sell <Asset> market <Units> <Price>
-§e Sends an order to sell an asset immediately at the lowest price §r
+> /buy <Asset> <Units> <Price> stop-limit
+§e Sends an order that turns into a limit order when market reaches its price §r
 -----
 > /account
 §e Returns current active account §r
@@ -54,11 +60,11 @@ public class HelpCommand implements CommandExecutor {
 > /wallet
 §e Displays all asset balances on your account §r
 -----
-> /wallet deposit <amount>
-§e Transfers desired amount from vault to your profitable's account wallet §r
+> /wallet deposit <Currency> <amount>
+§e Transfers desired amount from economy to your profitable's account wallet §r
 -----
-> /wallet withdraw <amount>
-§e Transfers desired amount from your wallet to vault §r
+> /wallet withdraw <Currency> <amount>
+§e Transfers desired amount from your wallet to your economy §r
 -----
 > /orders
 §e Displays all active orders on your account §r
@@ -98,6 +104,9 @@ public class HelpCommand implements CommandExecutor {
 -----
 > /asset <Asset> graph <Time frame>
 §e Gives you a map containing a candles graph showcasing price movements across a certain time frame §r""", """
+> /admin config reload
+§e Reloads and updates most config changes §r
+-----
 > /admin getplayeracc <player>
 §e shows player's current active account §r
 -----
@@ -164,6 +173,9 @@ public class HelpCommand implements CommandExecutor {
 > /admin assets fromid <asset> newtransaction <price> <volume>
 §e fakes transactions to make the illusion of market movement on an asset §r
 -----
+> /admin assets fromid <asset> edit <New symbol> <New name> <New Color>
+§e Allows you to edit the appearance and identifier of registered assets §r
+-----
 > /admin assets fromid <asset> resettransactions
 §e deletes all records of transactions from an asset (this kills graphs) §r"""
 
@@ -186,10 +198,10 @@ public class HelpCommand implements CommandExecutor {
             page = 0;
         }
 
-        TextUtil.sendCustomMessage(sender,
-                TextUtil.profitableTopSeparator().appendNewline()
+        MessagingUtil.sendCustomMessage(sender,
+                MessagingUtil.profitableTopSeparator("Help", "-------------------").appendNewline()
                         .append(Component.text(pages[page])).appendNewline()
-                        .append(TextUtil.profitableBottomSeparator())
+                        .append(MessagingUtil.profitableBottomSeparator())
         );
 
         return true;

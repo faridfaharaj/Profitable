@@ -1,75 +1,24 @@
 package com.faridfaharaj.profitable.util;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.command.CommandSender;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.text.DecimalFormat;
+import java.util.UUID;
 
-public class TextUtil {
+public class MessagingUtil {
 
-    private static final Map<String, String> commodityNaming = new HashMap<>();
-
-    private static final Pattern UNWANTED_SUFFIXES = Pattern.compile("_(block|ingot|nugget|bucket)$");
-
-    static {
-        commodityNaming.put("COW", "Live Cattle");
-        commodityNaming.put("PIG", "Lean Hogs");
-        commodityNaming.put("SHEEP", "Lamb");
-        commodityNaming.put("CHICKEN", "Broilers");
-
-        commodityNaming.put("ACACIA_PLANKS", "Lumber");
-        commodityNaming.put("ACACIA_LOG", "Timber");
-
-        commodityNaming.put("BIRCH_PLANKS", "Lumber");
-        commodityNaming.put("BIRCH_LOG", "Timber");
-
-        commodityNaming.put("CHERRY_PLANKS", "Lumber");
-        commodityNaming.put("CHERRY_LOG", "Timber");
-
-        commodityNaming.put("DARK_OAK_PLANKS", "Lumber");
-        commodityNaming.put("DARK_OAK_LOG", "Timber");
-
-        commodityNaming.put("JUNGLE_PLANKS", "Lumber");
-        commodityNaming.put("JUNGLE_LOG", "Timber");
-
-        commodityNaming.put("MANGROVE_PLANKS", "Lumber");
-        commodityNaming.put("MANGROVE_LOG", "Timber");
-
-        commodityNaming.put("OAK_PLANKS", "Lumber");
-        commodityNaming.put("OAK_LOG", "Timber");
-
-        commodityNaming.put("SPRUCE_PLANKS", "Lumber");
-        commodityNaming.put("SPRUCE_LOG", "Timber");
-    }
-
-
-
-
-    private static final String[] assetTypeNaming = {"" , "Forex", "Commodity", "Commodity", "Commodity", "Commodity", "Stock"};
-
-    public static String nameCommodity(String code) {
-        String name = commodityNaming.get(code);
-        if (name != null) {
-            return name;
-        }
-
-        return UNWANTED_SUFFIXES.matcher(code).replaceAll("").toLowerCase().replace("_", " ");
-    }
-
-    public static String nameType(int assetType) {
-        if (assetType < 1 || assetType >= assetTypeNaming.length) {
-            return "Unknown";
-        }
-        return assetTypeNaming[assetType];
-    }
+    static DecimalFormat decimalFormat = new DecimalFormat("0.0####");
 
     public static void sendButton(CommandSender sender, String text, String command){
 
@@ -79,16 +28,42 @@ public class TextUtil {
 
     }
 
+    public static Component assetAmmount(Asset asset, double amount){
+        return Component.text(decimalFormat.format(amount) + " " + asset.getCode(), asset.getColor()).hoverEvent(assetSummary(asset));
+    }
+
+    public static Component assetSummary(Asset asset){
+        Component component = Component.text("").append(Component.text(asset.getName(), asset.getColor())).appendNewline()
+                .append(Component.text(NamingUtil.nameType(asset.getAssetType()), NamedTextColor.BLUE));
+
+        if(!asset.getStringData().isEmpty()){
+            component = component.appendNewline();
+
+            String[] words = asset.getStringData().getFirst().split(" ");
+            int linelen = 0;
+            for (String word : words) {
+                linelen += word.length();
+                if (linelen >= 26) {
+                    linelen = 0;
+                    component = component.appendNewline();
+                }
+                component = component.append(Component.text(word)).appendSpace();
+            }
+        }
+
+        return  component;
+    }
+
     public static Component profitablePrefix(){
         return Component.text("").append(Component.text("[",Configuration.COLORPROFITABLE))
                 .append(Component.text("PRFT",Configuration.COLORPROFITABLE).decorate(TextDecoration.BOLD))
                 .append(Component.text("] ",Configuration.COLORPROFITABLE));
     }
 
-    public static Component profitableTopSeparator(){
-        return Component.text("").append(Component.text("--------------- [",Configuration.COLORPROFITABLE))
-                .append(Component.text("Profitable",Configuration.COLORPROFITABLE).decorate(TextDecoration.BOLD))
-                .append(Component.text("] ----------------",Configuration.COLORPROFITABLE));
+    public static Component profitableTopSeparator(String text, String sides){
+        return Component.text("").append(Component.text(sides + " [",Configuration.COLORPROFITABLE))
+                .append(Component.text(text,Configuration.COLORPROFITABLE).decorate(TextDecoration.BOLD))
+                .append(Component.text("] " + sides,Configuration.COLORPROFITABLE));
     }
 
     public static Component profitableBottomSeparator(){
@@ -154,6 +129,22 @@ public class TextUtil {
         sendCustomMessage(sender, profitablePrefix().append(Component.text(text)));
     }
 
+    public static void sendChargeNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
+        if(fee != 0){
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(assetAmmount(assetCharged, amount+fee)).append(Component.text(" (incl. " + decimalFormat.format(fee) + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
+        }else {
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(assetAmmount(assetCharged, amount+fee)));
+        }
+    }
+
+    public static void sendPaymentNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
+        if(fee != 0){
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(assetAmmount(assetCharged, amount-fee)).append(Component.text(" (incl. " + decimalFormat.format(fee) + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
+        }else {
+            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(assetAmmount(assetCharged, amount-fee)));
+        }
+    }
+
     public static void sendWarning(CommandSender sender, String text){
 
         sendCustomMessage(sender, profitablePrefix().append(Component.text(text).color(Configuration.COLORWARN)));
@@ -173,6 +164,21 @@ public class TextUtil {
 
     public static void genericInvalidSubcom(CommandSender sender, String subcom){
         sendError(sender, "Invalid Subcommand " + subcom);
+    }
+
+    public static byte[] UUIDtoBytes(UUID uuid) throws IOException {
+        ByteBuffer buffer = ByteBuffer.allocate(16);
+
+        buffer.putLong(uuid.getMostSignificantBits());
+        buffer.putLong(uuid.getLeastSignificantBits());
+
+        return buffer.array();
+    }
+
+    public static UUID UUIDfromBytes(byte[] uuid) throws IOException {
+        ByteBuffer buffer = ByteBuffer.wrap(uuid);
+
+        return new UUID(buffer.getLong(),buffer.getLong());
     }
 
 }
