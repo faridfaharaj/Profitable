@@ -131,8 +131,8 @@ public class Events implements Listener {
                 DataBase.updateWorld(event.getWorld());
                 Assets.generateAssets();
                 Accounts.registerDefaultAccount("server");
-                Accounts.changeEntityDelivery("server", Location.BLOCK_ZERO.toLocation(event.getWorld()));
-                Accounts.changeItemDelivery("server", Location.BLOCK_ZERO.toLocation(event.getWorld()));
+                Accounts.changeEntityDelivery("server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
+                Accounts.changeItemDelivery("server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

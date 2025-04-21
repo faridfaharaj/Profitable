@@ -107,8 +107,8 @@ public final class Profitable extends JavaPlugin {
         }else{
             Assets.generateAssets();
             Accounts.registerDefaultAccount("server");
-            Accounts.changeEntityDelivery("server", Location.BLOCK_ZERO.toLocation(Profitable.getInstance().getServer().getWorlds().getFirst()));
-            Accounts.changeItemDelivery("server", Location.BLOCK_ZERO.toLocation(Profitable.getInstance().getServer().getWorlds().getFirst()));
+            Accounts.changeEntityDelivery("server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
+            Accounts.changeItemDelivery("server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
             getLogger().info("Using single server-wide data");
         }
 
