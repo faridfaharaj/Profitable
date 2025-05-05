@@ -3,6 +3,7 @@ package com.faridfaharaj.profitable;
 import com.faridfaharaj.profitable.commands.*;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.Assets;
+import com.tcoded.folialib.FoliaLib;
 import net.kyori.adventure.platform.bukkit.*;
 
 import com.faridfaharaj.profitable.data.DataBase;
@@ -44,6 +45,7 @@ public final class Profitable extends JavaPlugin {
 
     private static Profitable instance;
     private static BukkitAudiences audiences;
+    private static FoliaLib foliaLib;
 
     public static Profitable getInstance() {
         return instance;
@@ -51,8 +53,8 @@ public final class Profitable extends JavaPlugin {
     public static BukkitAudiences getBukkitAudiences() {
         return audiences;
     }
-    public static void setInstance(Profitable profitable){
-        instance = profitable;
+    public static FoliaLib getfolialib() {
+        return foliaLib;
     }
 
     @Override
@@ -61,8 +63,9 @@ public final class Profitable extends JavaPlugin {
 
         checkForUpdate(this);
 
-        setInstance(this);
+        instance = this;
         audiences = BukkitAudiences.create(this);
+        foliaLib = new FoliaLib(this);
 
         //config-----------------
         Configuration.loadConfig(this);

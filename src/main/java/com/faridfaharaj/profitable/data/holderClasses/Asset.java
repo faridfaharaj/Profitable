@@ -2,7 +2,6 @@ package com.faridfaharaj.profitable.data.holderClasses;
 
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
-import com.faridfaharaj.profitable.Scheduler;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
@@ -284,7 +283,8 @@ public class Asset {
 
             Location location = Accounts.getItemDelivery(account);
 
-            Scheduler.runAtLocation(location, () -> {
+            Profitable.getfolialib().getScheduler().runAtLocation(location, task -> {
+
                 World world = location.getWorld();
                 Block block = location.getBlock();
                 if (block.getState() instanceof Chest chest) {
@@ -313,6 +313,7 @@ public class Asset {
                 world.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
                 world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
                 world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+
             });
 
         }else{
@@ -328,7 +329,7 @@ public class Asset {
 
             Location location = Accounts.getEntityDelivery(account);
             String claimId = Accounts.getEntityClaimId(account);
-            Scheduler.runAtLocation(location, () -> {
+            Profitable.getfolialib().getScheduler().runAtLocation(location, task -> {
                 World world = location.getWorld();
 
                 for(int i = 0; i<amount; i++){
