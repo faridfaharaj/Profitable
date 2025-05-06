@@ -26,6 +26,16 @@ public class Order{
         this.type = type;
     }
 
+    public Order(Order order) {
+        this.uuid = order.getUuid();
+        this.owner = order.getOwner();
+        this.asset = order.getAsset();
+        this.sideBuy = order.isSideBuy();
+        this.price = order.getPrice();
+        this.units = order.getUnits();
+        this.type = order.getType();
+    }
+
     public enum OrderType {
         LIMIT(0),
         MARKET(1),

@@ -107,18 +107,25 @@ public class Events implements Listener {
 
             } else {
 
-                if(Configuration.ENTITYCLAIMINGFEES > 0 && !Asset.retrieveAsset(player, "Couldn't claim "+ entity.getName() , Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES)){
-                    event.setCancelled(true);
-                    return;
+                Runnable claim = () -> {
+                    Profitable.getfolialib().getScheduler().runAtEntity(entity, task -> {
+                        entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));
+                    });
+                    MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName()))
+                            .append(Configuration.ENTITYCLAIMINGFEES == 0?
+                                    Component.text(" FOR FREE", NamedTextColor.GREEN):
+                                    Component.text(" using ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
+                            )
+                    );
+                };
+
+
+                if(Configuration.ENTITYCLAIMINGFEES <= 0){
+                    claim.run();
+                }else {
+                    Asset.chargeAndRun(player, "Could't claim "+ entity.getName() , Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES, claim);
                 }
 
-                MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName()))
-                        .append(Configuration.ENTITYCLAIMINGFEES == 0?
-                                 Component.text(" FOR FREE", NamedTextColor.GREEN):
-                                 Component.text(" using ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
-                        )
-                );
-                entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));
             }
             event.setCancelled(true);
         }

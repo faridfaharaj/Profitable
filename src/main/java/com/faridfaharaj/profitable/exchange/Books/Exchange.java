@@ -80,7 +80,7 @@ public class Exchange {
             return;
         }
 
-        if(order.getPrice() < 0){
+        if(order.getPrice() <= 0){
             MessagingUtil.sendError(player, "Invalid price");
             return;
         }
@@ -126,104 +126,84 @@ public class Exchange {
         }
 
         // Transacting
-        List<Order> ordersToDelete = new ArrayList<>();
+        Order partialOrder = null;
         double moneyTransacted = 0;
         double unitsMissing = order.getUnits();
-        double buyTakerFee = 0;
-        boolean fixedTakerFee = !Configuration.ASSETFEES[tradedAsset.getAssetType()][0].endsWith("%");
-        // Fixed fee
-        if(fixedTakerFee){
-            buyTakerFee = Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][0], 23);
-        }
-
-        System.out.println(fixedTakerFee + " "+ buyTakerFee);
         for(Order iteratedOrder : orders){
 
             // Prevent self transact
             if(Objects.equals(iteratedOrder.getOwner(), order.getOwner())){
-
-                if(unitsMissing != order.getUnits()){
-                    // Transact prematurely
-                    Orders.deleteOrders(ordersToDelete);
-                    wrapTransaction(player, order, buyTakerFee, tradedAsset, moneyTransacted, order.getUnits()-unitsMissing);
-                    Candles.updateDay(tradedAsset.getCode(), player.getWorld(), ordersToDelete.getLast().getPrice(), order.getUnits()-unitsMissing);
-                    Orders.updateStopLimit(lastday.getClose(), ordersToDelete.getLast().getPrice());
-                    MessagingUtil.sendWarning(player, "Order was partially filled");
-                }
                 MessagingUtil.sendError(player, "You can't transact with yourself!, cancel current order first");
                 return;
-
             }
 
             double transactingUnits = Math.min(unitsMissing, iteratedOrder.getUnits());
 
-            // insufficient funds
-            double takerFee = 0;
-            if(!fixedTakerFee){
-                takerFee = Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][0], transactingUnits*iteratedOrder.getPrice());
-            }
-            if(!Asset.retrieveAsset(player, unitsMissing == order.getUnits()? "Cannot fulfill your order":"Order was partially filled", collateralAsset, order.isSideBuy()?transactingUnits*iteratedOrder.getPrice()+takerFee:transactingUnits)){
-                if(order.getUnits() != unitsMissing){
-                    // Transact prematurely
-                    Orders.deleteOrders(ordersToDelete);
-                    wrapTransaction(player, order, buyTakerFee, tradedAsset, moneyTransacted, order.getUnits()-unitsMissing);
-                    Candles.updateDay(tradedAsset.getCode(), player.getWorld(), ordersToDelete.getLast().getPrice(), order.getUnits()-unitsMissing);
-                    Orders.updateStopLimit(lastday.getClose(), ordersToDelete.getLast().getPrice());
-                }
-                return;
-            }
-
             // transact
-            // Update units or mark for deletion
-            double newUnits = iteratedOrder.getUnits()-transactingUnits;
-            if(newUnits == 0){
-
-                ordersToDelete.add(iteratedOrder);
-
-            }else {
-
-                Orders.updateOrderUnits(iteratedOrder.getUuid(), newUnits);
-                iteratedOrder.setUnits(newUnits);
-
+            // Mark for deletion
+            if(iteratedOrder.getUnits() > unitsMissing){
+                Order clone = new Order(iteratedOrder);
+                clone.setUnits(iteratedOrder.getUnits() - transactingUnits);
+                partialOrder = clone;
             }
+
+            iteratedOrder.setUnits(transactingUnits);
+
 
             // Tracking
             unitsMissing -= transactingUnits;
             moneyTransacted += iteratedOrder.getPrice()*transactingUnits;
-            buyTakerFee += takerFee;
-
-            if(iteratedOrder.isSideBuy()){
-
-                Asset.distributeAsset(iteratedOrder.getOwner(), tradedAsset, transactingUnits);
-                sendTransactionNotice(iteratedOrder.getOwner(), true, tradedAsset, transactingUnits, (transactingUnits*iteratedOrder.getPrice()), 0);
-
-            }else {
-                double fee = Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][1],transactingUnits*iteratedOrder.getPrice());
-                Asset.distributeAsset(iteratedOrder.getOwner(), Configuration.MAINCURRENCYASSET, transactingUnits*iteratedOrder.getPrice()-fee);
-                sendTransactionNotice(iteratedOrder.getOwner(), false, tradedAsset, transactingUnits, (transactingUnits*iteratedOrder.getPrice()), fee);
-            }
 
         }
-        System.out.println(fixedTakerFee + " " + buyTakerFee);
-        Orders.deleteOrders(ordersToDelete);
-        wrapTransaction(player, order, buyTakerFee, tradedAsset, moneyTransacted, order.getUnits()-unitsMissing);
-        Candles.updateDay(tradedAsset.getCode(), player.getWorld(), orders.getLast().getPrice(), order.getUnits()-unitsMissing);
-        Orders.updateStopLimit(lastday.getClose(), orders.getLast().getPrice());
 
 
-        // Partial fill
-        if(unitsMissing > 0){
-            if(order.getType() == Order.OrderType.MARKET){
+        double unitsTransacted = order.getUnits()-unitsMissing;
+        double finalMoneyTransacted = moneyTransacted;
+        boolean fixedTakerFee = !Configuration.ASSETFEES[tradedAsset.getAssetType()][0].endsWith("%");
+        double fee = fixedTakerFee? Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][0], 23): Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][0], moneyTransacted);
 
-                MessagingUtil.sendWarning(player, "Partially filled because no more orders are available");
+        Order finalPartialOrder = partialOrder;
+        Asset.chargeAndRun(player, "Cannot fulfill your order", collateralAsset, order.isSideBuy()?moneyTransacted+fee:unitsTransacted, () -> {
+            wrapTransaction(player, order, fee, tradedAsset, finalMoneyTransacted, unitsTransacted);
+            Candles.updateDay(tradedAsset.getCode(), player.getWorld(), orders.getLast().getPrice(), unitsTransacted);
+            Orders.updateStopLimit(lastday.getClose(), orders.getLast().getPrice());
+            List<Order> ordersToDelete = new ArrayList<>(orders);
+            if(finalPartialOrder != null){
 
-            }else{
-
-                order.setUnits(unitsMissing);
-                addToBook(player, order, Configuration.MAINCURRENCYASSET, tradedAsset, collateralAsset);
-
+                Orders.updateOrderUnits(finalPartialOrder.getUuid(), finalPartialOrder.getUnits());
+                ordersToDelete.removeLast();
 
             }
+            for(Order iteratedOrder:orders){
+                if(iteratedOrder.isSideBuy()){
+
+                    Asset.distributeAsset(iteratedOrder.getOwner(), tradedAsset, iteratedOrder.getUnits());
+                    sendTransactionNotice(iteratedOrder.getOwner(), true, tradedAsset, iteratedOrder.getUnits(), (iteratedOrder.getUnits()*iteratedOrder.getPrice()), 0);
+
+                }else {
+
+                    double makerFee = Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][1],iteratedOrder.getUnits()*iteratedOrder.getPrice());
+                    Asset.distributeAsset(iteratedOrder.getOwner(), Configuration.MAINCURRENCYASSET, iteratedOrder.getUnits()*iteratedOrder.getPrice()-makerFee);
+                    sendTransactionNotice(iteratedOrder.getOwner(), false, tradedAsset, iteratedOrder.getUnits(), (iteratedOrder.getUnits()*iteratedOrder.getPrice()), makerFee);
+
+                }
+            }
+            Orders.deleteOrders(ordersToDelete);
+        });
+
+        // Partial fill
+        if(order.getType() == Order.OrderType.MARKET){
+
+            if(unitsTransacted != order.getUnits()){
+                MessagingUtil.sendWarning(player, "Partially filled because no more orders are available");
+            }
+
+        }else{
+            if(unitsTransacted != order.getUnits()){
+                order.setUnits(order.getUnits()-unitsTransacted);
+                addToBook(player, order, Configuration.MAINCURRENCYASSET, tradedAsset, collateralAsset);
+            }
+
         }
 
     }
@@ -255,9 +235,11 @@ public class Exchange {
             MessagingUtil.sendPaymentNotice(player, money, fee, Configuration.MAINCURRENCYASSET);
         }
 
-        player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
-        player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
-        player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+        Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+            player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
+            player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
+            player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+        });
     }
 
     public static void sendTransactionNotice(String account, boolean sideBuy, Asset tradedAsset, double units, double money, double fee){
@@ -285,9 +267,12 @@ public class Exchange {
                 MessagingUtil.sendPaymentNotice(player, money, fee, Configuration.MAINCURRENCYASSET);
             }
 
-            player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
-            player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
-            player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+
+            Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
+                player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
+                player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+            });
         }
     }
 
@@ -296,43 +281,33 @@ public class Exchange {
         // Collateral
         double cost = order.getPrice()*order.getUnits();
         double makerFee = Configuration.parseFee(Configuration.ASSETFEES[tradedasset.getAssetType()][1], cost);
-        if(order.isSideBuy()){
-            // Charge extra to buyer
-            if(!Asset.retrieveAsset(player, "Order couldn't be added", collateralAsset, cost+makerFee)){
-                return;
+
+        Asset.chargeAndRun(player, "Order couldn't be added", collateralAsset, order.isSideBuy()? cost+makerFee: order.getUnits(), () -> {
+            // Insert
+            Orders.insertOrder(UUID.randomUUID(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), order.getType());
+
+            // Feedback
+            Profitable.getfolialib().getScheduler().runAtEntity(player, task -> player.playSound(player, Sound.ITEM_BOOK_PAGE_TURN, 1 , 1));
+            MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix()
+                    .append(Component.text("New " + order.getType().toString().replace("_","-").toLowerCase() + " order ")).append(order.isSideBuy()?Component.text("Buy ", Configuration.COLORBULLISH):Component.text("Sell ", Configuration.COLORBEARISH))
+                    .append(MessagingUtil.assetAmmount(tradedasset, order.getUnits()))
+                    .append(Component.text(" at "))
+                    .append(MessagingUtil.assetAmmount(currency, order.getPrice()))
+                    .append(Component.text(" each"))
+            );
+
+            if(order.isSideBuy()){
+
+                MessagingUtil.sendChargeNotice(player, cost, makerFee, collateralAsset);
+
+            }else{
+                MessagingUtil.sendChargeNotice(player, order.getUnits(), 0, collateralAsset);
+
+                if(makerFee >= cost){
+                    MessagingUtil.sendWarning(player, "This order is worth less than its fee ($" + makerFee + ") there will be no profit!");
+                }
             }
-
-        }else{
-            // Fee gets paid on transaction for seller
-            if(!Asset.retrieveAsset(player, "Order couldn't be added", collateralAsset, order.getUnits())){
-                return;
-            }
-        }
-
-        // Insert
-        Orders.insertOrder(UUID.randomUUID(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), order.getType());
-
-        // Feedback
-        player.playSound(player, Sound.ITEM_BOOK_PAGE_TURN, 1 , 1);
-        MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix()
-                .append(Component.text("New " + order.getType().toString().replace("_","-").toLowerCase() + " order ")).append(order.isSideBuy()?Component.text("Buy ", Configuration.COLORBULLISH):Component.text("Sell ", Configuration.COLORBEARISH))
-                .append(MessagingUtil.assetAmmount(tradedasset, order.getUnits()))
-                .append(Component.text(" at "))
-                .append(MessagingUtil.assetAmmount(currency, order.getPrice()))
-                .append(Component.text(" each"))
-        );
-
-        if(order.isSideBuy()){
-
-            MessagingUtil.sendChargeNotice(player, cost, makerFee, collateralAsset);
-
-        }else{
-            MessagingUtil.sendChargeNotice(player, order.getUnits(), 0, collateralAsset);
-
-            if(makerFee >= cost){
-                MessagingUtil.sendWarning(player, "This order is worth less than its fee ($" + makerFee + ") there will be no profit!");
-            }
-        }
+        });
     }
 
 }
