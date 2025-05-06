@@ -50,8 +50,8 @@
 
 - Find a way to add compatibility with older versions
 
+- Make sql queries run async
+
 ## Bugs
 
-- Fix "delivery marker" double "must be container" error
-
-- [Fix possible folia bug when retrieving assets and players](https://github.com/faridfaharaj/Profitable/tree/fix/complete-folia-support)
+- Fix delivery marker duplicated "must be container" message on item delivery when clicking blocks
