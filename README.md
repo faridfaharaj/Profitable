@@ -42,9 +42,9 @@ Useful if you think Prices will keep going up after a certain price
 
 ![bii](https://github.com/user-attachments/assets/79c4bc07-290e-42e7-a194-05c332c7d328)
 
-## ⚠️ Important
 
-This Update had major changes on the way databases are managed, meaning databases from pre 0.2.0 versions will only migrate partially as **Orders and Multi-World data cannot be migrated**, cancel all orders and back-up your data **before** runing this new version.
+> [!WARNING]
+> This Update had major changes on the way databases are managed, meaning databases from pre 0.2.0 versions will only migrate partially as **Orders and Multi-World data cannot be migrated**, cancel all orders and back-up your data **before** runing this new version.
 
 # 📌 Features
 
@@ -60,7 +60,7 @@ This Update had major changes on the way databases are managed, meaning database
 - **Advanced trading**
 - **Candle graphs display prices**
 
-## 🪝 Hooks
+## Hooks
 - **Vault**: Anything compatible with vault its compatible with Profitable
 - **PlayerPoints**
 
@@ -93,7 +93,7 @@ or
 
 
 
-# 📊 Market Data & Analysis
+# Market Data & Analysis
 
 Since Profitable is a plugin designed to simulate real trading, which includes speculation and market data tracking,
 Players can monitor **prices**, **price movements**, **liquidity**, **supply**, and more stuff using a single command:
@@ -105,7 +105,7 @@ Even some nice fancy candle graphs, so players can predict and profit off of spe
 ![2025-04-20_20 30 33](https://github.com/user-attachments/assets/7a7d318c-c17d-4f68-b403-386a3527d711)
 
 
-# 💸 Why?
+# Why?
 
 **Put it like this**, 
 
