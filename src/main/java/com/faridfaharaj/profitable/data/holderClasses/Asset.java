@@ -348,33 +348,40 @@ public class Asset {
         }
     }
 
-    public static boolean retrieveAsset(Player player, String notice, Asset asset, double ammount){
+    public static void chargeAndRun(Player player, String notice, Asset asset, double ammount, Runnable runnable){
 
         switch (asset.getAssetType()) {
             case 2: // Item
-                if(!retrieveCommodityItem(player, asset.getCode(), (int) ammount)){
-                    MessagingUtil.sendError(player, notice + ", not enough " + asset.getCode().toLowerCase().replace("_", " "));
-                    return false;
-                }
+                Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                    if(retrieveCommodityItem(player, asset.getCode(), (int) ammount)){
+                        runnable.run();
+                    }else {
+                        MessagingUtil.sendError(player, notice + ", not enough " + asset.getCode().toLowerCase().replace("_", " "));
+                    }
+
+                });
                 break;
             case 3: // Entity
-                if(!retrieveCommodityEntity(player, asset.getCode(), Accounts.getEntityClaimId(Accounts.getAccount(player)), (int) ammount)){
-                    MessagingUtil.sendError(player,notice + ", Not enough claimed " + asset.getCode().toLowerCase().replace("_", " ") + "s around");
-                    return false;
-                }
+                Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                    if(retrieveCommodityEntity(player, asset.getCode(), Accounts.getEntityClaimId(Accounts.getAccount(player)), (int) ammount)){
+                        runnable.run();
+                    }else{
+                        MessagingUtil.sendError(player,notice + ", Not enough claimed " + asset.getCode().toLowerCase().replace("_", " ") + "s around");
+                    }
+
+                });
                 break;
             case 4: // Fluid
-                    return false;
+                    return;
             case 5: // Energy
-                    return false;
+                    return;
             default: // any numerical value
-                if(!retrieveBalance(player, asset.getCode(), ammount)){
-                    MessagingUtil.sendError(player,notice + ", insufficient " + asset);
-                    return false;
+                if(retrieveBalance(player, asset.getCode(), ammount)){
+                    runnable.run();
+                }else {
+                    MessagingUtil.sendError(player,notice + ", insufficient " + asset.getCode());
                 }
-                break;
         }
-        return true;
     }
 
     public static boolean retrieveBalance(Player player, String asset, double ammount){
