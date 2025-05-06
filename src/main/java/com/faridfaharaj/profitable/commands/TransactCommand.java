@@ -41,6 +41,13 @@ public class TransactCommand implements CommandExecutor {
                 return false;
             }
 
+            String asset;
+            if(args.length == 0){
+                asset = player.getInventory().getItemInMainHand().getType().name();
+            }else {
+                asset = args[0];
+            }
+
             Order.OrderType orderType;
             double price;
 
@@ -93,7 +100,7 @@ public class TransactCommand implements CommandExecutor {
             }
 
 
-            Exchange.sendNewOrder(player, new Order(UUID.randomUUID(), Accounts.getAccount(player), args[0], sideBuy, price, units, orderType));
+            Exchange.sendNewOrder(player, new Order(UUID.randomUUID(), Accounts.getAccount(player), asset, sideBuy, price, units, orderType));
             return true;
 
         }
