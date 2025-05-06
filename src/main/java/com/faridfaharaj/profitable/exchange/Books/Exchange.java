@@ -235,9 +235,11 @@ public class Exchange {
             MessagingUtil.sendPaymentNotice(player, money, fee, Configuration.MAINCURRENCYASSET);
         }
 
-        player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
-        player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
-        player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+        Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+            player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
+            player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
+            player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+        });
     }
 
     public static void sendTransactionNotice(String account, boolean sideBuy, Asset tradedAsset, double units, double money, double fee){
@@ -265,9 +267,12 @@ public class Exchange {
                 MessagingUtil.sendPaymentNotice(player, money, fee, Configuration.MAINCURRENCYASSET);
             }
 
-            player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
-            player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
-            player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+
+            Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
+                player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
+                player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+            });
         }
     }
 
@@ -282,9 +287,7 @@ public class Exchange {
             Orders.insertOrder(UUID.randomUUID(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), order.getType());
 
             // Feedback
-            Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
-                player.playSound(player, Sound.ITEM_BOOK_PAGE_TURN, 1 , 1);
-            });
+            Profitable.getfolialib().getScheduler().runAtEntity(player, task -> player.playSound(player, Sound.ITEM_BOOK_PAGE_TURN, 1 , 1));
             MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix()
                     .append(Component.text("New " + order.getType().toString().replace("_","-").toLowerCase() + " order ")).append(order.isSideBuy()?Component.text("Buy ", Configuration.COLORBULLISH):Component.text("Sell ", Configuration.COLORBEARISH))
                     .append(MessagingUtil.assetAmmount(tradedasset, order.getUnits()))
