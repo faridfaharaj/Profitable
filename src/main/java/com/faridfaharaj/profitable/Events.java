@@ -75,9 +75,11 @@ public class Events implements Listener {
         Player player = event.getEntity();
 
         if (TemporalItems.holdingTemp.containsKey(player.getUniqueId())) {
-            ItemStack mainHandItem = player.getInventory().getItemInMainHand();
-            event.getDrops().removeIf(item -> item != null && item.isSimilar(mainHandItem));
-            TemporalItems.removeTemp(player);
+            Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                ItemStack mainHandItem = player.getInventory().getItemInMainHand();
+                event.getDrops().removeIf(item -> item != null && item.isSimilar(mainHandItem));
+                TemporalItems.removeTemp(player);
+            });
         }
     }
 
@@ -86,11 +88,9 @@ public class Events implements Listener {
         HumanEntity player = event.getWhoClicked();
         if(TemporalItems.holdingTemp.containsKey(player.getUniqueId())){
             TemporalItems.removeTempItem((Player) player);
-            if(player.getGameMode() == GameMode.CREATIVE) {
-                event.setCancelled(false);
-            }else{
-                event.setCancelled(true);
-            }
+            Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                event.setCancelled(player.getGameMode() != GameMode.CREATIVE);
+            });
         }
     }
 
@@ -161,59 +161,59 @@ public class Events implements Listener {
 
             if(tempItem == TemporalItems.TemporalItem.ITEMDELIVERYSTICK){
 
-                Material material = event.getMaterial();
-                if(!materialCooldown(material, player)){
+                runItmCooldown(event.getMaterial(), player, () -> {
                     Block block = event.getClickedBlock();
                     if(block != null){
-                        if(!(block.getState() instanceof Container)){
-                            MessagingUtil.sendError(player, "Item delivery location must be a container");
-                            return;
-                        }
-                        Location correctedlocation = block.getLocation();
-                        if(Accounts.changeItemDelivery(Accounts.getAccount(player), correctedlocation)){
-                            MessagingUtil.sendSuccsess(player,"Updated item delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
+                        Profitable.getfolialib().getScheduler().runAtLocation(event.getInteractionPoint(), task -> {
+                            if(!(block.getState() instanceof Container)){
+                                MessagingUtil.sendError(player, "Item delivery location must be a container");
+                                return;
+                            }
+                            Location correctedlocation = block.getLocation();
+                            if(Accounts.changeItemDelivery(Accounts.getAccount(player), correctedlocation)){
+                                MessagingUtil.sendSuccsess(player,"Updated item delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
 
-                            TemporalItems.removeTempItem(player);
-                        }else {
-                            MessagingUtil.sendError(player, "Could not update Item delivery");
-                        }
+                                TemporalItems.removeTempItem(player);
+                            }else {
+                                MessagingUtil.sendError(player, "Could not update Item delivery");
+                            }
+                        });
                     }
-
-                }
-
-                event.setCancelled(true);
+                });
 
             } else if (tempItem == TemporalItems.TemporalItem.ENTITYDELIVERYSTICK) {
 
+                runItmCooldown(event.getMaterial(), player, () -> {
 
-                Material material = event.getMaterial();
-                if(!materialCooldown(material, player)){
+                    Profitable.getfolialib().getScheduler().runAtLocation(event.getInteractionPoint(), task -> {
+                        Block block = event.getClickedBlock();
+                        if(block != null){
+                            Location correctedlocation = block.getLocation().add(0.5,0,0.5).add(event.getBlockFace().getDirection());
+                            if(Accounts.changeEntityDelivery(Accounts.getAccount(player), correctedlocation)){
+                                MessagingUtil.sendSuccsess(player,"Updated entity delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
+                                TemporalItems.removeTempItem(player);
+                            }else {
+                                MessagingUtil.sendError(player, "Could not update Entity delivery");
+                            }
+                        }
+                    });
 
-                    Block block = event.getClickedBlock();
-                    if(block != null){
-                        Location correctedlocation = block.getLocation().add(0.5,0,0.5);
-                        correctedlocation = correctedlocation.add(event.getBlockFace().getDirection());
-
-                        Accounts.changeEntityDelivery(Accounts.getAccount(player), correctedlocation);
-                        MessagingUtil.sendSuccsess(player,"Updated entity delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
-                        TemporalItems.removeTempItem(player);
-                    }
-
-                }
-
-                event.setCancelled(true);
+                });
 
             }
+
+            event.setCancelled(true);
 
         }
     }
 
-    private boolean materialCooldown(Material material, Player player){
-        boolean onCooldown = player.getCooldown(material) != 0;
-        if(!onCooldown){
-            player.setCooldown(material, 40);
-        }
-        return onCooldown;
+    private void runItmCooldown(Material material, Player player, Runnable runnable){
+        Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+            if (player.getCooldown(material) == 0) {
+                player.setCooldown(material, 40);
+                runnable.run();
+            }
+        });
     }
 
 
