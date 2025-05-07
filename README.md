@@ -59,8 +59,9 @@ Useful if you think Prices will keep going up after a certain price
 - **Currency trading (Forex)**
 - **Advanced trading**
 - **Candle graphs display prices**
+- **Full Folia support**
 
-## Hooks
+## Integration
 - **Vault**: Anything compatible with vault its compatible with Profitable
 - **PlayerPoints**
 
