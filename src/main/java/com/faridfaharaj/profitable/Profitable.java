@@ -61,11 +61,13 @@ public final class Profitable extends JavaPlugin {
     public void onEnable() {
         getLogger().info("====================    Profitable    ====================" );
 
-        checkForUpdate(this);
-
         instance = this;
         audiences = BukkitAudiences.create(this);
         foliaLib = new FoliaLib(this);
+
+        foliaLib.getScheduler().runAsync(task -> {
+            checkForUpdate(this);
+        });
 
         //config-----------------
         Configuration.loadConfig(this);
@@ -186,9 +188,10 @@ public final class Profitable extends JavaPlugin {
 
     public void checkForUpdate(Profitable plugin) {
         try {
-            plugin.getLogger().info("Looking for updates...");
+            String projectSlug = "profitable";
+            String url = "https://api.modrinth.com/v2/project/" + projectSlug + "/version";
 
-            HttpURLConnection conn = (HttpURLConnection) URI.create("https://api.spiget.org/v2/resources/123560/versions?size=1&sort=-releaseDate&fields=name").toURL().openConnection();
+            HttpURLConnection conn = (HttpURLConnection) URI.create(url).toURL().openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
             conn.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -202,25 +205,25 @@ public final class Profitable extends JavaPlugin {
             reader.close();
 
             String json = jsonBuilder.toString();
-
-            Pattern pattern = Pattern.compile("\"name\"\\s*:\\s*\"(.*?)\"");
+            Pattern pattern = Pattern.compile("\"version_number\"\\s*:\\s*\"(.*?)\"");
             Matcher matcher = pattern.matcher(json);
 
             if (matcher.find()) {
-                String latestVersion = matcher.group(1).replace("v","");
+                String latestVersion = matcher.group(1).replace("v", "");
                 String currentVersion = plugin.getDescription().getVersion();
 
                 if (!latestVersion.equalsIgnoreCase(currentVersion)) {
                     plugin.getLogger().warning("UPDATE AVAILABLE! Latest: " + latestVersion);
+                    plugin.getLogger().info("Download latest here: https://modrinth.com/plugin/profitable");
                 } else {
                     plugin.getLogger().info("Up to date!");
                 }
             } else {
-                plugin.getLogger().warning("Could not parse version from API response.");
+                plugin.getLogger().warning("Could not parse version from Modrinth API response.");
             }
 
         } catch (Exception ex) {
-            plugin.getLogger().warning("Could not check for updates");
+            plugin.getLogger().warning("Could not check for updates: " + ex.getMessage());
         }
     }
 

@@ -31,7 +31,12 @@ public class TransactCommand implements CommandExecutor {
 
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
 
-                String asset = args.length == 0?player.getInventory().getItemInMainHand().getType().name():args[0];
+                String asset;
+                if(args.length == 0 || args[0].equals("hand")){
+                    asset = player.getInventory().getItemInMainHand().getType().name();
+                }else {
+                    asset = args[0];
+                }
 
                 MessagingUtil.sendInfoNotice(player, "Processing Order...");
                 Profitable.getfolialib().getScheduler().runAsync(async -> {
@@ -124,6 +129,7 @@ public class TransactCommand implements CommandExecutor {
                 if(VaultHook.isConnected()){
                     options.add(VaultHook.getAsset().getCode());
                 }
+                options.add("hand");
 
                 StringUtil.copyPartialMatches(args[0], options, suggestions);
             }
