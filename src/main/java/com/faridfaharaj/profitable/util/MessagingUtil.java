@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.util;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -8,8 +9,10 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -107,9 +110,15 @@ public class MessagingUtil {
     }
 
     public static void sendCustomMessage(CommandSender sender, Component component){
-        String jsonMessage = GsonComponentSerializer.gson().serialize(component);
-
-        sender.spigot().sendMessage(ComponentSerializer.parse(jsonMessage));
+        if(sender instanceof Player player){
+            Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                String jsonMessage = GsonComponentSerializer.gson().serialize(component);
+                sender.spigot().sendMessage(ComponentSerializer.parse(jsonMessage));
+            });
+        }else{
+            String legacy = LegacyComponentSerializer.legacySection().serialize(component);
+            sender.sendMessage(legacy);
+        }
     }
 
     public static void sendEmptyNotice(CommandSender sender, String text){

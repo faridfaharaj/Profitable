@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.tables.Candles;
 import com.faridfaharaj.profitable.util.MessagingUtil;
@@ -32,35 +33,44 @@ public class TopCommand  implements CommandExecutor {
 
             if(args.length == 0 || args[0].equals("HOT")){
 
-                MessagingUtil.sendCustomMessage(player,
+                Profitable.getfolialib().getScheduler().runAsync(task -> {
+                    Component assetsComponent = Candles.getHotAssets(player.getWorld().getFullTime(), 0);
+                    MessagingUtil.sendCustomMessage(player,
 
-                        Component.text("=========== [ HOT Assets ] ===========", TextColor.color(0xFF7C1E)).appendNewline().append(Candles.getHotAssets(player.getWorld().getFullTime(), 0))
+                            Component.text("=========== [ HOT Assets ] ===========", TextColor.color(0xFF7C1E)).appendNewline().append(assetsComponent)
 
-                );
+                    );
+                });
 
             }else if(args[0].equals("LIQUID")){
+                Profitable.getfolialib().getScheduler().runAsync(task -> {
+                    Component assetsComponent = Candles.getHotAssets(player.getWorld().getFullTime(), 2);
+                    MessagingUtil.sendCustomMessage(player,
 
-                MessagingUtil.sendCustomMessage(player,
+                            Component.text("========== [ Liquid Assets ] ==========", TextColor.color(0x2BCCFF)).appendNewline().append(assetsComponent)
 
-                        Component.text("========== [ Liquid Assets ] ==========", TextColor.color(0x2BCCFF)).appendNewline().append(Candles.getHotAssets(player.getWorld().getFullTime(),2))
-
-                );
+                    );
+                });
 
             }else if(args[0].equals("GROW")){
+                Profitable.getfolialib().getScheduler().runAsync(task -> {
+                    Component assetsComponent = Candles.getHotAssets(player.getWorld().getFullTime(), 1);
+                    MessagingUtil.sendCustomMessage(player,
 
-                MessagingUtil.sendCustomMessage(player,
+                            Component.text("========= [ Growing Assets ] =========", TextColor.color(0xFF7A)).appendNewline().append(assetsComponent)
 
-                        Component.text("========= [ Growing Assets ] =========", TextColor.color(0xFF7A)).appendNewline().append(Candles.getHotAssets(player.getWorld().getFullTime(),1))
-
-                );
+                    );
+                });
 
             }else if(args[0].equals("BIG")){
+                Profitable.getfolialib().getScheduler().runAsync(task -> {
+                    Component assetsComponent = Candles.getHotAssets(player.getWorld().getFullTime(), 3);
+                    MessagingUtil.sendCustomMessage(player,
 
-                MessagingUtil.sendCustomMessage(player,
+                            Component.text("========= [ Biggest Assets ] =========", TextColor.color(0xFFCA00)).appendNewline().append(assetsComponent)
 
-                        Component.text("========= [ Biggest Assets ] =========", TextColor.color(0xFFCA00)).appendNewline().append(Candles.getHotAssets(player.getWorld().getFullTime(),3))
-
-                );
+                    );
+                });
 
             }else{
                 MessagingUtil.sendError(sender, "Invalid Subcommand");

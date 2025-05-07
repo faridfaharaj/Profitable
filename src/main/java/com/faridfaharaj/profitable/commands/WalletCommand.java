@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.tables.AccountHoldings;
@@ -81,8 +82,10 @@ public class WalletCommand implements CommandExecutor {
 
                         Asset asset = VaultHook.getAsset();
                         if(VaultHook.getEconomy().withdrawPlayer(player, ammount).transactionSuccess()){
-                            Asset.distributeAsset(Accounts.getAccount(player), asset, ammount-fee);
-                            MessagingUtil.sendPaymentNotice(sender, ammount, fee, asset);
+                            Profitable.getfolialib().getScheduler().runAsync(task -> {
+                                Asset.distributeAsset(Accounts.getAccount(player), asset, ammount-fee);
+                                MessagingUtil.sendPaymentNotice(sender, ammount, fee, asset);
+                            });
 
                             return true;
                         }
@@ -90,7 +93,6 @@ public class WalletCommand implements CommandExecutor {
                     }
 
                     if (PlayerPointsHook.isConnected() && Objects.equals(PlayerPointsHook.getAsset().getCode(), args[1])){
-                        fee = Math.ceil(fee);
                         Asset asset = PlayerPointsHook.getAsset();
                         int integerAmount = (int) ammount;
                         if(integerAmount < 1){
@@ -98,8 +100,10 @@ public class WalletCommand implements CommandExecutor {
                             return true;
                         }
                         if(PlayerPointsHook.getApi().take(player.getUniqueId(), integerAmount)){
-                            Asset.distributeAsset(Accounts.getAccount(player), asset, integerAmount-fee);
-                            MessagingUtil.sendPaymentNotice(sender, ammount, fee, asset);
+                            Profitable.getfolialib().getScheduler().runAsync(task -> {
+                                Asset.distributeAsset(Accounts.getAccount(player), asset, integerAmount- Math.ceil(fee));
+                                MessagingUtil.sendPaymentNotice(sender, ammount, Math.ceil(fee), asset);
+                            });
                             return true;
                         }
 
@@ -140,27 +144,36 @@ public class WalletCommand implements CommandExecutor {
                     if(args[1].equals(VaultHook.getAsset().getCode()) && VaultHook.isConnected()){
                         Asset asset = VaultHook.getAsset();
 
-                        if(Asset.retrieveBalance(player, "Withdraw amount to Vault", asset.getCode(), ammount, false)){
-                            EconomyResponse es = VaultHook.getEconomy().depositPlayer(player, ammount);
-                            if(es.transactionSuccess()){
-                                MessagingUtil.sendChargeNotice(sender, ammount-fee, fee, asset);
-                            }else{
-                                MessagingUtil.sendError(sender, es.errorMessage);
-                                Asset.distributeAsset(Accounts.getAccount(player), asset, ammount);
+                        Profitable.getfolialib().getScheduler().runAsync(async -> {
+                            if(Asset.retrieveBalance(player, "Couldn't withdraw amount to Vault", asset.getCode(), ammount, false)){
+                                Profitable.getfolialib().getScheduler().runNextTick(global -> {
+                                    EconomyResponse es = VaultHook.getEconomy().depositPlayer(player, ammount);
+                                    if(es.transactionSuccess()){
+                                        MessagingUtil.sendChargeNotice(sender, ammount-fee, fee, asset);
+                                    }else{
+                                        MessagingUtil.sendError(sender, es.errorMessage);
+                                        Asset.distributeAsset(Accounts.getAccount(player), asset, ammount);
+                                    }
+                                });
                             }
-                        }
+                        });
 
                     }else if (args[1].equals(PlayerPointsHook.getAsset().getCode()) && PlayerPointsHook.isConnected()){
-                        fee = Math.ceil(fee);
                         Asset asset = PlayerPointsHook.getAsset();
                         int integerAmount = (int) ammount;
                         if(integerAmount < 1){
                             MessagingUtil.sendError(sender, "Cannot Withdraw fractional Player Points");
                             return true;
                         }
-                        if(Asset.retrieveBalance(player, "Withdraw amount to PlayerPoints", asset.getCode(), ammount, false) && PlayerPointsHook.getApi().give(player.getUniqueId(), (int) (integerAmount-fee))){
-                            MessagingUtil.sendChargeNotice(sender, ammount-fee, fee, asset);
-                        }
+                        Profitable.getfolialib().getScheduler().runAsync(async -> {
+                            if(Asset.retrieveBalance(player, "Couldn't withdraw amount to PlayerPoints", asset.getCode(), ammount, false)){
+                                Profitable.getfolialib().getScheduler().runNextTick(global -> {
+                                    double ceilFee = Math.ceil(fee);
+                                    PlayerPointsHook.getApi().give(player.getUniqueId(), (int) (integerAmount-ceilFee));
+                                    MessagingUtil.sendChargeNotice(sender, ammount-ceilFee, ceilFee, asset);
+                                });
+                            }
+                        });
                     }else{
                         MessagingUtil.sendError(sender, "Invalid Currency");
                         return true;

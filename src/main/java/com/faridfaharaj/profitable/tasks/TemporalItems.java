@@ -9,6 +9,7 @@ import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.util.NamingUtil;
+import com.tcoded.folialib.FoliaLib;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
@@ -157,17 +158,7 @@ public class TemporalItems {
 
         TemporalItems.addTemp(player, TemporalItem.CLAIMINGTAG);
 
-        ItemStack nameTag = new ItemStack(Material.NAME_TAG);
-        ItemMeta meta = nameTag.getItemMeta();
-
-        if (meta != null) {
-            meta.setDisplayName("§dClaiming Tag");
-            meta.addEnchant(Enchantment.EFFICIENCY, 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            nameTag.setItemMeta(meta);
-        }
-
-        player.getInventory().setItemInMainHand(nameTag);
+        setItemOnHand(player, new ItemStack(Material.NAME_TAG), "§dClaiming Tag");
 
     }
 
@@ -180,17 +171,7 @@ public class TemporalItems {
 
         TemporalItems.addTemp(player, items?TemporalItem.ITEMDELIVERYSTICK:TemporalItem.ENTITYDELIVERYSTICK);
 
-        ItemStack nameTag = new ItemStack(Material.CARROT_ON_A_STICK);
-        ItemMeta meta = nameTag.getItemMeta();
-
-        if (meta != null) {
-            meta.setDisplayName("§ddelivery marker");
-            meta.addEnchant(Enchantment.BLAST_PROTECTION, 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            nameTag.setItemMeta(meta);
-        }
-
-        player.getInventory().setItemInMainHand(nameTag);
+        setItemOnHand(player, new ItemStack(Material.CARROT_ON_A_STICK), "§ddelivery marker");
 
     }
 
@@ -210,17 +191,22 @@ public class TemporalItems {
 
         TemporalItems.addTemp(player, TemporalItem.GRAPHMAP);
 
-        ItemStack graphMap = MapGraphRenderer.createGraphMap(player, assetid, time, interval);
-        ItemMeta meta = graphMap.getItemMeta();
+        setItemOnHand(player, MapGraphRenderer.createGraphMap(player, assetid, time, interval), "§dGraph " + assetid);
+    }
+
+    public static void setItemOnHand(Player player, ItemStack item, String displayName){
+        ItemMeta meta = item.getItemMeta();
 
         if (meta != null) {
-            meta.setDisplayName("§dGraph " + assetid);
+            meta.setDisplayName(displayName);
             meta.addEnchant(Enchantment.BLAST_PROTECTION, 1, true);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            graphMap.setItemMeta(meta);
+            item.setItemMeta(meta);
         }
 
-        player.getInventory().setItemInMainHand(graphMap);
+        Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+            player.getInventory().setItemInMainHand(item);
+        });
     }
 
 }

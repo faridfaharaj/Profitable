@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
 import com.faridfaharaj.profitable.hooks.VaultHook;
@@ -46,7 +47,9 @@ public class AssetCommand  implements CommandExecutor {
             }
 
             if(sender instanceof Player player){
-                TemporalItems.sendInfoBook(player, args[0]);
+                Profitable.getfolialib().getScheduler().runAsync(task -> {
+                    TemporalItems.sendInfoBook(player, args[0]);
+                });
             }
             return true;
         }
@@ -102,7 +105,9 @@ public class AssetCommand  implements CommandExecutor {
 
                 }
 
-                TemporalItems.sendGraphMap(player, args[0], timeFrame, args[2]);
+                Profitable.getfolialib().getScheduler().runAsync(task -> {
+                    TemporalItems.sendGraphMap(player, args[0], timeFrame, args[2]);
+                });
                 return true;
 
             }

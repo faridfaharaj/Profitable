@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.data.tables.Accounts;
@@ -42,9 +43,11 @@ public class OrdersCommand  implements CommandExecutor {
 
                 }
 
-                if(!Orders.cancelOrder(UUID.fromString(args[1]), player)){
-                    MessagingUtil.sendError(sender, "Couldn't cancel that order");
-                }
+                Profitable.getfolialib().getScheduler().runAsync(task -> {
+                    if(!Orders.cancelOrder(UUID.fromString(args[1]), player)){
+                        MessagingUtil.sendError(sender, "Couldn't cancel that order");
+                    }
+                });
                 return true;
             }
 
@@ -61,25 +64,27 @@ public class OrdersCommand  implements CommandExecutor {
                 return true;
             }
 
-            List<Order> orders = Orders.getAccountOrders(Accounts.getAccount(player));
-            if(orders.isEmpty()){
-                MessagingUtil.sendEmptyNotice(player, "No active orders on this account");
-            }else {
-                int totalPages = (orders.size()-1)/2;
-                Component component = MessagingUtil.profitableTopSeparator("Orders", "-----------------");
-                for(int i = page*2; i<Math.min(page*2+2,orders.size()); i++){
-                    Order order = orders.get(i);
-                    String cmnd = "/orders cancel " + order.getUuid();
-                    component = component.appendNewline().append(order.toComponent()).appendNewline()
-                            .append(Component.text("[Click to cancel]",Configuration.COLORINFO)
-                                    .clickEvent(ClickEvent.runCommand(cmnd))
-                                    .hoverEvent(HoverEvent.showText(Component.text(cmnd,Configuration.COLORINFO))))
-                            .appendNewline();
-                }
-                component = component.appendNewline().append(MessagingUtil.profitablePaginator(page, totalPages, "/orders"));
-                MessagingUtil.sendCustomMessage(sender, component);
+            Profitable.getfolialib().getScheduler().runAsync(task -> {
+                List<Order> orders = Orders.getAccountOrders(Accounts.getAccount(player));
+                if(orders.isEmpty()){
+                    MessagingUtil.sendEmptyNotice(player, "No active orders on this account");
+                }else {
+                    int totalPages = (orders.size()-1)/2;
+                    Component component = MessagingUtil.profitableTopSeparator("Orders", "-----------------");
+                    for(int i = page*2; i<Math.min(page*2+2,orders.size()); i++){
+                        Order order = orders.get(i);
+                        String cmnd = "/orders cancel " + order.getUuid();
+                        component = component.appendNewline().append(order.toComponent()).appendNewline()
+                                .append(Component.text("[Click to cancel]",Configuration.COLORINFO)
+                                        .clickEvent(ClickEvent.runCommand(cmnd))
+                                        .hoverEvent(HoverEvent.showText(Component.text(cmnd,Configuration.COLORINFO))))
+                                .appendNewline();
+                    }
+                    component = component.appendNewline().append(MessagingUtil.profitablePaginator(page, totalPages, "/orders"));
+                    MessagingUtil.sendCustomMessage(sender, component);
 
-            }
+                }
+            });
         }else{
             MessagingUtil.sendGenericCantConsole(sender);
         }
