@@ -98,35 +98,37 @@ public class Events implements Listener {
     public void onPlayerInteractAtEntity(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
         if(Objects.equals(TemporalItems.holdingTemp.get(player.getUniqueId()), TemporalItems.TemporalItem.CLAIMINGTAG)){
-            Entity entity = event.getRightClicked();
-            if(entity.getCustomName() != null){
-                MessagingUtil.sendError(player, "Cannot claim named entities");
-            }else if(!Configuration.ALLOWENTITIES.contains(entity.getType().name())){
+            runItmCooldown(Material.NAME_TAG, event.getPlayer(), () -> {
+                Entity entity = event.getRightClicked();
+                if(entity.getCustomName() != null){
+                    MessagingUtil.sendError(player, "Cannot claim named entities");
+                }else if(!Configuration.ALLOWENTITIES.contains(entity.getType().name())){
 
-                MessagingUtil.sendError(player, "Owning this entity isn't allowed");
+                    MessagingUtil.sendError(player, "Owning this entity isn't allowed");
 
-            } else {
+                } else {
 
-                Runnable claim = () -> {
-                    Profitable.getfolialib().getScheduler().runAtEntity(entity, task -> {
-                        entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));
-                    });
-                    MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName()))
-                            .append(Configuration.ENTITYCLAIMINGFEES == 0?
-                                    Component.text(" FOR FREE", NamedTextColor.GREEN):
-                                    Component.text(" using ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
-                            )
-                    );
-                };
+                    Runnable claim = () -> {
+                        Profitable.getfolialib().getScheduler().runAtEntity(entity, task -> {
+                            entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));
+                        });
+                        MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName()))
+                                .append(Configuration.ENTITYCLAIMINGFEES == 0?
+                                        Component.text(" FOR FREE", NamedTextColor.GREEN):
+                                        Component.text(" using ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
+                                )
+                        );
+                    };
 
 
-                if(Configuration.ENTITYCLAIMINGFEES <= 0){
-                    claim.run();
-                }else {
-                    Asset.chargeAndRun(player, "Could't claim "+ entity.getName() , Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES, claim);
+                    if(Configuration.ENTITYCLAIMINGFEES <= 0){
+                        claim.run();
+                    }else {
+                        Asset.chargeAndRun(player, "Could't claim "+ entity.getName() , Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES, claim);
+                    }
+
                 }
-
-            }
+            });
             event.setCancelled(true);
         }
     }
