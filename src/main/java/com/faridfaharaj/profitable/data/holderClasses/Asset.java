@@ -514,6 +514,7 @@ public class Asset {
 
     public static boolean retrieveCommodityEntity(Player player, String asset, String id, int amount){
 
+        System.out.println(id + " " + asset + " " + amount);
         if(amount == 0){
             return true;
         }
@@ -528,12 +529,12 @@ public class Asset {
         // get from world
         if (Configuration.ALLOWEDCOMMODITYCOLLATERAL[2]) {
             EntityType entityType = EntityType.fromName(asset);
-            World world = player.getWorld();
 
             int entitiesRemaining = amount;
             List<Entity> entities = new ArrayList<>();
 
-            for(Entity entity : world.getEntities()){
+            List<Entity> nearbyEntities = player.getNearbyEntities(20, 20, 20);
+            for(Entity entity : nearbyEntities){
 
                 if(id.equals(entity.getCustomName())){
 
@@ -546,17 +547,18 @@ public class Asset {
 
                 }
 
-                if(entitiesRemaining <= 0){
+            }
 
-                    for(Entity retrieved : entities){
-                        world.playSound(retrieved.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-                        world.spawnParticle(Particle.HAPPY_VILLAGER, retrieved.getLocation(), 5, 1,1,1,1);
-                        retrieved.remove();
-                    }
+            World world = player.getWorld();
+            if(entitiesRemaining <= 0){
 
-                    return true;
+                for(Entity retrieved : entities){
+                    world.playSound(retrieved.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+                    world.spawnParticle(Particle.HAPPY_VILLAGER, retrieved.getLocation(), 5, 1,1,1,1);
+                    retrieved.remove();
                 }
 
+                return true;
             }
         }
         return false;

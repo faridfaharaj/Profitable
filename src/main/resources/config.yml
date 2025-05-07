@@ -53,7 +53,7 @@ exchange:
     take-inventory: true
 
     # Allow taking claimed entities from world for transactions
-    take-world: false
+    take-world: true
 
     # note: commodities are RAW and FUNGIBLE materials traded in BULK that are then processed into different products
     #       crops and building material can be commodities as well:

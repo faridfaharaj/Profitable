@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
@@ -37,18 +38,20 @@ public class DeliveryCommand implements CommandExecutor {
                     return true;
                 }
 
-                Location entityDelivery = Accounts.getEntityDelivery(account);
-                Location itemDelivery = Accounts.getItemDelivery(account);
+                Profitable.getfolialib().getScheduler().runAsync(task -> {
+                    Location entityDelivery = Accounts.getEntityDelivery(account);
+                    Location itemDelivery = Accounts.getItemDelivery(account);
 
-                MessagingUtil.sendCustomMessage(sender,
-                        MessagingUtil.profitableTopSeparator("Delivery","----------------").appendNewline()
-                                .append(Component.text("Item Delivery Location:")).appendNewline()
-                                .append(Component.text((itemDelivery == null?"Not set":itemDelivery.toVector() + " (" + itemDelivery.getWorld().getName()+")")).color(Configuration.COLORINFO)).appendNewline()
-                                .appendNewline()
-                                .append(Component.text("Entity Delivery Location:")).appendNewline()
-                                .append(Component.text((entityDelivery == null?"Not set":entityDelivery.toVector() + " (" + entityDelivery.getWorld().getName()+")")).color(Configuration.COLORINFO)).appendNewline()
-                                .append(MessagingUtil.profitableBottomSeparator())
-                );
+                    MessagingUtil.sendCustomMessage(sender,
+                            MessagingUtil.profitableTopSeparator("Delivery","----------------").appendNewline()
+                                    .append(Component.text("Item Delivery Location:")).appendNewline()
+                                    .append(Component.text((itemDelivery == null?"Not set":itemDelivery.toVector() + " (" + itemDelivery.getWorld().getName()+")")).color(Configuration.COLORINFO)).appendNewline()
+                                    .appendNewline()
+                                    .append(Component.text("Entity Delivery Location:")).appendNewline()
+                                    .append(Component.text((entityDelivery == null?"Not set":entityDelivery.toVector() + " (" + entityDelivery.getWorld().getName()+")")).color(Configuration.COLORINFO)).appendNewline()
+                                    .append(MessagingUtil.profitableBottomSeparator())
+                    );
+                });
 
                 return true;
             }

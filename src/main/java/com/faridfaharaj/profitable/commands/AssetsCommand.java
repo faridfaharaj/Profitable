@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.tables.Assets;
@@ -45,17 +46,55 @@ public class AssetsCommand implements CommandExecutor {
                 return true;
             }
 
-            int assetType;
-            if(args[1].equals("forex")){
-                assetType = 1;
-            }else if(args[1].equals("commodity")){
+            Profitable.getfolialib().getScheduler().runAsync(task -> {
 
-                List<Asset> foundAssets = Assets.getAssetFancyType(2);
-                foundAssets.addAll(Assets.getAssetFancyType(3));
+                int assetType;
+                if(args[1].equals("forex")){
+                    assetType = 1;
+                }else if(args[1].equals("commodity")){
 
+                    List<Asset> foundAssets = Assets.getAssetFancyType(2);
+                    foundAssets.addAll(Assets.getAssetFancyType(3));
+
+                    if(foundAssets.isEmpty()){
+                        MessagingUtil.sendEmptyNotice(sender, "No commodities can be traded");
+                        return;
+                    }
+
+                    int page;
+
+                    if(args.length == 2){
+                        page = 0;
+                    }else {
+                        try {
+                            page = Integer.parseInt(args[2]);
+                        }catch (Exception e){
+                            MessagingUtil.sendError(sender, "Invalid page number");
+                            return;
+                        }
+                    }
+
+                    int totalPages = (foundAssets.size()-1)/8;
+                    Component component = MessagingUtil.profitableTopSeparator("Commodities", "--------------").appendNewline()
+                            .append(getAssetList(page, foundAssets))
+                            .append(MessagingUtil.profitablePaginator(page, totalPages, "/assets categories " + args[1]))
+                            ;
+
+                    MessagingUtil.sendCustomMessage(sender, component);
+
+                    return;
+
+                }else{
+
+                    MessagingUtil.sendError(sender, "Invalid Asset Type");
+                    return;
+
+                }
+
+                List<Asset> foundAssets = Assets.getAssetFancyType(assetType);
                 if(foundAssets.isEmpty()){
-                    MessagingUtil.sendEmptyNotice(sender, "No commodities can be traded");
-                    return true;
+                    MessagingUtil.sendEmptyNotice(sender, "No "+ NamingUtil.nameType(assetType) +" can be traded");
+                    return;
                 }
 
                 int page;
@@ -67,51 +106,17 @@ public class AssetsCommand implements CommandExecutor {
                         page = Integer.parseInt(args[2]);
                     }catch (Exception e){
                         MessagingUtil.sendError(sender, "Invalid page number");
-                        return true;
+                        return;
                     }
                 }
 
                 int totalPages = (foundAssets.size()-1)/8;
-                Component component = MessagingUtil.profitableTopSeparator("Commodities", "--------------").appendNewline()
+                Component component = MessagingUtil.profitableTopSeparator(NamingUtil.nameType(assetType), "-----------------").appendNewline()
                         .append(getAssetList(page, foundAssets))
-                        .append(MessagingUtil.profitablePaginator(page, totalPages, "/assets categories " + args[1]))
-                        ;
-
+                        .append(MessagingUtil.profitablePaginator(page, totalPages, "/assets categories " + args[1]));
                 MessagingUtil.sendCustomMessage(sender, component);
 
-                return true;
-
-            }else{
-
-                MessagingUtil.sendError(sender, "Invalid Asset Type");
-                return true;
-
-            }
-
-            List<Asset> foundAssets = Assets.getAssetFancyType(assetType);
-            if(foundAssets.isEmpty()){
-                MessagingUtil.sendEmptyNotice(sender, "No "+ NamingUtil.nameType(assetType) +" can be traded");
-                return true;
-            }
-
-            int page;
-
-            if(args.length == 2){
-                page = 0;
-            }else {
-                try {
-                    page = Integer.parseInt(args[2]);
-                }catch (Exception e){
-                    MessagingUtil.sendError(sender, "Invalid page number");
-                    return true;
-                }
-            }
-
-            int totalPages = (foundAssets.size()-1)/8;
-            Component component = MessagingUtil.profitableTopSeparator(NamingUtil.nameType(assetType), "-----------------").appendNewline()
-                    .append(getAssetList(page, foundAssets))
-                    .append(MessagingUtil.profitablePaginator(page, totalPages, "/assets categories " + args[1]));
-            MessagingUtil.sendCustomMessage(sender, component);
+            });
 
             return true;
         }
