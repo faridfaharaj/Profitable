@@ -5,6 +5,7 @@ import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
+import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -23,6 +24,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
@@ -84,13 +86,21 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public void onInventoryOpen(InventoryClickEvent event) {
+    public void onClickInventory(InventoryClickEvent event) {
         HumanEntity player = event.getWhoClicked();
+        Inventory inventory = event.getInventory();
         if(TemporalItems.holdingTemp.containsKey(player.getUniqueId())){
             TemporalItems.removeTempItem((Player) player);
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
                 event.setCancelled(player.getGameMode() != GameMode.CREATIVE);
             });
+        }
+
+        if(inventory.getHolder() instanceof ChestGUI gui){
+
+            gui.slotInteracted((Player) player, event.getSlot(), event.getClick());
+
+            event.setCancelled(true);
         }
     }
 

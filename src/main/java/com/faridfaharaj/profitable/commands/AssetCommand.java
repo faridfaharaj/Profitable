@@ -6,6 +6,8 @@ import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
 import com.faridfaharaj.profitable.hooks.VaultHook;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
+import com.faridfaharaj.profitable.tasks.gui.guis.AssetInspector;
+import com.faridfaharaj.profitable.tasks.gui.guis.GraphsMenu;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -47,9 +49,7 @@ public class AssetCommand  implements CommandExecutor {
             }
 
             if(sender instanceof Player player){
-                Profitable.getfolialib().getScheduler().runAsync(task -> {
-                    TemporalItems.sendInfoBook(player, args[0]);
-                });
+                new AssetInspector(args[0], player.getWorld()).openGui(player);
             }
             return true;
         }
@@ -70,7 +70,7 @@ public class AssetCommand  implements CommandExecutor {
 
                 if (args.length == 2) {
 
-                    sendGraphOptions(player, args[0]);
+                    new GraphsMenu(args[0]).openGui(player);
 
                     return true;
                 }
