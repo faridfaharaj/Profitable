@@ -166,20 +166,18 @@ public class Events implements Listener {
                 runItmCooldown(event.getMaterial(), player, () -> {
                     Block block = event.getClickedBlock();
                     if(block != null){
-                        Profitable.getfolialib().getScheduler().runAtLocation(event.getInteractionPoint(), task -> {
-                            if(!(block.getState() instanceof Container)){
-                                MessagingUtil.sendError(player, "Item delivery location must be a container");
-                                return;
-                            }
-                            Location correctedlocation = block.getLocation();
-                            if(Accounts.changeItemDelivery(Accounts.getAccount(player), correctedlocation)){
-                                MessagingUtil.sendSuccsess(player,"Updated item delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
+                        if(!(block.getState() instanceof Container)){
+                            MessagingUtil.sendError(player, "Item delivery location must be a container");
+                            return;
+                        }
+                        Location correctedlocation = block.getLocation();
+                        if(Accounts.changeItemDelivery(Accounts.getAccount(player), correctedlocation)){
+                            MessagingUtil.sendSuccsess(player,"Updated item delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
 
-                                TemporalItems.removeTempItem(player);
-                            }else {
-                                MessagingUtil.sendError(player, "Could not update Item delivery");
-                            }
-                        });
+                            TemporalItems.removeTempItem(player);
+                        }else {
+                            MessagingUtil.sendError(player, "Could not update Item delivery");
+                        }
                     }
                 });
 
@@ -187,18 +185,16 @@ public class Events implements Listener {
 
                 runItmCooldown(event.getMaterial(), player, () -> {
 
-                    Profitable.getfolialib().getScheduler().runAtLocation(event.getInteractionPoint(), task -> {
-                        Block block = event.getClickedBlock();
-                        if(block != null){
-                            Location correctedlocation = block.getLocation().add(0.5,0,0.5).add(event.getBlockFace().getDirection());
-                            if(Accounts.changeEntityDelivery(Accounts.getAccount(player), correctedlocation)){
-                                MessagingUtil.sendSuccsess(player,"Updated entity delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
-                                TemporalItems.removeTempItem(player);
-                            }else {
-                                MessagingUtil.sendError(player, "Could not update Entity delivery");
-                            }
+                    Block block = event.getClickedBlock();
+                    if(block != null){
+                        Location correctedlocation = block.getLocation().add(0.5,0,0.5).add(event.getBlockFace().getDirection());
+                        if(Accounts.changeEntityDelivery(Accounts.getAccount(player), correctedlocation)){
+                            MessagingUtil.sendSuccsess(player,"Updated entity delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
+                            TemporalItems.removeTempItem(player);
+                        }else {
+                            MessagingUtil.sendError(player, "Could not update Entity delivery");
                         }
-                    });
+                    }
 
                 });
 
