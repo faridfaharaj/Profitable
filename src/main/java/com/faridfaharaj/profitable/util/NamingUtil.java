@@ -51,8 +51,9 @@ public class NamingUtil {
         if (name != null) {
             return name;
         }
+        name = UNWANTED_SUFFIXES.matcher(code).replaceAll("").toLowerCase().replace("_", " ");
 
-        return UNWANTED_SUFFIXES.matcher(code).replaceAll("").toLowerCase().replace("_", " ");
+        return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
     }
 
     public static String nameType(int assetType) {

@@ -124,7 +124,7 @@ public class Asset {
             color = RandomUtil.randomTextColor();
         }
 
-        return new Asset(MCdata[0], 1, color, name);
+        return new Asset(MCdata[0].toUpperCase(), 1, color, name);
     }
 
     public String getCode(){
