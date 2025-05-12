@@ -84,7 +84,7 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public void onInventoryOpen(InventoryClickEvent event) {
+    public void onClickInventory(InventoryClickEvent event) {
         HumanEntity player = event.getWhoClicked();
         if(TemporalItems.holdingTemp.containsKey(player.getUniqueId())){
             TemporalItems.removeTempItem((Player) player);
