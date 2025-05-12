@@ -110,14 +110,23 @@ public class MessagingUtil {
     }
 
     public static void sendCustomMessage(CommandSender sender, Component component){
-        if(sender instanceof Player player){
-            Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
-                String jsonMessage = GsonComponentSerializer.gson().serialize(component);
-                sender.spigot().sendMessage(ComponentSerializer.parse(jsonMessage));
-            });
-        }else{
-            String legacy = LegacyComponentSerializer.legacySection().serialize(component);
-            sender.sendMessage(legacy);
+        if(Profitable.getfolialib().isSpigot()){
+
+            String jsonMessage = GsonComponentSerializer.gson().serialize(component);
+            sender.spigot().sendMessage(ComponentSerializer.parse(jsonMessage));
+
+        }else {
+
+            if(sender instanceof Player player){
+                Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                    sender.sendMessage(component);
+                });
+            }else{
+                Profitable.getfolialib().getScheduler().runNextTick(task -> {
+                    sender.sendMessage(component);
+                });
+            }
+
         }
     }
 

@@ -35,7 +35,7 @@ public class TransactCommand implements CommandExecutor {
                 if(args.length == 0 || args[0].equals("hand")){
                     asset = player.getInventory().getItemInMainHand().getType().name();
                 }else {
-                    asset = args[0];
+                    asset = args[0].toUpperCase();
                 }
 
                 MessagingUtil.sendInfoNotice(player, "Processing Order...");
