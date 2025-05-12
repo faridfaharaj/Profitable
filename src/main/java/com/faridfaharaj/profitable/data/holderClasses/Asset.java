@@ -124,7 +124,7 @@ public class Asset {
             color = RandomUtil.randomTextColor();
         }
 
-        return new Asset(MCdata[0], 1, color, name);
+        return new Asset(MCdata[0].toUpperCase(), 1, color, name);
     }
 
     public String getCode(){
@@ -547,18 +547,16 @@ public class Asset {
 
                 }
 
-            }
-
-            World world = player.getWorld();
-            if(entitiesRemaining <= 0){
-
-                for(Entity retrieved : entities){
-                    world.playSound(retrieved.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-                    world.spawnParticle(Particle.HAPPY_VILLAGER, retrieved.getLocation(), 5, 1,1,1,1);
-                    retrieved.remove();
+                if(entitiesRemaining <= 0){
+                    World world = player.getWorld();
+                    for(Entity retrieved : entities){
+                        world.playSound(retrieved.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+                        world.spawnParticle(Particle.HAPPY_VILLAGER, retrieved.getLocation(), 5, 1,1,1,1);
+                        retrieved.remove();
+                    }
+                    return true;
                 }
 
-                return true;
             }
         }
         return false;
