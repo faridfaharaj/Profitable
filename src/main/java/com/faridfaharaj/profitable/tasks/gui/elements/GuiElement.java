@@ -1,6 +1,5 @@
 package com.faridfaharaj.profitable.tasks.gui;
 
-import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -19,7 +18,7 @@ public class GuiElement {
     public GuiElement(ChestGUI gui, Material material, Component text, int slot){
         display = new ItemStack(material);
         ItemMeta metaAccountButton = display.getItemMeta();
-        if(Profitable.isPaper()){
+        if(!Profitable.getfolialib().isSpigot()){
             metaAccountButton.displayName(text);
         }else {
             metaAccountButton.setDisplayName(LegacyComponentSerializer.legacySection().serialize(text));
@@ -33,7 +32,7 @@ public class GuiElement {
     public GuiElement(ChestGUI gui, Material material, Component text, List<Component> lore, int slot){
         display = new ItemStack(material);
         ItemMeta metaAccountButton = display.getItemMeta();
-        if(Profitable.isPaper()){
+        if(!Profitable.getfolialib().isSpigot()){
             metaAccountButton.displayName(text);
             metaAccountButton.lore(lore);
         }else {
