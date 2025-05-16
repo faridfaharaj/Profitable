@@ -4,18 +4,20 @@ import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
-import com.faridfaharaj.profitable.tasks.gui.GuiElement;
+import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
+import com.faridfaharaj.profitable.tasks.gui.elements.ReturnButton;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GraphsMenu extends ChestGUI {
+public final class GraphsMenu extends ChestGUI {
 
     String assetid;
 
@@ -36,13 +38,17 @@ public class GraphsMenu extends ChestGUI {
         buttonInstructions.add(Component.empty());
         buttonInstructions.add(Component.text("[Left-Click to view graph]", Configuration.COLORINFO));
 
-        returnButton = new GuiElement(this, Material.BARRIER, Component.text("return", NamedTextColor.RED), vectorSlotPosition(0,2));
+        fillAll(Material.BLACK_STAINED_GLASS_PANE);
 
-        graph1MButton = new GuiElement(this, Material.FILLED_MAP, Component.text("1 Month", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(2,1));
-        graph3MButton = new GuiElement(this, Material.FILLED_MAP, Component.text("3 Months", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(3,1));
-        graph6MButton = new GuiElement(this, Material.FILLED_MAP, Component.text("6 Months", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(4,1));
-        graph1YButton = new GuiElement(this, Material.FILLED_MAP, Component.text("1 Year", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(5,1));
-        graph2YButton = new GuiElement(this, Material.FILLED_MAP, Component.text("2 Years", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(6,1));
+        returnButton = new ReturnButton(this, vectorSlotPosition(0,2));
+
+        ItemStack mapStack = new ItemStack(Material.FILLED_MAP);
+
+        graph1MButton = new GuiElement(this, mapStack, Component.text("1 Month", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(2,1));
+        graph3MButton = new GuiElement(this, mapStack, Component.text("3 Months", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(3,1));
+        graph6MButton = new GuiElement(this, mapStack, Component.text("6 Months", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(4,1));
+        graph1YButton = new GuiElement(this, mapStack, Component.text("1 Year", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(5,1));
+        graph2YButton = new GuiElement(this, mapStack, Component.text("2 Years", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(6,1));
     }
 
     @Override

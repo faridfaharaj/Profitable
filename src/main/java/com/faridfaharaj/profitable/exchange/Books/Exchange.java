@@ -119,7 +119,7 @@ public class Exchange {
 
             //Market
             if(order.getType() == Order.OrderType.MARKET){
-                MessagingUtil.sendWarning(player, "No orders available, add a price to place a limit order");
+                MessagingUtil.sendError(player, "No orders available, use limit order instead");
                 return;
             }
 

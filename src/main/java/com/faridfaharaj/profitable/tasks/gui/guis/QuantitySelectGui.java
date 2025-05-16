@@ -1,4 +1,4 @@
-package com.faridfaharaj.profitable.tasks.gui.guis.orderBuilding;
+package com.faridfaharaj.profitable.tasks.gui.guis;
 
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
@@ -13,57 +13,56 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class QuantitySelectGui extends ChestGUI {
+public abstract class QuantitySelectGui extends ChestGUI {
 
-    final GuiElement[] buttons = new GuiElement[8];
+    final GuiElement[] buttons = new GuiElement[10];
 
-    int amount = 1;
+    protected double amount = 1;
+    final boolean enfoceInt;
 
-    public QuantitySelectGui() {
-        super(5, "Units");
+    public QuantitySelectGui(String text, boolean decimal, boolean enforceInteger, double defaultAmount) {
+        super(5, text);
+
+        this.amount = defaultAmount;
 
         fillAll(Material.BLACK_STAINED_GLASS_PANE);
 
         buttons[0] = new ReturnButton(this, vectorSlotPosition(0, 4));
 
+        int big = decimal?50:64;
+        int mid = decimal?10:16;
+
+        this.enfoceInt = enforceInteger;
 
         // -64/-50
-        buttons[1] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, 64), Component.text("Remove 64"),
-                List.of(
-                        GuiElement.clickAction(ClickType.LEFT, "Remove")
-                ), vectorSlotPosition(1, 2));
+        buttons[1] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, big), GuiElement.clickAction(null, "Remove " + big), null, vectorSlotPosition(1, 2));
         // -16/-10
-        buttons[2] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, 16), Component.text("Remove 16"),
-                List.of(
-                        GuiElement.clickAction(ClickType.LEFT, "Remove")
-                ), vectorSlotPosition(2, 2));
+        buttons[2] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, mid), GuiElement.clickAction(null, "Remove " + mid), null, vectorSlotPosition(2, 2));
         // -1/-1
-        buttons[3] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, 1), Component.text("Remove 1"),
-                List.of(
-                        GuiElement.clickAction(ClickType.LEFT, "Remove")
-                ), vectorSlotPosition(3, 2));
+        buttons[3] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, 1), GuiElement.clickAction(null, "Remove 1"), null, vectorSlotPosition(3, 2));
 
         // middle
-        buttons[4] = new GuiElement(this, new ItemStack(Material.PAPER, 1), Component.text(amount),
-                List.of(
-                        GuiElement.clickAction(ClickType.LEFT, "Select this amount")
-                ), vectorSlotPosition(4, 2));
+        buttons[4] = submitButton(vectorSlotPosition(4, 2));
 
         // 1/1
-        buttons[5] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, 1), Component.text("Add 1"),
-                List.of(
-                        GuiElement.clickAction(ClickType.LEFT, "Add")
-                ), vectorSlotPosition(5, 2));
+        buttons[5] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, 1), GuiElement.clickAction(null, "Add 1"),
+                null, vectorSlotPosition(5, 2));
         // 16/10
-        buttons[6] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, 16), Component.text("Add 16"),
-                List.of(
-                        GuiElement.clickAction(ClickType.LEFT, "Add")
-                ), vectorSlotPosition(6, 2));
+        buttons[6] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, mid), GuiElement.clickAction(null, "Add " + mid), null, vectorSlotPosition(6, 2));
         // 64/50
-        buttons[7] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, 64), Component.text("Add 64"),
+        buttons[7] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, big), GuiElement.clickAction(null, "Add " + big), null, vectorSlotPosition(7, 2));
+
+        // add 0
+        buttons[8] = new GuiElement(this, new ItemStack(Material.STONE_BUTTON), Component.text("Move dot to left"),
                 List.of(
-                        GuiElement.clickAction(ClickType.LEFT, "Add")
-                ), vectorSlotPosition(7, 2));
+                        GuiElement.clickAction(null, "0.X <-")
+                ), vectorSlotPosition(3, 4));
+
+        // remove 0
+        buttons[9] = new GuiElement(this, new ItemStack(Material.STONE_BUTTON), Component.text("Move dot to right"),
+                List.of(
+                        GuiElement.clickAction(null, "X.0 ->")
+                ), vectorSlotPosition(5, 4));
 
     }
 
@@ -74,13 +73,12 @@ public class QuantitySelectGui extends ChestGUI {
 
                 if(button == buttons[0]){
                     this.getInventory().close();
-                    new OrderTypeGui().openGui(player);
+                    onReturn(player);
                     return;
                 }
 
                 if(button == buttons[4]){
-                    this.getInventory().close();
-                    new ConfirmOrder().openGui(player);
+                    onSubmitAmount(player, amount);
                     return;
                 }
 
@@ -116,10 +114,38 @@ public class QuantitySelectGui extends ChestGUI {
                     });
                 }
 
-                buttons[4].setDisplayName(Component.text(amount + " EMERALD"));
-                buttons[4].show(this);
+                if (button == buttons[8]) {
+                    amount /= 10;
+                    Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                        player.playSound(player, Sound.ENTITY_SHEEP_SHEAR, 1,1);
+                    });
+                }else if (button == buttons[9]) {
+                    amount *= 10;
+                    Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                        player.playSound(player, Sound.ENTITY_ITEM_PICKUP, 1,1);
+                    });
+                }
 
+                if(enfoceInt){
+                    amount = Math.max(1, (int)amount);
+                }else {
+                    amount = Math.max(0.001, amount);
+                }
+
+                onAmountUpdate(amount);
             }
         }
     }
+
+    protected abstract void onAmountUpdate(double newAmount);
+
+    protected GuiElement getSubmitButton(){
+        return buttons[4];
+    }
+
+    protected abstract GuiElement submitButton(int slot);
+
+    protected abstract void onSubmitAmount(Player player, double amount);
+
+    protected abstract void onReturn(Player player);
 }

@@ -47,8 +47,6 @@ public final class Profitable extends JavaPlugin {
     private static BukkitAudiences audiences;
     private static FoliaLib foliaLib;
 
-    private static boolean isPaper;
-
     public static Profitable getInstance() {
         return instance;
     }
@@ -58,9 +56,6 @@ public final class Profitable extends JavaPlugin {
     public static FoliaLib getfolialib() {
         return foliaLib;
     }
-    public static boolean isPaper() {
-        return isPaper;
-    }
 
     @Override
     public void onEnable() {
@@ -69,12 +64,6 @@ public final class Profitable extends JavaPlugin {
         instance = this;
         audiences = BukkitAudiences.create(this);
         foliaLib = new FoliaLib(this);
-        try {
-            Class.forName("com.destroystokyo.paper.event.server.ServerTickStartEvent");
-            isPaper = true;
-        } catch (ClassNotFoundException e) {
-            isPaper = false;
-        }
 
         foliaLib.getScheduler().runAsync(task -> {
             checkForUpdate(this);
