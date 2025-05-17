@@ -35,12 +35,7 @@ commands:
   assets:
     description: sends you a list of all tradeable assets
     usage: /assets <Asset Type>
-    aliases: [ ]
-
-  asset:
-    description: gets market information about an asset
-    usage: /asset <Asset>
-    aliases: [ ]
+    aliases: [gui, GUI]
 
   top:
     description: Lets you view the most popular assets

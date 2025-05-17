@@ -5,6 +5,7 @@ import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.tables.Assets;
+import com.faridfaharaj.profitable.tasks.gui.guis.AssetExplorer;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.Component;
@@ -14,6 +15,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 
@@ -26,98 +28,12 @@ public class AssetsCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if(args.length == 0){
-            return false;
-        }
-
         if(Configuration.MULTIWORLD){
             DataBase.universalUpdateWorld(sender);
         }
 
-        if(Objects.equals(args[0], "categories")){
-
-            if(!sender.hasPermission("profitable.asset.categories")){
-                MessagingUtil.sendGenericMissingPerm(sender);
-                return true;
-            }
-
-            if(args.length < 2){
-                MessagingUtil.sendError(sender, "/assets category <Asset Category>");
-                return true;
-            }
-
-            Profitable.getfolialib().getScheduler().runAsync(task -> {
-
-                int assetType;
-                if(args[1].equals("forex")){
-                    assetType = 1;
-                }else if(args[1].equals("commodity")){
-
-                    List<Asset> foundAssets = Assets.getAssetFancyType(2);
-                    foundAssets.addAll(Assets.getAssetFancyType(3));
-
-                    if(foundAssets.isEmpty()){
-                        MessagingUtil.sendEmptyNotice(sender, "No commodities can be traded");
-                        return;
-                    }
-
-                    int page;
-
-                    if(args.length == 2){
-                        page = 0;
-                    }else {
-                        try {
-                            page = Integer.parseInt(args[2]);
-                        }catch (Exception e){
-                            MessagingUtil.sendError(sender, "Invalid page number");
-                            return;
-                        }
-                    }
-
-                    int totalPages = (foundAssets.size()-1)/8;
-                    Component component = MessagingUtil.profitableTopSeparator("Commodities", "--------------").appendNewline()
-                            .append(getAssetList(page, foundAssets))
-                            .append(MessagingUtil.profitablePaginator(page, totalPages, "/assets categories " + args[1]))
-                            ;
-
-                    MessagingUtil.sendCustomMessage(sender, component);
-
-                    return;
-
-                }else{
-
-                    MessagingUtil.sendError(sender, "Invalid Asset Type");
-                    return;
-
-                }
-
-                List<Asset> foundAssets = Assets.getAssetFancyType(assetType);
-                if(foundAssets.isEmpty()){
-                    MessagingUtil.sendEmptyNotice(sender, "No "+ NamingUtil.nameType(assetType) +" can be traded");
-                    return;
-                }
-
-                int page;
-
-                if(args.length == 2){
-                    page = 0;
-                }else {
-                    try {
-                        page = Integer.parseInt(args[2]);
-                    }catch (Exception e){
-                        MessagingUtil.sendError(sender, "Invalid page number");
-                        return;
-                    }
-                }
-
-                int totalPages = (foundAssets.size()-1)/8;
-                Component component = MessagingUtil.profitableTopSeparator(NamingUtil.nameType(assetType), "-----------------").appendNewline()
-                        .append(getAssetList(page, foundAssets))
-                        .append(MessagingUtil.profitablePaginator(page, totalPages, "/assets categories " + args[1]));
-                MessagingUtil.sendCustomMessage(sender, component);
-
-            });
-
+        if(sender instanceof Player player){
+            new AssetExplorer(player).openGui(player);
             return true;
         }
 

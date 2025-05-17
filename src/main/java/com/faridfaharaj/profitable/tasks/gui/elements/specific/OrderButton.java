@@ -18,7 +18,7 @@ public class OrderButton extends GuiElement{
     Order order;
 
     public OrderButton(ChestGUI gui, Order order, int slot) {
-        super(gui, new ItemStack(Material.PAPER), order.isSideBuy()?Component.text("Buy order", Configuration.COLORBULLISH):Component.text("Sell order", Configuration.COLORBEARISH),
+        super(gui, order.isSideBuy()?new ItemStack(Material.PAPER):new ItemStack(Material.MAP), order.isSideBuy()?Component.text("Buy order", Configuration.COLORBULLISH):Component.text("Sell order", Configuration.COLORBEARISH),
                 List.of(
                         Component.text("Order Type: " + order.getType()),
                         Component.empty(),
@@ -34,9 +34,8 @@ public class OrderButton extends GuiElement{
     }
 
     public void cancel(Player player){
-        player.getInventory().close();
         Profitable.getfolialib().getScheduler().runAsync(task -> {
-            Orders.cancelOrder(order.getUuid());
+            Orders.cancelOrder(order.getUuid(), player);
         });
     }
 

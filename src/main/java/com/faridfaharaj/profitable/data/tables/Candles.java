@@ -10,18 +10,14 @@ import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetButtonData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.World;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Candles {
 
@@ -104,7 +100,7 @@ public class Candles {
         return new Candle(0, 0, 0, 0, 0);
     }
 
-    public static List<AssetButtonData> getAssetFancyTypeWithCandles(int type, long time) {
+    public static List<AssetButtonData> getAssetsNPrice(int type, long time) {
         List<AssetButtonData> result = new ArrayList<>();
 
         String sql = """
@@ -146,20 +142,23 @@ public class Candles {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     String assetID = rs.getString("asset_id");
-                    int assetType = rs.getInt("asset_type");
-                    byte[] meta = rs.getBytes("meta");
 
-                    Asset asset = Asset.assetFromMeta(assetID, assetType, meta);
+                    if(!Objects.equals(assetID, Configuration.MAINCURRENCYASSET.getCode())){
+                        int assetType = rs.getInt("asset_type");
+                        byte[] meta = rs.getBytes("meta");
 
-                    double open = rs.getDouble("open");
-                    double close = rs.getDouble("close");
-                    double high = rs.getDouble("high");
-                    double low = rs.getDouble("low");
-                    double volume = rs.getDouble("volume");
+                        Asset asset = Asset.assetFromMeta(assetID, assetType, meta);
 
-                    Candle candle = new Candle(open, close, high, low, volume);
+                        double open = rs.getDouble("open");
+                        double close = rs.getDouble("close");
+                        double high = rs.getDouble("high");
+                        double low = rs.getDouble("low");
+                        double volume = rs.getDouble("volume");
 
-                    result.add(new AssetButtonData(asset, candle));
+                        Candle candle = new Candle(open, close, high, low, volume);
+
+                        result.add(new AssetButtonData(asset, candle));
+                    }
                 }
             }
 

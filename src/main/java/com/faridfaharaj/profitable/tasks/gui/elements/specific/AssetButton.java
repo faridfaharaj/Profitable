@@ -30,50 +30,6 @@ public class AssetButton extends GuiElement {
     Candle lastestDay;
     boolean loaded = false;
 
-    public AssetButton(ChestGUI gui, long fullTime, String assetId, int slot) {
-        super(gui, new ItemStack(Material.PAPER), Component.text("Loading...", Configuration.COLOREMPTY), null, slot);
-
-        Profitable.getfolialib().getScheduler().runAsync(task -> {
-
-            this.asset = Assets.getAssetData(assetId);
-            this.lastestDay = Candles.getLastDay(asset.getCode(), fullTime);
-            double price = lastestDay.getClose(),
-                    change = lastestDay.getClose()-lastestDay.getOpen(),
-                    volume = lastestDay.getVolume(), Open = lastestDay.getOpen();
-            String symbol = asset.getAssetType() == 1? Configuration.MAINCURRENCYASSET.getCode() + "/" + asset.getCode():asset.getCode(),
-                    priceStr = "$"+ price,
-                    dayChange =  change+" "+ Math.ceil(change/lastestDay.getOpen()*10000)/100 + "% today";
-
-            if(asset.getAssetType() == 2){
-                this.display = new ItemStack(Material.getMaterial(asset.getCode()));
-            }if(asset.getAssetType() == 3){
-                this.display = new ItemStack(Material.getMaterial(asset.getCode()+"_SPAWN_EGG"));
-            }if(asset.getAssetType() == 1) {
-                this.display = new ItemStack(Material.EMERALD);
-            }
-
-            List<Component> keyDataPoints = new ArrayList<>();
-            keyDataPoints.add(Component.text(NamingUtil.nameType(asset.getAssetType())));
-            keyDataPoints.add(Component.space());
-            keyDataPoints.add(Component.text("Volume: " + volume));
-            keyDataPoints.add(Component.text("Open: " + Open));
-            keyDataPoints.add(Component.text("Day's Range: " + lastestDay.getLow() + " to " + lastestDay.getHigh()));
-
-            keyDataPoints.add(Component.empty());
-            keyDataPoints.add(GuiElement.clickAction(ClickType.LEFT, "Trade asset"));
-            keyDataPoints.add(GuiElement.clickAction(ClickType.RIGHT, "Get graphs"));
-
-            setDisplayName(Component.text("").append(Component.text(symbol, asset.getColor()).decorate(TextDecoration.BOLD).hoverEvent(HoverEvent.showText(MessagingUtil.assetSummary(asset)))).append( Component.space().appendSpace().appendSpace().append(Component.text(priceStr)).appendSpace().appendSpace().appendSpace()).append(Component.text(dayChange,(change<0?Configuration.COLORBEARISH:Configuration.COLORBULLISH))));
-            setLore(keyDataPoints);
-
-            loaded = true;
-
-            this.show(gui);
-
-        });
-
-    }
-
     public AssetButton(ChestGUI gui, AssetButtonData assetButtonData, int slot) {
         super(gui, new ItemStack(Material.PAPER), Component.text("Loading...", Configuration.COLOREMPTY), null, slot);
 
