@@ -1,7 +1,8 @@
 package com.faridfaharaj.profitable.tasks.gui.guis;
 
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
-import com.faridfaharaj.profitable.tasks.gui.elements.AssetButton;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetButton;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetHolderButton;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -9,12 +10,15 @@ import org.bukkit.event.inventory.ClickType;
 public final class AssetInspector extends ChestGUI {
 
     AssetButton tradeButton;
+    AssetHolderButton withdrawButton;
 
     public AssetInspector(String assetID, World world) {
         super(6, assetID);
 
 
         tradeButton = new AssetButton(this, world.getFullTime(),assetID,vectorSlotPosition(2,1));
+
+        withdrawButton = new AssetHolderButton(this, world.getFullTime(), assetID, 5d, vectorSlotPosition(3,1));
 
     }
 

@@ -56,7 +56,7 @@ public final class GraphsMenu extends ChestGUI {
 
         if(slot == returnButton.getSlot()){
             this.getInventory().close();
-            new AssetInspector(assetid, player.getWorld()).openGui(player);
+            new AssetExplorer(player).openGui(player);
         }else if(slot == graph1MButton.getSlot()){
             this.getInventory().close();
             MessagingUtil.sendSuccsess(player, "Preparing Graph...");

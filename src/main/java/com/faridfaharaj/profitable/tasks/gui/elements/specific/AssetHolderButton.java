@@ -1,4 +1,4 @@
-package com.faridfaharaj.profitable.tasks.gui.elements.assetSpecific;
+package com.faridfaharaj.profitable.tasks.gui.elements.specific;
 
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;

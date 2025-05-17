@@ -1,7 +1,6 @@
-package com.faridfaharaj.profitable.tasks.gui.guis;
+package com.faridfaharaj.profitable.tasks.gui;
 
 import com.faridfaharaj.profitable.Profitable;
-import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.elements.ReturnButton;
 import net.kyori.adventure.text.Component;
@@ -17,7 +16,7 @@ public abstract class QuantitySelectGui extends ChestGUI {
 
     final GuiElement[] buttons = new GuiElement[10];
 
-    protected double amount = 1;
+    protected double amount;
     final boolean enfoceInt;
 
     public QuantitySelectGui(String text, boolean decimal, boolean enforceInteger, double defaultAmount) {
@@ -35,31 +34,31 @@ public abstract class QuantitySelectGui extends ChestGUI {
         this.enfoceInt = enforceInteger;
 
         // -64/-50
-        buttons[1] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, big), GuiElement.clickAction(null, "Remove " + big), null, vectorSlotPosition(1, 2));
+        buttons[1] = new GuiElement(this, new ItemStack(Material.RED_CANDLE, big), GuiElement.clickAction(null, "Remove " + big), null, vectorSlotPosition(1, 2));
         // -16/-10
-        buttons[2] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, mid), GuiElement.clickAction(null, "Remove " + mid), null, vectorSlotPosition(2, 2));
+        buttons[2] = new GuiElement(this, new ItemStack(Material.RED_CANDLE, mid), GuiElement.clickAction(null, "Remove " + mid), null, vectorSlotPosition(2, 2));
         // -1/-1
-        buttons[3] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, 1), GuiElement.clickAction(null, "Remove 1"), null, vectorSlotPosition(3, 2));
+        buttons[3] = new GuiElement(this, new ItemStack(Material.RED_CANDLE, 1), GuiElement.clickAction(null, "Remove 1"), null, vectorSlotPosition(3, 2));
 
         // middle
         buttons[4] = submitButton(vectorSlotPosition(4, 2));
 
         // 1/1
-        buttons[5] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, 1), GuiElement.clickAction(null, "Add 1"),
+        buttons[5] = new GuiElement(this, new ItemStack(Material.LIME_CANDLE, 1), GuiElement.clickAction(null, "Add 1"),
                 null, vectorSlotPosition(5, 2));
         // 16/10
-        buttons[6] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, mid), GuiElement.clickAction(null, "Add " + mid), null, vectorSlotPosition(6, 2));
+        buttons[6] = new GuiElement(this, new ItemStack(Material.LIME_CANDLE, mid), GuiElement.clickAction(null, "Add " + mid), null, vectorSlotPosition(6, 2));
         // 64/50
-        buttons[7] = new GuiElement(this, new ItemStack(Material.GRAY_DYE, big), GuiElement.clickAction(null, "Add " + big), null, vectorSlotPosition(7, 2));
+        buttons[7] = new GuiElement(this, new ItemStack(Material.LIME_CANDLE, big), GuiElement.clickAction(null, "Add " + big), null, vectorSlotPosition(7, 2));
 
         // add 0
-        buttons[8] = new GuiElement(this, new ItemStack(Material.STONE_BUTTON), Component.text("Move dot to left"),
+        buttons[8] = new GuiElement(this, new ItemStack(Material.SHEARS), Component.text("Move dot to left"),
                 List.of(
                         GuiElement.clickAction(null, "0.X <-")
                 ), vectorSlotPosition(3, 4));
 
         // remove 0
-        buttons[9] = new GuiElement(this, new ItemStack(Material.STONE_BUTTON), Component.text("Move dot to right"),
+        buttons[9] = new GuiElement(this, new ItemStack(Material.SUGAR), Component.text("Move dot to right"),
                 List.of(
                         GuiElement.clickAction(null, "X.0 ->")
                 ), vectorSlotPosition(5, 4));
@@ -122,7 +121,7 @@ public abstract class QuantitySelectGui extends ChestGUI {
                 }else if (button == buttons[9]) {
                     amount *= 10;
                     Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
-                        player.playSound(player, Sound.ENTITY_ITEM_PICKUP, 1,1);
+                        player.playSound(player, Sound.BLOCK_BREWING_STAND_BREW, 1,1);
                     });
                 }
 

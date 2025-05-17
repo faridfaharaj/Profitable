@@ -4,12 +4,19 @@ package com.faridfaharaj.profitable.data.tables;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
+import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetButtonData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.World;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -95,6 +102,72 @@ public class Candles {
         }
 
         return new Candle(0, 0, 0, 0, 0);
+    }
+
+    public static List<AssetButtonData> getAssetFancyTypeWithCandles(int type, long time) {
+        List<AssetButtonData> result = new ArrayList<>();
+
+        String sql = """
+        SELECT
+            a.asset_id,
+            a.asset_type,
+            a.meta,
+            c.open,
+            c.close,
+            c.high,
+            c.low,
+            c.volume
+        FROM assets a
+        LEFT JOIN (
+            SELECT world, asset_id, time, open, close, high, low, volume
+            FROM candles_day
+            WHERE world = ? AND time = ?
+
+            UNION ALL
+
+            SELECT world, asset_id, MAX(time), close AS open, close, close AS high, close AS low, 0 AS volume
+            FROM candles_day
+            WHERE world = ?
+            GROUP BY world, asset_id
+        ) c ON a.world = c.world AND a.asset_id = c.asset_id
+        WHERE a.world = ? AND a.asset_type = ?;
+    """;
+
+        byte[] world = DataBase.getCurrentWorld();
+        long roundedTime = (time / intervals[0]) * intervals[0];
+
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+            stmt.setBytes(1, world); // for exact candle
+            stmt.setLong(2, roundedTime);
+            stmt.setBytes(3, world); // for fallback
+            stmt.setBytes(4, world); // final filter
+            stmt.setInt(5, type);    // asset_type filter
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String assetID = rs.getString("asset_id");
+                    int assetType = rs.getInt("asset_type");
+                    byte[] meta = rs.getBytes("meta");
+
+                    Asset asset = Asset.assetFromMeta(assetID, assetType, meta);
+
+                    double open = rs.getDouble("open");
+                    double close = rs.getDouble("close");
+                    double high = rs.getDouble("high");
+                    double low = rs.getDouble("low");
+                    double volume = rs.getDouble("volume");
+
+                    Candle candle = new Candle(open, close, high, low, volume);
+
+                    result.add(new AssetButtonData(asset, candle));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     public static List<Candle> getInterval(String asset, long time, int interval) {

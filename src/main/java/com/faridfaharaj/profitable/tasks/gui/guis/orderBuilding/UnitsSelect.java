@@ -5,7 +5,7 @@ import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
-import com.faridfaharaj.profitable.tasks.gui.guis.QuantitySelectGui;
+import com.faridfaharaj.profitable.tasks.gui.QuantitySelectGui;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;

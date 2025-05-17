@@ -46,9 +46,6 @@ public abstract class ChestGUI implements InventoryHolder {
         }
 
 
-        for(int i = vectorSlotPosition(x1, y1); i <= vectorSlotPosition(x2, y2); i++){
-            inventory.setItem(i, itemStack);
-        }
 
     }
 

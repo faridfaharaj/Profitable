@@ -5,7 +5,7 @@ import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
-import com.faridfaharaj.profitable.tasks.gui.guis.QuantitySelectGui;
+import com.faridfaharaj.profitable.tasks.gui.QuantitySelectGui;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -26,9 +26,7 @@ public final class PriceSelect  extends QuantitySelectGui {
 
     public PriceSelect(Order order, Asset asset, Candle lastDay, List<Order> bidOrders, List<Order> askOrders) {
         super("Select price per unit.", true, false,
-                order.isSideBuy()?
-                        (bidOrders.isEmpty()? lastDay.getClose() : bidOrders.getFirst().getPrice())
-                        :(askOrders.isEmpty()? lastDay.getClose() : askOrders.getFirst().getPrice())
+                Math.max(order.isSideBuy()? (bidOrders.isEmpty()? lastDay.getClose() : bidOrders.getFirst().getPrice()) :(askOrders.isEmpty()? lastDay.getClose() : askOrders.getFirst().getPrice()), 0.001)
         );
 
         this.order = order;
@@ -61,7 +59,7 @@ public final class PriceSelect  extends QuantitySelectGui {
     @Override
     protected GuiElement submitButton(int slot) {
 
-        ItemStack display = new ItemStack(Material.EMERALD);
+        ItemStack display = new ItemStack(Material.MAP);
 
         Component name = Component.text("Your price: ").append(Component.text(this.amount + " " + Configuration.MAINCURRENCYASSET.getCode(),NamedTextColor.YELLOW));
 

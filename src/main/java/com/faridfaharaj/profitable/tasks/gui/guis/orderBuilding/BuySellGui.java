@@ -8,6 +8,7 @@ import com.faridfaharaj.profitable.data.tables.Orders;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.elements.ReturnButton;
+import com.faridfaharaj.profitable.tasks.gui.guis.AssetExplorer;
 import com.faridfaharaj.profitable.tasks.gui.guis.MainMenu;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
@@ -50,7 +51,7 @@ public final class BuySellGui extends ChestGUI {
         if(!askOrders.isEmpty()){
             sellLore.add(Component.text("Ask: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, askOrders.getFirst().getPrice())));
             sellLore.add(Component.empty());
-            sellLore.add(Component.text("Best orders: "));
+            sellLore.add(Component.text("Lowest prices: "));
             for(int i = 0; i < 7; i++){
                 if(i < askOrders.size()){
                     Order iteratedAsk = askOrders.get(i);
@@ -74,7 +75,7 @@ public final class BuySellGui extends ChestGUI {
         if(!bidOrders.isEmpty()){
             buyLore.add(Component.text("Bid: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET,bidOrders.getFirst().getPrice())));
             buyLore.add(Component.empty());
-            buyLore.add(Component.text("Best orders: "));
+            buyLore.add(Component.text("Highest prices: "));
             for(int i = 0; i < 7; i++){
                 if(i < bidOrders.size()){
                     Order iteratedAsk = bidOrders.get(i);
@@ -107,7 +108,7 @@ public final class BuySellGui extends ChestGUI {
 
                 if(button == buttons[0]){
                     this.getInventory().close();
-                    new MainMenu().openGui(player);
+                    new AssetExplorer(player).openGui(player);
                 }
 
                 if(button == buttons[1]){

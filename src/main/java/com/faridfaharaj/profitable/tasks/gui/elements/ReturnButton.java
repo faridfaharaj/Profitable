@@ -4,15 +4,14 @@ import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class ReturnButton extends GuiElement{
+public final class ReturnButton extends GuiElement{
 
     public ReturnButton(ChestGUI gui, int slot) {
-        super(gui, new ItemStack(Material.ARROW), Component.text("Return", NamedTextColor.RED), List.of(GuiElement.clickAction(null, "Return to last menu")), slot);
+        super(gui, new ItemStack(Material.ARROW), Component.text("Return", NamedTextColor.RED), List.of(GuiElement.clickAction(null, "return to last menu")), slot);
     }
 
 }
