@@ -1,14 +1,14 @@
-package com.faridfaharaj.profitable.tasks.gui.elements;
+package com.faridfaharaj.profitable.tasks.gui.elements.assetSpecific;
 
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
-import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.data.tables.Candles;
 import com.faridfaharaj.profitable.data.tables.Orders;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
+import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.guis.GraphsMenu;
 import com.faridfaharaj.profitable.tasks.gui.guis.orderBuilding.BuySellGui;
 import com.faridfaharaj.profitable.util.MessagingUtil;
@@ -24,7 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AssetButton extends GuiElement{
+public class AssetButton extends GuiElement {
 
     Asset asset;
     Candle lastestDay;
