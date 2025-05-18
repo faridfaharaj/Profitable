@@ -1,11 +1,12 @@
 package com.faridfaharaj.profitable.tasks.gui.guis;
 
 import com.faridfaharaj.profitable.Profitable;
-import com.faridfaharaj.profitable.data.tables.Candles;
+import com.faridfaharaj.profitable.data.tables.AccountHoldings;
+import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
-import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetButton;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetButtonData;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetHolderButton;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,19 +16,19 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class AssetExplorer extends ChestGUI {
+public final class HoldingsMenu extends ChestGUI {
 
     GuiElement categoryButton;
     GuiElement pageButton = null;
 
     List<AssetButtonData> assets = new ArrayList<>();
-    List<AssetButton> assetButtons = new ArrayList<>();
+    List<AssetHolderButton> assetButtons = new ArrayList<>();
 
     int page = 0;
     int pages = 0;
 
-    public AssetExplorer(Player player) {
-        super(6, "Asset explorer");
+    public HoldingsMenu(Player player) {
+        super(6, "Portfolio");
         fillSlots(0, 0, 8,0, Material.BLACK_STAINED_GLASS_PANE);
         fillSlots(0, 0, 0,5, Material.BLACK_STAINED_GLASS_PANE);
         fillSlots(8, 0, 8,5, Material.BLACK_STAINED_GLASS_PANE);
@@ -40,11 +41,11 @@ public final class AssetExplorer extends ChestGUI {
 
                 ), vectorSlotPosition(6, 5));
 
-        long time = player.getWorld().getFullTime();
         Profitable.getfolialib().getScheduler().runAsync(task -> {
-            assets = Candles.getAssetsNPrice(2, time);
+            assets = AccountHoldings.AssetBalancesToAssetData(Accounts.getAccount(player));
 
             pages = assets.size()/21;
+
 
             updatePage();
 
@@ -57,11 +58,9 @@ public final class AssetExplorer extends ChestGUI {
             }
 
         });
-
-
     }
 
-    public void updatePage(){
+    void updatePage(){
         assetButtons.clear();
         for(int i = 0; i < 21; i++){
 
@@ -70,7 +69,7 @@ public final class AssetExplorer extends ChestGUI {
             if(index >= assets.size()){
                 getInventory().clear(slot);
             }else {
-                assetButtons.add(new AssetButton(this, assets.get(index), slot));
+                assetButtons.add(new AssetHolderButton(this, assets.get(index), slot));
             }
 
         }
@@ -79,13 +78,14 @@ public final class AssetExplorer extends ChestGUI {
     @Override
     public void slotInteracted(Player player, int slot, ClickType click) {
 
-        for(AssetButton button : assetButtons){
+        for(AssetHolderButton button : assetButtons){
             if(button.getSlot() == slot){
                 if(click.isLeftClick()){
-                    button.trade(player);
-                }
-                if(click.isRightClick()){
-                    button.graphs(player);
+
+                    button.manage(player, false);
+
+                }else if(click.isRightClick()){
+                    button.manage(player, true);
                 }
             }
         }

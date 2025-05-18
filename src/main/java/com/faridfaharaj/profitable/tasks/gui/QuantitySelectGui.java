@@ -22,7 +22,7 @@ public abstract class QuantitySelectGui extends ChestGUI {
     public QuantitySelectGui(String text, boolean decimal, boolean enforceInteger, double defaultAmount) {
         super(5, text);
 
-        this.amount = defaultAmount;
+        this.amount = Math.max(defaultAmount, 1);
 
         fillAll(Material.BLACK_STAINED_GLASS_PANE);
 
