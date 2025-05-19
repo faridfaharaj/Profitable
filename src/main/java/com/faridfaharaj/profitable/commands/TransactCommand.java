@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.data.tables.Accounts;
@@ -21,79 +22,92 @@ public class TransactCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        Player player = null;
-        if(sender instanceof Player got){
-            player = got;
-        }
-
         if(Configuration.MULTIWORLD){
             DataBase.universalUpdateWorld(sender);
         }
 
-        if(player != null){
+        if(sender instanceof Player player){
 
-            boolean sideBuy;
-            if(command.getName().equals("buy")){
-                sideBuy = true;
-            }else if(command.getName().equals("sell")){
-                sideBuy = false;
-            }else{
-                return false;
-            }
 
-            Order.OrderType orderType;
-            double price;
+            Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
 
-            if (args.length > 2) {
-                orderType = Order.OrderType.LIMIT;
-
-                try{
-                    price = Double.parseDouble(args[2]);
-                }catch (Exception e){
-                    MessagingUtil.sendError(sender, "Invalid Price");
-                    return true;
+                String asset;
+                if(args.length == 0 || args[0].equals("hand")){
+                    asset = player.getInventory().getItemInMainHand().getType().name();
+                }else {
+                    asset = args[0].toUpperCase();
                 }
 
-            }else {
-                orderType = Order.OrderType.MARKET;
-                price = sideBuy?Double.MAX_VALUE:Double.MIN_VALUE;
-            }
+                MessagingUtil.sendInfoNotice(player, "Processing Order...");
+                Profitable.getfolialib().getScheduler().runAsync(async -> {
 
-            if(args.length > 3){
-                if(args[3].equals("stop-limit")){
-                    orderType = Order.OrderType.STOP_LIMIT;
-                }else if(args[3].equals("stop-market")){
-                    orderType = Order.OrderType.STOP_MARKET;
-                } else if (args[3].equals("limit")) {
+                    boolean sideBuy;
+                    if(command.getName().equals("buy")){
+                        sideBuy = true;
+                    }else if(command.getName().equals("sell")){
+                        sideBuy = false;
+                    }else{
+                        return;
+                    }
 
-                }else if (args[3].equals("market")) {
+                    Order.OrderType orderType;
+                    double price;
 
-                    MessagingUtil.sendWarning(sender, "Ignoring price for market order");
-                    price = sideBuy?Double.MAX_VALUE:Double.MIN_VALUE;
-                    orderType = Order.OrderType.MARKET;
+                    if (args.length > 2) {
+                        orderType = Order.OrderType.LIMIT;
 
-                } else{
-                    MessagingUtil.sendError(sender,"Invalid Order Type");
-                    return true;
-                }
-            }
+                        try{
+                            price = Double.parseDouble(args[2]);
+                        }catch (Exception e){
+                            MessagingUtil.sendError(sender, "Invalid Price");
+                            return;
+                        }
 
-            double units;
-            if(args.length <= 1){
+                    }else {
+                        orderType = Order.OrderType.MARKET;
+                        price = sideBuy?Double.MAX_VALUE:Double.MIN_VALUE;
+                    }
 
-                units = 1d;
+                    if(args.length > 3){
+                        switch (args[3]) {
+                            case "stop-limit" -> orderType = Order.OrderType.STOP_LIMIT;
+                            case "stop-market" -> orderType = Order.OrderType.STOP_MARKET;
+                            case "limit" -> {
+                            }
+                            case "market" -> {
 
-            }else{
-                try{
-                    units = Double.parseDouble(args[1]);
-                }catch (Exception e){
-                    MessagingUtil.sendError(sender, "Invalid Units");
-                    return true;
-                }
-            }
+                                MessagingUtil.sendWarning(sender, "Ignoring price for market order");
+                                price = sideBuy ? Double.MAX_VALUE : Double.MIN_VALUE;
+                                orderType = Order.OrderType.MARKET;
+                            }
+                            default -> {
+                                MessagingUtil.sendError(sender, "Invalid Order Type");
+                                return;
+                            }
+                        }
+                    }
 
+                    double units;
+                    if(args.length <= 1){
 
-            Exchange.sendNewOrder(player, new Order(UUID.randomUUID(), Accounts.getAccount(player), args[0], sideBuy, price, units, orderType));
+                        units = 1d;
+
+                    }else{
+                        try{
+                            units = Double.parseDouble(args[1]);
+                        }catch (Exception e){
+                            MessagingUtil.sendError(sender, "Invalid Units");
+                            return;
+                        }
+                    }
+
+                    double finalPrice = price;
+                    Order.OrderType finalOrderType = orderType;
+
+                    Exchange.sendNewOrder(player, new Order(UUID.randomUUID(), Accounts.getAccount(player), asset, sideBuy, finalPrice, units, finalOrderType));
+
+                });
+            });
             return true;
 
         }
@@ -115,6 +129,7 @@ public class TransactCommand implements CommandExecutor {
                 if(VaultHook.isConnected()){
                     options.add(VaultHook.getAsset().getCode());
                 }
+                options.add("hand");
 
                 StringUtil.copyPartialMatches(args[0], options, suggestions);
             }

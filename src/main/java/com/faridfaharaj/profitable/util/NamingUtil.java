@@ -51,8 +51,9 @@ public class NamingUtil {
         if (name != null) {
             return name;
         }
+        name = UNWANTED_SUFFIXES.matcher(code).replaceAll("").toLowerCase().replace("_", " ");
 
-        return UNWANTED_SUFFIXES.matcher(code).replaceAll("").toLowerCase().replace("_", " ");
+        return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
     }
 
     public static String nameType(int assetType) {
@@ -60,5 +61,19 @@ public class NamingUtil {
             return "Unknown";
         }
         return assetTypeNaming[assetType];
+    }
+
+    public static String formatVolume(double number) {
+        if (number >= 1_000_000) {
+            return String.format("%.1fM", number / 1_000_000).replaceAll("\\.0$", "");
+        } else if (number >= 1_000) {
+            return String.format("%.1fk", number / 1_000).replaceAll("\\.0$", "");
+        } else {
+            if (number < 10) {
+                return String.valueOf(number);
+            } else {
+                return String.format("%.0f", number);
+            }
+        }
     }
 }

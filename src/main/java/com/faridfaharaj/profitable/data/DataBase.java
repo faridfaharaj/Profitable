@@ -61,6 +61,8 @@ public class DataBase {
         connection = DriverManager.getConnection(data);
         try (Statement stmt = connection.createStatement()) {
             stmt.execute("PRAGMA foreign_keys = ON;");
+            stmt.execute("PRAGMA journal_mode = WAL;");
+            stmt.execute("PRAGMA threadsafety=1;");
         }catch (Exception e){
             e.printStackTrace();
         }

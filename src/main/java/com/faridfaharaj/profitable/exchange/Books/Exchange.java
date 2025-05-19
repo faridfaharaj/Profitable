@@ -25,7 +25,8 @@ public class Exchange {
 
     public static void sendNewOrder(Player player, Order order){
 
-        //validate
+        // validation -------------------------
+
         if(Objects.equals(order.getAsset(), Configuration.MAINCURRENCYASSET.getCode())){
             MessagingUtil.sendError(player, "Cannot trade " + order.getAsset() + " using " + order.getAsset());
             return;
@@ -85,10 +86,12 @@ public class Exchange {
             return;
         }
 
+        // Send Order -------------------------
+
+        // Stop orders
         Asset collateralAsset = order.isSideBuy()? Configuration.MAINCURRENCYASSET: tradedAsset;
 
         Candle lastday = Candles.getLastDay(tradedAsset.getCode(), player.getWorld().getFullTime());
-        //stopOrders
         if(order.getType() == Order.OrderType.STOP_LIMIT){
 
             if(order.isSideBuy()?lastday.getClose() >= order.getPrice(): lastday.getClose() <= order.getPrice()){
@@ -116,7 +119,7 @@ public class Exchange {
 
             //Market
             if(order.getType() == Order.OrderType.MARKET){
-                MessagingUtil.sendWarning(player, "No orders available, add a price to place a limit order");
+                MessagingUtil.sendError(player, "No orders available, use limit order instead");
                 return;
             }
 
@@ -139,8 +142,7 @@ public class Exchange {
 
             double transactingUnits = Math.min(unitsMissing, iteratedOrder.getUnits());
 
-            // transact
-            // Mark for deletion
+            // Partial order
             if(iteratedOrder.getUnits() > unitsMissing){
                 Order clone = new Order(iteratedOrder);
                 clone.setUnits(iteratedOrder.getUnits() - transactingUnits);
@@ -153,74 +155,69 @@ public class Exchange {
             // Tracking
             unitsMissing -= transactingUnits;
             moneyTransacted += iteratedOrder.getPrice()*transactingUnits;
-
         }
 
 
         double unitsTransacted = order.getUnits()-unitsMissing;
+        double takerFee = !Configuration.ASSETFEES[tradedAsset.getAssetType()][0].endsWith("%")? Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][0], 23): Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][0], moneyTransacted);
         double finalMoneyTransacted = moneyTransacted;
-        boolean fixedTakerFee = !Configuration.ASSETFEES[tradedAsset.getAssetType()][0].endsWith("%");
-        double fee = fixedTakerFee? Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][0], 23): Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][0], moneyTransacted);
-
         Order finalPartialOrder = partialOrder;
-        Asset.chargeAndRun(player, "Cannot fulfill your order", collateralAsset, order.isSideBuy()?moneyTransacted+fee:unitsTransacted, () -> {
-            wrapTransaction(player, order, fee, tradedAsset, finalMoneyTransacted, unitsTransacted);
-            Candles.updateDay(tradedAsset.getCode(), player.getWorld(), orders.getLast().getPrice(), unitsTransacted);
-            Orders.updateStopLimit(lastday.getClose(), orders.getLast().getPrice());
-            List<Order> ordersToDelete = new ArrayList<>(orders);
-            if(finalPartialOrder != null){
+        Asset.chargeAndRun(player, "Cannot fulfill your order", collateralAsset, order.isSideBuy()?moneyTransacted+ takerFee :unitsTransacted, () -> {
+            Profitable.getfolialib().getScheduler().runAsync(task -> {
+                List<Order> ordersToDelete = new ArrayList<>(orders);
+                if(finalPartialOrder != null){
 
-                Orders.updateOrderUnits(finalPartialOrder.getUuid(), finalPartialOrder.getUnits());
-                ordersToDelete.removeLast();
-
-            }
-            for(Order iteratedOrder:orders){
-                if(iteratedOrder.isSideBuy()){
-
-                    Asset.distributeAsset(iteratedOrder.getOwner(), tradedAsset, iteratedOrder.getUnits());
-                    sendTransactionNotice(iteratedOrder.getOwner(), true, tradedAsset, iteratedOrder.getUnits(), (iteratedOrder.getUnits()*iteratedOrder.getPrice()), 0);
-
-                }else {
-
-                    double makerFee = Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][1],iteratedOrder.getUnits()*iteratedOrder.getPrice());
-                    Asset.distributeAsset(iteratedOrder.getOwner(), Configuration.MAINCURRENCYASSET, iteratedOrder.getUnits()*iteratedOrder.getPrice()-makerFee);
-                    sendTransactionNotice(iteratedOrder.getOwner(), false, tradedAsset, iteratedOrder.getUnits(), (iteratedOrder.getUnits()*iteratedOrder.getPrice()), makerFee);
+                    Orders.updateOrderUnits(finalPartialOrder.getUuid(), finalPartialOrder.getUnits());
+                    ordersToDelete.removeLast();
 
                 }
-            }
-            Orders.deleteOrders(ordersToDelete);
+                wrapTransactions(player, order, orders, takerFee, tradedAsset, collateralAsset, finalMoneyTransacted, unitsTransacted);
+                Candles.updateDay(tradedAsset.getCode(), player.getWorld(), orders.getLast().getPrice(), unitsTransacted);
+                Orders.updateStopLimit(lastday.getClose(), orders.getLast().getPrice());
+                Orders.deleteOrders(ordersToDelete);
+            });
         });
 
-        // Partial fill
-        if(order.getType() == Order.OrderType.MARKET){
+    }
 
-            if(unitsTransacted != order.getUnits()){
+    private static void wrapTransactions(Player player, Order takerOrder, List<Order> makerOrder, double takerFee, Asset tradedAsset, Asset collateralAsset, double moneyTransacted, double unitsTransacted) {
+
+        for(Order iteratedOrder:makerOrder){
+            if(iteratedOrder.isSideBuy()){
+
+                Asset.distributeAsset(iteratedOrder.getOwner(), tradedAsset, iteratedOrder.getUnits());
+                //                                                                                                                            Paid on order placement --------v
+                sendTransactionNotice(iteratedOrder.getOwner(), true, tradedAsset, iteratedOrder.getUnits(), (iteratedOrder.getUnits()*iteratedOrder.getPrice()), 0);
+
+            }else {
+
+                double makerFee = Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][1],iteratedOrder.getUnits()*iteratedOrder.getPrice());
+                Asset.distributeAsset(iteratedOrder.getOwner(), Configuration.MAINCURRENCYASSET, iteratedOrder.getUnits()*iteratedOrder.getPrice()-makerFee);
+                sendTransactionNotice(iteratedOrder.getOwner(), false, tradedAsset, iteratedOrder.getUnits(), (iteratedOrder.getUnits()*iteratedOrder.getPrice()), makerFee);
+
+            }
+        }
+
+        // Partial fill
+        if(takerOrder.getType() == Order.OrderType.MARKET){
+
+            if(unitsTransacted != takerOrder.getUnits()){
                 MessagingUtil.sendWarning(player, "Partially filled because no more orders are available");
             }
 
         }else{
-            if(unitsTransacted != order.getUnits()){
-                order.setUnits(order.getUnits()-unitsTransacted);
-                addToBook(player, order, Configuration.MAINCURRENCYASSET, tradedAsset, collateralAsset);
+            if(unitsTransacted != takerOrder.getUnits()){
+                takerOrder.setUnits(takerOrder.getUnits()-unitsTransacted);
+                addToBook(player, takerOrder, Configuration.MAINCURRENCYASSET, tradedAsset, collateralAsset);
             }
 
         }
 
-    }
-
-    private static void wrapTransaction(Player player, Order order, double fee, Asset tradedAsset, double moneyTransacted, double unitsTransacted) {
-        System.out.println(fee + " " + fee);
-        if(order.isSideBuy()){
-            Asset.distributeAsset(order.getOwner(), tradedAsset, unitsTransacted);
-            sendTransactionNotice(player, true, tradedAsset, unitsTransacted, moneyTransacted, fee);
-        }else{
-            Asset.distributeAsset(order.getOwner(), Configuration.MAINCURRENCYASSET, moneyTransacted - fee);
-            sendTransactionNotice(player, false, tradedAsset, unitsTransacted, moneyTransacted, fee);
-        }
+        Asset.distributeAsset(takerOrder.getOwner(), takerOrder.isSideBuy()?tradedAsset:collateralAsset, takerOrder.isSideBuy()?unitsTransacted:moneyTransacted - takerFee);
+        sendTransactionNotice(player, takerOrder.isSideBuy(), tradedAsset, unitsTransacted, moneyTransacted, takerFee);
     }
 
     public static void sendTransactionNotice(Player player, boolean sideBuy, Asset tradedAsset, double units, double money, double fee){
-        Location location = player.getLocation();
         MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix()
                         .append(sideBuy?Component.text("Bought ", Configuration.COLORBULLISH):Component.text("Sold ", Configuration.COLORBEARISH))
                         .append(Component.text(units + " " + tradedAsset.getCode(), tradedAsset.getColor()))
@@ -236,6 +233,7 @@ public class Exchange {
         }
 
         Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+            Location location = player.getLocation();
             player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
             player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
             player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
@@ -252,7 +250,6 @@ public class Exchange {
 
         Player player = Profitable.getInstance().getServer().getPlayer(playerid);
         if(player != null){
-            Location location = player.getLocation();
             MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix()
                     .append(sideBuy?Component.text("Bought ", Configuration.COLORBULLISH):Component.text("Sold ", Configuration.COLORBEARISH))
                     .append(Component.text(units + " " + tradedAsset.getCode(), tradedAsset.getColor()))
@@ -269,6 +266,7 @@ public class Exchange {
 
 
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                Location location = player.getLocation();
                 player.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
                 player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
                 player.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);

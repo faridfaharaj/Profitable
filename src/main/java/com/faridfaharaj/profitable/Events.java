@@ -5,6 +5,7 @@ import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
+import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -23,6 +24,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.world.WorldInitEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
@@ -75,22 +77,30 @@ public class Events implements Listener {
         Player player = event.getEntity();
 
         if (TemporalItems.holdingTemp.containsKey(player.getUniqueId())) {
-            ItemStack mainHandItem = player.getInventory().getItemInMainHand();
-            event.getDrops().removeIf(item -> item != null && item.isSimilar(mainHandItem));
-            TemporalItems.removeTemp(player);
+            Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                ItemStack mainHandItem = player.getInventory().getItemInMainHand();
+                event.getDrops().removeIf(item -> item != null && item.isSimilar(mainHandItem));
+                TemporalItems.removeTemp(player);
+            });
         }
     }
 
     @EventHandler
-    public void onInventoryOpen(InventoryClickEvent event) {
+    public void onClickInventory(InventoryClickEvent event) {
         HumanEntity player = event.getWhoClicked();
+        Inventory inventory = event.getInventory();
         if(TemporalItems.holdingTemp.containsKey(player.getUniqueId())){
             TemporalItems.removeTempItem((Player) player);
-            if(player.getGameMode() == GameMode.CREATIVE) {
-                event.setCancelled(false);
-            }else{
-                event.setCancelled(true);
-            }
+            Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                event.setCancelled(player.getGameMode() != GameMode.CREATIVE);
+            });
+        }
+
+        if(inventory.getHolder() instanceof ChestGUI gui){
+
+            gui.slotInteracted((Player) player, event.getSlot(), event.getClick());
+
+            event.setCancelled(true);
         }
     }
 
@@ -98,35 +108,37 @@ public class Events implements Listener {
     public void onPlayerInteractAtEntity(PlayerInteractEntityEvent event) {
         Player player = event.getPlayer();
         if(Objects.equals(TemporalItems.holdingTemp.get(player.getUniqueId()), TemporalItems.TemporalItem.CLAIMINGTAG)){
-            Entity entity = event.getRightClicked();
-            if(entity.getCustomName() != null){
-                MessagingUtil.sendError(player, "Cannot claim named entities");
-            }else if(!Configuration.ALLOWENTITIES.contains(entity.getType().name())){
+            runItmCooldown(Material.NAME_TAG, event.getPlayer(), () -> {
+                Entity entity = event.getRightClicked();
+                if(entity.getCustomName() != null){
+                    MessagingUtil.sendError(player, "Cannot claim named entities");
+                }else if(!Configuration.ALLOWENTITIES.contains(entity.getType().name())){
 
-                MessagingUtil.sendError(player, "Owning this entity isn't allowed");
+                    MessagingUtil.sendError(player, "Owning this entity isn't allowed");
 
-            } else {
+                } else {
 
-                Runnable claim = () -> {
-                    Profitable.getfolialib().getScheduler().runAtEntity(entity, task -> {
-                        entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));
-                    });
-                    MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName()))
-                            .append(Configuration.ENTITYCLAIMINGFEES == 0?
-                                    Component.text(" FOR FREE", NamedTextColor.GREEN):
-                                    Component.text(" using ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
-                            )
-                    );
-                };
+                    Runnable claim = () -> {
+                        Profitable.getfolialib().getScheduler().runAtEntity(entity, task -> {
+                            entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));
+                        });
+                        MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName()))
+                                .append(Configuration.ENTITYCLAIMINGFEES == 0?
+                                        Component.text(" FOR FREE", NamedTextColor.GREEN):
+                                        Component.text(" using ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
+                                )
+                        );
+                    };
 
 
-                if(Configuration.ENTITYCLAIMINGFEES <= 0){
-                    claim.run();
-                }else {
-                    Asset.chargeAndRun(player, "Could't claim "+ entity.getName() , Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES, claim);
+                    if(Configuration.ENTITYCLAIMINGFEES <= 0){
+                        claim.run();
+                    }else {
+                        Asset.chargeAndRun(player, "Could't claim "+ entity.getName() , Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES, claim);
+                    }
+
                 }
-
-            }
+            });
             event.setCancelled(true);
         }
     }
@@ -161,8 +173,7 @@ public class Events implements Listener {
 
             if(tempItem == TemporalItems.TemporalItem.ITEMDELIVERYSTICK){
 
-                Material material = event.getMaterial();
-                if(!materialCooldown(material, player)){
+                runItmCooldown(event.getMaterial(), player, () -> {
                     Block block = event.getClickedBlock();
                     if(block != null){
                         if(!(block.getState() instanceof Container)){
@@ -178,42 +189,39 @@ public class Events implements Listener {
                             MessagingUtil.sendError(player, "Could not update Item delivery");
                         }
                     }
-
-                }
-
-                event.setCancelled(true);
+                });
 
             } else if (tempItem == TemporalItems.TemporalItem.ENTITYDELIVERYSTICK) {
 
-
-                Material material = event.getMaterial();
-                if(!materialCooldown(material, player)){
+                runItmCooldown(event.getMaterial(), player, () -> {
 
                     Block block = event.getClickedBlock();
                     if(block != null){
-                        Location correctedlocation = block.getLocation().add(0.5,0,0.5);
-                        correctedlocation = correctedlocation.add(event.getBlockFace().getDirection());
-
-                        Accounts.changeEntityDelivery(Accounts.getAccount(player), correctedlocation);
-                        MessagingUtil.sendSuccsess(player,"Updated entity delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
-                        TemporalItems.removeTempItem(player);
+                        Location correctedlocation = block.getLocation().add(0.5,0,0.5).add(event.getBlockFace().getDirection());
+                        if(Accounts.changeEntityDelivery(Accounts.getAccount(player), correctedlocation)){
+                            MessagingUtil.sendSuccsess(player,"Updated entity delivery to: " + correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")");
+                            TemporalItems.removeTempItem(player);
+                        }else {
+                            MessagingUtil.sendError(player, "Could not update Entity delivery");
+                        }
                     }
 
-                }
-
-                event.setCancelled(true);
+                });
 
             }
+
+            event.setCancelled(true);
 
         }
     }
 
-    private boolean materialCooldown(Material material, Player player){
-        boolean onCooldown = player.getCooldown(material) != 0;
-        if(!onCooldown){
-            player.setCooldown(material, 40);
-        }
-        return onCooldown;
+    private void runItmCooldown(Material material, Player player, Runnable runnable){
+        Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+            if (player.getCooldown(material) == 0) {
+                player.setCooldown(material, 40);
+                runnable.run();
+            }
+        });
     }
 
 
