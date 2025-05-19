@@ -12,9 +12,12 @@ import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,14 +44,18 @@ public final class AssetButton extends GuiElement {
             this.display = new ItemStack(Material.getMaterial(assetData.getAsset().getCode()+"_SPAWN_EGG"));
         }if(assetData.getAsset().getAssetType() == 1) {
             this.display = new ItemStack(Material.EMERALD);
+            ItemMeta meta = this.display.getItemMeta();
+            meta.setEnchantmentGlintOverride(true);
+            this.display.setItemMeta(meta);
         }
 
         List<Component> keyDataPoints = new ArrayList<>();
         keyDataPoints.add(Component.text(NamingUtil.nameType(assetData.getAsset().getAssetType())));
-        keyDataPoints.add(Component.space());
-        keyDataPoints.add(Component.text("Volume: " + volume));
-        keyDataPoints.add(Component.text("Open: " + Open));
-        keyDataPoints.add(Component.text("Day's Range: " + assetData.getlastCandle().getLow() + " to " + assetData.getlastCandle().getHigh()));
+        keyDataPoints.add(Component.empty());
+        keyDataPoints.add(Component.text(assetData.getAsset().getName()));
+        keyDataPoints.add(Component.text(" - Volume: " + volume));
+        keyDataPoints.add(Component.text(" - Open: " + Open));
+        keyDataPoints.add(Component.text(" - Day's Range: " + assetData.getlastCandle().getLow() + " to " + assetData.getlastCandle().getHigh()));
 
         keyDataPoints.add(Component.empty());
         keyDataPoints.add(GuiElement.clickAction(ClickType.LEFT, "Trade asset"));

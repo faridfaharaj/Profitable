@@ -29,8 +29,12 @@ public abstract class ChestGUI implements InventoryHolder {
         return x + (y * 9);
     }
 
-    protected void setSlot(int x, int y, ItemStack item){
-        inventory.setItem(vectorSlotPosition(x, y), item);
+    protected void fillSlot(int slot, ItemStack item){
+        ItemStack itemStack = new ItemStack(item);
+        ItemMeta metaAccountButton = itemStack.getItemMeta();
+        metaAccountButton.setDisplayName(" ");
+        itemStack.setItemMeta(metaAccountButton);
+        inventory.setItem(slot, itemStack);
     }
 
     protected void fillSlots(int x1, int y1, int x2, int y2, Material item){

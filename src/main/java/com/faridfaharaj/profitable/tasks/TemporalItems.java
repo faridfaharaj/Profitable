@@ -109,8 +109,7 @@ public class TemporalItems {
 
         if (meta != null) {
             meta.setDisplayName(displayName);
-            meta.addEnchant(Enchantment.BLAST_PROTECTION, 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+            meta.setEnchantmentGlintOverride(true);
             item.setItemMeta(meta);
         }
 

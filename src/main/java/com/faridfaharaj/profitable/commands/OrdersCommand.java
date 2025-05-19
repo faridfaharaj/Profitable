@@ -30,7 +30,7 @@ public class OrdersCommand  implements CommandExecutor {
         }
         if(sender instanceof Player player){
 
-            new UserOrdersGui(player).openGui(player);
+            new UserOrdersGui(player, null).openGui(player);
 
         }else{
             MessagingUtil.sendGenericCantConsole(sender);

@@ -5,6 +5,7 @@ import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
+import com.faridfaharaj.profitable.tasks.gui.elements.ReturnButton;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetHolderButton;
 import net.kyori.adventure.text.Component;
@@ -18,7 +19,7 @@ import java.util.List;
 
 public final class HoldingsMenu extends ChestGUI {
 
-    GuiElement categoryButton;
+    GuiElement returnButton;
     GuiElement pageButton = null;
 
     List<AssetCache> assets = new ArrayList<>();
@@ -27,19 +28,16 @@ public final class HoldingsMenu extends ChestGUI {
     int page = 0;
     int pages = 0;
 
-    public HoldingsMenu(Player player) {
+    AssetCache[][] assetCache;
+    public HoldingsMenu(Player player, AssetCache[][] assetCache) {
         super(6, "Portfolio");
         fillSlots(0, 0, 8,0, Material.BLACK_STAINED_GLASS_PANE);
         fillSlots(0, 0, 0,5, Material.BLACK_STAINED_GLASS_PANE);
         fillSlots(8, 0, 8,5, Material.BLACK_STAINED_GLASS_PANE);
         fillSlots(0, 4, 8,5, Material.BLACK_STAINED_GLASS_PANE);
 
-        categoryButton = new GuiElement(this, new ItemStack(Material.ENDER_EYE), Component.text("Category"),
-                List.of(
-
-
-
-                ), vectorSlotPosition(6, 5));
+        this.assetCache= assetCache;
+        returnButton = new ReturnButton(this, vectorSlotPosition(4, 5));
 
         Profitable.getfolialib().getScheduler().runAsync(task -> {
             assets = AccountHoldings.AssetBalancesToAssetData(Accounts.getAccount(player));
@@ -82,12 +80,17 @@ public final class HoldingsMenu extends ChestGUI {
             if(button.getSlot() == slot){
                 if(click.isLeftClick()){
 
-                    button.manage(player, false);
+                    button.manage(player, false, assetCache);
 
                 }else if(click.isRightClick()){
-                    button.manage(player, true);
+                    button.manage(player, true, assetCache);
                 }
             }
+        }
+
+        if(returnButton.getSlot() == slot){
+            player.getInventory().close();
+            new AssetExplorer(player, 2, assetCache).openGui(player);
         }
 
         if(pageButton != null){

@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,9 @@ public final class AssetHolderButton extends GuiElement {
                 this.display = new ItemStack(Material.getMaterial(asset.getCode()+"_SPAWN_EGG"));
             }if(asset.getAssetType() == 1) {
                 this.display = new ItemStack(Material.EMERALD);
+                ItemMeta meta = this.display.getItemMeta();
+                meta.setEnchantmentGlintOverride(true);
+                this.display.setItemMeta(meta);
             }
 
             setDisplayName(Component.text(asset.getCode(),asset.getColor()));
@@ -63,7 +67,7 @@ public final class AssetHolderButton extends GuiElement {
         });
     }
 
-    public void manage(Player player, boolean depositing){
-        new DepositWithdrawalGui(asset, depositing).openGui(player);
+    public void manage(Player player, boolean depositing, AssetCache[][] assetCache){
+        new DepositWithdrawalGui(asset, depositing, assetCache).openGui(player);
     }
 }

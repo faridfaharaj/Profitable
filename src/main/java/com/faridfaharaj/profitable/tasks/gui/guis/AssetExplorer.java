@@ -2,6 +2,7 @@ package com.faridfaharaj.profitable.tasks.gui.guis;
 
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.tables.Candles;
+import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetButton;
@@ -19,7 +20,11 @@ import java.util.List;
 public final class AssetExplorer extends ChestGUI {
 
     GuiElement categoryButton;
-    GuiElement pageButton = null;
+    GuiElement pageButton;
+
+    GuiElement walletButton;
+    GuiElement ordersButton;
+    GuiElement deliveryButton;
 
     AssetCache[][] assetCache = new AssetCache[5][];
     int assetType;
@@ -44,7 +49,7 @@ public final class AssetExplorer extends ChestGUI {
                         Component.text("Assets"),
                         Component.empty(),
                         Component.text("♦ ", NamedTextColor.WHITE).append(Component.text("Forex", assetType == 1? NamedTextColor.WHITE:NamedTextColor.GRAY)),
-                        Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Entity)", assetType == 2? NamedTextColor.GREEN:NamedTextColor.GRAY)),
+                        Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Item)", assetType == 2? NamedTextColor.GREEN:NamedTextColor.GRAY)),
                         Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Entity)", assetType == 3? NamedTextColor.GREEN:NamedTextColor.GRAY)),
                         Component.empty(),
                         GuiElement.clickAction(null, "cycle")
@@ -56,6 +61,31 @@ public final class AssetExplorer extends ChestGUI {
                 GuiElement.clickAction(ClickType.LEFT, "next page"),
                 GuiElement.clickAction(ClickType.RIGHT, "previous page")
         ), vectorSlotPosition(7,5));
+
+        walletButton = new GuiElement(this, new ItemStack(Material.CHEST), Component.text("Manage owned assets"),
+                List.of(
+                        Component.text("Asset portfolio"),
+                        Component.empty(),
+                        GuiElement.clickAction(null, "view portfolio")
+
+                ), vectorSlotPosition(2, 5));
+
+        ordersButton = new GuiElement(this, new ItemStack(Material.BOOK), Component.text("Manage orders"),
+                List.of(
+                        Component.text("Orders"),
+                        Component.empty(),
+                        GuiElement.clickAction(null, "view active orders")
+
+                ), vectorSlotPosition(1, 5));
+
+        deliveryButton = new GuiElement(this, new ItemStack(Material.CARROT_ON_A_STICK), Component.text("Set delivery location"),
+                List.of(
+                        Component.text("Delivery"),
+                        Component.empty(),
+                        GuiElement.clickAction(null, "set item delivery"),
+                        GuiElement.clickAction(null, "set entity delivery")
+
+                ), vectorSlotPosition(3, 5));
 
         long time = player.getWorld().getFullTime();
         updateAssets(assetType, previousCache, time);
@@ -83,7 +113,7 @@ public final class AssetExplorer extends ChestGUI {
                 pageButton.setDisplayName(Component.text("Page " + page + " / " + pages));
                 pageButton.show(this);
             }else {
-                getInventory().setItem(pageButton.getSlot(), new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
+                fillSlot(pageButton.getSlot(), new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
             }
 
         });
@@ -118,6 +148,27 @@ public final class AssetExplorer extends ChestGUI {
             }
         }
 
+        if(walletButton.getSlot() == slot){
+            player.getInventory().close();
+            new HoldingsMenu(player, assetCache).openGui(player);
+        }
+
+        if(ordersButton.getSlot() == slot){
+            player.getInventory().close();
+            new UserOrdersGui(player, assetCache).openGui(player);
+        }
+
+        if(deliveryButton.getSlot() == slot){
+            if(click.isLeftClick()){
+                player.getInventory().close();
+                TemporalItems.sendDeliveryStick(player, true);
+            }
+            if(click.isRightClick()){
+                player.getInventory().close();
+                TemporalItems.sendDeliveryStick(player, false);
+            }
+        }
+
         if(categoryButton.getSlot() == slot){
             assetType += 1;
             if(assetType >= 4){
@@ -127,7 +178,7 @@ public final class AssetExplorer extends ChestGUI {
                     Component.text("Assets"),
                     Component.empty(),
                     Component.text("♦ ", NamedTextColor.WHITE).append(Component.text("Forex", assetType == 1? NamedTextColor.WHITE:NamedTextColor.GRAY)),
-                    Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Entity)", assetType == 2? NamedTextColor.GREEN:NamedTextColor.GRAY)),
+                    Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Item)", assetType == 2? NamedTextColor.GREEN:NamedTextColor.GRAY)),
                     Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Entity)", assetType == 3? NamedTextColor.GREEN:NamedTextColor.GRAY)),
                     Component.empty(),
                     GuiElement.clickAction(null, "cycle")

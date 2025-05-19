@@ -4,6 +4,7 @@ import com.faridfaharaj.profitable.commands.WalletCommand;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.tasks.gui.QuantitySelectGui;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -17,8 +18,10 @@ public final class DepositWithdrawalGui extends QuantitySelectGui {
     boolean depositing;
     Asset asset;
 
-    public DepositWithdrawalGui(Asset asset, boolean depositing) {
+    AssetCache[][] assetCache;
+    public DepositWithdrawalGui(Asset asset, boolean depositing, AssetCache[][] assetCache) {
         super("Select amount to " + (depositing?"deposit.":"withdraw."), true, asset.getAssetType() == 2 && asset.getAssetType() == 3, 1);
+        this.assetCache = assetCache;
         this.depositing = depositing;
         this.asset = asset;
     }
@@ -69,6 +72,6 @@ public final class DepositWithdrawalGui extends QuantitySelectGui {
 
     @Override
     protected void onReturn(Player player) {
-        new HoldingsMenu(player).openGui(player);
+        new HoldingsMenu(player, assetCache).openGui(player);
     }
 }

@@ -8,6 +8,7 @@ import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.tasks.gui.guis.HoldingsMenu;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.hooks.VaultHook;
@@ -25,6 +26,8 @@ import static com.faridfaharaj.profitable.data.holderClasses.Asset.retrieveCommo
 import static com.faridfaharaj.profitable.data.holderClasses.Asset.retrieveCommodityItem;
 
 public class WalletCommand implements CommandExecutor {
+
+    AssetCache[][] assetCache;
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
 
@@ -43,7 +46,7 @@ public class WalletCommand implements CommandExecutor {
 
             if(args.length == 0){
 
-                new HoldingsMenu(player).openGui(player);
+                new HoldingsMenu(player, null).openGui(player);
 
                 return true;
             }
@@ -313,6 +316,8 @@ public class WalletCommand implements CommandExecutor {
                     Asset.sendCommodityEntityToPlayer(player, account, asset.getCode(), (int) ammount);
                     MessagingUtil.sendPaymentNotice(player, ammount, 0, asset);
                 });
+            }else {
+                MessagingUtil.sendError(player, "Not enough " + asset.getCode() + " on your account");
             }
             return;
 
@@ -328,6 +333,8 @@ public class WalletCommand implements CommandExecutor {
                     MessagingUtil.sendPaymentNotice(player, ammount, 0, asset);
                 });
                 return;
+            }else {
+                MessagingUtil.sendError(player, "Not enough " + asset.getCode() + " on your account");
             }
 
         }

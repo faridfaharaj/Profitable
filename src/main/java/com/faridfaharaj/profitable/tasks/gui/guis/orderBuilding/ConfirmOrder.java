@@ -11,6 +11,7 @@ import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.elements.ReturnButton;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.OrderButton;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -43,18 +44,7 @@ public final  class ConfirmOrder extends ChestGUI {
         fillAll(Material.BLACK_STAINED_GLASS_PANE);
         buttons[0] = new ReturnButton(this, vectorSlotPosition(0, 2));
 
-        buttons[1] = new GuiElement(this, new ItemStack(Material.FILLED_MAP), Component.text("Order"),
-                List.of(
-                        Component.text("Type: ").append(Component.text(order.getType().toString())),
-                        Component.text("Side: ").append(order.isSideBuy()?Component.text("Buy",Configuration.COLORBULLISH):Component.text("Sell",Configuration.COLORBEARISH)),
-                        Component.empty(),
-                        Component.text("Asset: ").append(Component.text(ConfirmOrder.this.assetData.getAsset().getCode(),ConfirmOrder.this.assetData.getAsset().getColor())),
-                        Component.empty(),
-                        Component.text("Units: ").append(Component.text(order.getUnits())),
-                        Component.text("Price: ").append(order.getType() == Order.OrderType.MARKET?Component.text(order.isSideBuy()?"Lowest":"Highest"):Component.text(order.getPrice())),
-                        Component.empty(),
-                        GuiElement.clickAction(ClickType.LEFT, "Place Order")
-                ), vectorSlotPosition(4, 1));
+        buttons[1] = new OrderButton(this, order, vectorSlotPosition(4, 1), "confirm this order");
 
     }
 

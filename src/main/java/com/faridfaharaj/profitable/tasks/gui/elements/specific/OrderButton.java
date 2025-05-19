@@ -18,7 +18,7 @@ public final class OrderButton extends GuiElement{
 
     Order order;
 
-    public OrderButton(ChestGUI gui, Order order, int slot) {
+    public OrderButton(ChestGUI gui, Order order, int slot, String clickAction) {
         super(gui, order.isSideBuy()?new ItemStack(Material.PAPER):new ItemStack(Material.MAP), order.isSideBuy()?Component.text("Buy order", Configuration.COLORBULLISH):Component.text("Sell order", Configuration.COLORBEARISH),
                 List.of(
                         Component.text("Type: " + order.getType()),
@@ -30,7 +30,7 @@ public final class OrderButton extends GuiElement{
                         Component.empty(),
                         Component.text("Total value: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getPrice()*order.getUnits())),
                         Component.empty(),
-                        GuiElement.clickAction(null, "cancel this order")
+                        GuiElement.clickAction(null, clickAction)
                 ), slot);
 
         this.order = order;

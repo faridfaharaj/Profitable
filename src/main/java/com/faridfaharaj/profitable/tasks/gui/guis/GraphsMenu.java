@@ -39,8 +39,9 @@ public final class GraphsMenu extends ChestGUI {
         this.cache = cache;
 
         List<Component> buttonInstructions = new ArrayList<>();
+        buttonInstructions.add(Component.text(assetID));
         buttonInstructions.add(Component.empty());
-        buttonInstructions.add(Component.text("[Left-Click to view graph]", Configuration.COLORINFO));
+        buttonInstructions.add(GuiElement.clickAction(null, "view graph"));
 
         fillAll(Material.BLACK_STAINED_GLASS_PANE);
 

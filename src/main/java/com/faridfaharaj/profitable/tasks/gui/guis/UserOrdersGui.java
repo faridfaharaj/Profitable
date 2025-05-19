@@ -6,7 +6,9 @@ import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.Orders;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
+import com.faridfaharaj.profitable.tasks.gui.elements.ReturnButton;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetButton;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.OrderButton;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -27,13 +29,18 @@ public final class UserOrdersGui extends ChestGUI {
     int pages = 0;
 
     GuiElement pageButton = null;
+    GuiElement returnButton;
 
-    public UserOrdersGui(Player player) {
+    AssetCache[][] assetCache;
+    public UserOrdersGui(Player player, AssetCache[][] assetCache) {
         super(6, "Your active orders");
         fillSlots(0, 0, 8,0, Material.BLACK_STAINED_GLASS_PANE);
         fillSlots(0, 0, 0,5, Material.BLACK_STAINED_GLASS_PANE);
         fillSlots(8, 0, 8,5, Material.BLACK_STAINED_GLASS_PANE);
         fillSlots(0, 4, 8,5, Material.BLACK_STAINED_GLASS_PANE);
+
+        this.assetCache = assetCache;
+        returnButton = new ReturnButton(this, vectorSlotPosition(4, 5));
 
         Profitable.getfolialib().getScheduler().runAsync(task -> {
             orders = Orders.getAccountOrders(Accounts.getAccount(player));
@@ -63,7 +70,7 @@ public final class UserOrdersGui extends ChestGUI {
             if(index >= orders.size()){
                 getInventory().clear(slot);
             }else {
-                orderButtons.add(new OrderButton(this, orders.get(index), slot));
+                orderButtons.add(new OrderButton(this, orders.get(index), slot, "cancel this order"));
             }
 
         }
@@ -85,6 +92,11 @@ public final class UserOrdersGui extends ChestGUI {
                 }
                 break;
             }
+        }
+
+        if(returnButton.getSlot() == slot){
+            player.getInventory().close();
+            new AssetExplorer(player, 2, assetCache).openGui(player);
         }
 
         if(pageButton != null){
