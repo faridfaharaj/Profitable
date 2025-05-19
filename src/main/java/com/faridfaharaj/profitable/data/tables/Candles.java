@@ -6,7 +6,7 @@ import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
-import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetButtonData;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -100,8 +100,8 @@ public class Candles {
         return new Candle(0, 0, 0, 0, 0);
     }
 
-    public static List<AssetButtonData> getAssetsNPrice(int type, long time) {
-        List<AssetButtonData> result = new ArrayList<>();
+    public static List<AssetCache> getAssetsNPrice(int type, long time) {
+        List<AssetCache> result = new ArrayList<>();
 
         String sql = """
         SELECT
@@ -157,7 +157,7 @@ public class Candles {
 
                         Candle candle = new Candle(open, close, high, low, volume);
 
-                        result.add(new AssetButtonData(asset, candle));
+                        result.add(new AssetCache(asset, candle));
                     }
                 }
             }
@@ -165,6 +165,8 @@ public class Candles {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        System.out.println("CACHED");
 
         return result;
     }

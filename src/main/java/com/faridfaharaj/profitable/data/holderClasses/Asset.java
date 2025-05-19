@@ -302,6 +302,7 @@ public class Asset {
 
                 missing -= giveAmount;
             }
+                    player.playSound(player, Sound.ENTITY_ITEM_PICKUP, 1,1);
                     player.playSound(player, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
                     player.playSound(player, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
                     player.playSound(player, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);

@@ -3,12 +3,12 @@ package com.faridfaharaj.profitable.tasks.gui.elements.specific;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 
-public class AssetButtonData {
+public final class AssetCache {
 
-    Asset asset;
-    Candle lastCandle;
+    private Asset asset;
+    private Candle lastCandle;
 
-    public AssetButtonData(Asset asset, Candle lastCandle){
+    public AssetCache(Asset asset, Candle lastCandle){
         this.asset = asset;
         this.lastCandle = lastCandle;
     }

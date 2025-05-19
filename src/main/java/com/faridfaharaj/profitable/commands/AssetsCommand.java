@@ -33,7 +33,7 @@ public class AssetsCommand implements CommandExecutor {
         }
 
         if(sender instanceof Player player){
-            new AssetExplorer(player).openGui(player);
+            new AssetExplorer(player, 2, null).openGui(player);
             return true;
         }
 

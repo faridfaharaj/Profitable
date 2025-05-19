@@ -5,8 +5,9 @@ import com.faridfaharaj.profitable.data.tables.Candles;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetButton;
-import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetButtonData;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -20,14 +21,19 @@ public final class AssetExplorer extends ChestGUI {
     GuiElement categoryButton;
     GuiElement pageButton = null;
 
-    List<AssetButtonData> assets = new ArrayList<>();
+    AssetCache[][] assetCache = new AssetCache[5][];
+    int assetType;
+
     List<AssetButton> assetButtons = new ArrayList<>();
 
     int page = 0;
     int pages = 0;
 
-    public AssetExplorer(Player player) {
+    public AssetExplorer(Player player, int assetType, AssetCache[][] previousCache) {
         super(6, "Asset explorer");
+
+        this.assetType = assetType;
+
         fillSlots(0, 0, 8,0, Material.BLACK_STAINED_GLASS_PANE);
         fillSlots(0, 0, 0,5, Material.BLACK_STAINED_GLASS_PANE);
         fillSlots(8, 0, 8,5, Material.BLACK_STAINED_GLASS_PANE);
@@ -35,30 +41,52 @@ public final class AssetExplorer extends ChestGUI {
 
         categoryButton = new GuiElement(this, new ItemStack(Material.ENDER_EYE), Component.text("Category"),
                 List.of(
-
-
+                        Component.text("Assets"),
+                        Component.empty(),
+                        Component.text("♦ ", NamedTextColor.WHITE).append(Component.text("Forex", assetType == 1? NamedTextColor.WHITE:NamedTextColor.GRAY)),
+                        Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Entity)", assetType == 2? NamedTextColor.GREEN:NamedTextColor.GRAY)),
+                        Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Entity)", assetType == 3? NamedTextColor.GREEN:NamedTextColor.GRAY)),
+                        Component.empty(),
+                        GuiElement.clickAction(null, "cycle")
 
                 ), vectorSlotPosition(6, 5));
 
-        long time = player.getWorld().getFullTime();
-        Profitable.getfolialib().getScheduler().runAsync(task -> {
-            assets = Candles.getAssetsNPrice(2, time);
+        pageButton = new GuiElement(this, new ItemStack(Material.PAPER), Component.text("Page " + page + " / " + pages), List.of(
+                Component.empty(),
+                GuiElement.clickAction(ClickType.LEFT, "next page"),
+                GuiElement.clickAction(ClickType.RIGHT, "previous page")
+        ), vectorSlotPosition(7,5));
 
-            pages = assets.size()/21;
+        long time = player.getWorld().getFullTime();
+        updateAssets(assetType, previousCache, time);
+
+
+    }
+
+    private void updateAssets(int assetType, AssetCache[][] previousCache, long time) {
+        Profitable.getfolialib().getScheduler().runAsync(task -> {
+            page = 0;
+            if(previousCache == null){
+                assetCache[assetType] = Candles.getAssetsNPrice(assetType, time).toArray(new AssetCache[0]);
+            }else {
+                assetCache = previousCache;
+                if(previousCache[assetType] == null){
+                    assetCache[assetType] = Candles.getAssetsNPrice(assetType, time).toArray(new AssetCache[0]);
+                }
+            }
+
+            pages = assetCache[assetType].length/21;
 
             updatePage();
 
             if(pages > 0){
-                pageButton = new GuiElement(this, new ItemStack(Material.PAPER), Component.text("Page " + page + " / " + pages), List.of(
-                        Component.empty(),
-                        GuiElement.clickAction(ClickType.LEFT, "next page"),
-                        GuiElement.clickAction(ClickType.RIGHT, "previous page")
-                ), vectorSlotPosition(7,5));
+                pageButton.setDisplayName(Component.text("Page " + page + " / " + pages));
+                pageButton.show(this);
+            }else {
+                getInventory().setItem(pageButton.getSlot(), new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
             }
 
         });
-
-
     }
 
     public void updatePage(){
@@ -67,10 +95,10 @@ public final class AssetExplorer extends ChestGUI {
 
             int index = i+(page*21);
             int slot = (i+1)+9+((i/7)*2);
-            if(index >= assets.size()){
+            if(index >= assetCache[assetType].length){
                 getInventory().clear(slot);
             }else {
-                assetButtons.add(new AssetButton(this, assets.get(index), slot));
+                assetButtons.add(new AssetButton(this, assetCache[assetType][index], new int[]{assetType, index}, slot));
             }
 
         }
@@ -82,15 +110,34 @@ public final class AssetExplorer extends ChestGUI {
         for(AssetButton button : assetButtons){
             if(button.getSlot() == slot){
                 if(click.isLeftClick()){
-                    button.trade(player);
+                    button.trade(player, assetCache);
                 }
                 if(click.isRightClick()){
-                    button.graphs(player);
+                    button.graphs(player, assetCache);
                 }
             }
         }
 
-        if(pageButton != null){
+        if(categoryButton.getSlot() == slot){
+            assetType += 1;
+            if(assetType >= 4){
+                assetType = 1;
+            }
+            categoryButton.setLore(List.of(
+                    Component.text("Assets"),
+                    Component.empty(),
+                    Component.text("♦ ", NamedTextColor.WHITE).append(Component.text("Forex", assetType == 1? NamedTextColor.WHITE:NamedTextColor.GRAY)),
+                    Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Entity)", assetType == 2? NamedTextColor.GREEN:NamedTextColor.GRAY)),
+                    Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Entity)", assetType == 3? NamedTextColor.GREEN:NamedTextColor.GRAY)),
+                    Component.empty(),
+                    GuiElement.clickAction(null, "cycle")
+
+            ));
+            categoryButton.show(this);
+            updateAssets(assetType, assetCache, player.getWorld().getFullTime());
+        }
+
+        if(pages > 0){
             if(slot == pageButton.getSlot()){
                 if(click.isLeftClick()){
                     page+=1;

@@ -24,7 +24,7 @@ public final class AssetHolderButton extends GuiElement {
     Candle lastestDay;
     boolean loaded = false;
 
-    public AssetHolderButton(ChestGUI gui, AssetButtonData assetButtonData, int slot) {
+    public AssetHolderButton(ChestGUI gui, AssetCache assetButtonData, int slot) {
         super(gui, new ItemStack(Material.PAPER), Component.text("Loading...", Configuration.COLOREMPTY), null, slot);
 
         Profitable.getfolialib().getScheduler().runAsync(task -> {

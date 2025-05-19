@@ -6,6 +6,7 @@ import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.elements.ReturnButton;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -29,10 +30,13 @@ public final class GraphsMenu extends ChestGUI {
     final GuiElement graph1YButton;
     final GuiElement graph2YButton;
 
-    public GraphsMenu(String assetID) {
+    AssetCache[][] cache;
+
+    public GraphsMenu(String assetID, AssetCache[][] cache) {
         super(3, "Graphs for " + assetID);
 
         this.assetid = assetID;
+        this.cache = cache;
 
         List<Component> buttonInstructions = new ArrayList<>();
         buttonInstructions.add(Component.empty());
@@ -56,7 +60,7 @@ public final class GraphsMenu extends ChestGUI {
 
         if(slot == returnButton.getSlot()){
             this.getInventory().close();
-            new AssetExplorer(player).openGui(player);
+            new AssetExplorer(player, 2, cache).openGui(player);
         }else if(slot == graph1MButton.getSlot()){
             this.getInventory().close();
             MessagingUtil.sendSuccsess(player, "Preparing Graph...");

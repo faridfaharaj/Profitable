@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class DepositWithdrawalGui extends QuantitySelectGui {
+public final class DepositWithdrawalGui extends QuantitySelectGui {
 
     boolean depositing;
     Asset asset;

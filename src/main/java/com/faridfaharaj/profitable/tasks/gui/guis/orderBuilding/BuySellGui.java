@@ -7,6 +7,7 @@ import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.elements.ReturnButton;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.tasks.gui.guis.AssetExplorer;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
@@ -22,19 +23,19 @@ import static com.faridfaharaj.profitable.util.NamingUtil.formatVolume;
 
 public final class BuySellGui extends ChestGUI {
 
-    Asset asset;
-    Candle lastDay;
     List<Order> bidOrders;
     List<Order> askOrders;
 
     GuiElement[] buttons = new GuiElement[3];
 
-    public BuySellGui(Asset asset, Candle lastDay, List<Order> bidOrders, List<Order> askOrders) {
+    AssetCache[][] assetCache;
+    AssetCache assetData;
+    public BuySellGui(AssetCache[][] assetCache, AssetCache assetData, List<Order> bidOrders, List<Order> askOrders) {
         super(3, "Pick a side.");
 
-        this.asset = asset;
-        this.lastDay = lastDay;
-        System.out.println(lastDay);
+        this.assetCache = assetCache;
+        this.assetData = assetData;
+
         this.bidOrders = bidOrders;
         this.askOrders = askOrders;
 
@@ -44,7 +45,7 @@ public final class BuySellGui extends ChestGUI {
 
 
         List<Component> sellLore = new ArrayList<>();
-        sellLore.add(Component.text(asset.getCode()));
+        sellLore.add(Component.text(this.assetData.getAsset().getCode()));
         sellLore.add(Component.empty());
         if(!askOrders.isEmpty()){
             sellLore.add(Component.text("Ask: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, askOrders.getFirst().getPrice())));
@@ -68,7 +69,7 @@ public final class BuySellGui extends ChestGUI {
         sellLore.add(GuiElement.clickAction(null, "select sell"));
 
         List<Component> buyLore = new ArrayList<>();
-        buyLore.add(Component.text(asset.getCode()));
+        buyLore.add(Component.text(this.assetData.getAsset().getCode()));
         buyLore.add(Component.empty());
         if(!bidOrders.isEmpty()){
             buyLore.add(Component.text("Bid: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET,bidOrders.getFirst().getPrice())));
@@ -106,17 +107,17 @@ public final class BuySellGui extends ChestGUI {
 
                 if(button == buttons[0]){
                     this.getInventory().close();
-                    new AssetExplorer(player).openGui(player);
+                    new AssetExplorer(player, assetData.getAsset().getAssetType(), assetCache).openGui(player);
                 }
 
                 if(button == buttons[1]){
                     this.getInventory().close();
-                    new OrderTypeGui(new Order(null, null, asset.getCode(), false, 0, 0, null), asset,lastDay, bidOrders, askOrders).openGui(player);
+                    new OrderTypeGui(assetCache, assetData, new Order(null, null, assetData.getAsset().getCode(), false, 0, 0, null), bidOrders, askOrders).openGui(player);
                 }
 
                 if(button == buttons[2]){
                     this.getInventory().close();
-                    new OrderTypeGui(new Order(null, null, asset.getCode(), true, 0, 0, null),asset,lastDay, bidOrders, askOrders).openGui(player);
+                    new OrderTypeGui(assetCache, assetData, new Order(null, null, assetData.getAsset().getCode(), true, 0, 0, null), bidOrders, askOrders).openGui(player);
                 }
 
             }

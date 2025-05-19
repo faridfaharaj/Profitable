@@ -6,6 +6,7 @@ import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.QuantitySelectGui;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -18,16 +19,17 @@ import java.util.List;
 public final class UnitsSelect extends QuantitySelectGui {
 
     Order order;
-    Asset asset;
-    Candle lastDay;
     List<Order> bidOrders;
     List<Order> askOrders;
 
-    public UnitsSelect(Order order, Asset asset, Candle lastDay, List<Order> bidOrders, List<Order> askOrders) {
-        super("How much are you " + (order.isSideBuy()?"buying.":"selling."),asset.getAssetType() != 2, asset.getAssetType() == 2 || asset.getAssetType() == 3, 1);
+    AssetCache[][] assetCache;
+    AssetCache assetData;
+    public UnitsSelect(AssetCache[][] assetCache, AssetCache assetData, Order order, List<Order> bidOrders, List<Order> askOrders) {
+        super("How much are you " + (order.isSideBuy()?"buying.":"selling."), assetData.getAsset().getAssetType() != 2, assetData.getAsset().getAssetType() == 2 || assetData.getAsset().getAssetType() == 3, 1);
+        this.assetCache = assetCache;
+        this.assetData = assetData;
+
         this.order = order;
-        this.asset = asset;
-        this.lastDay = lastDay;
         this.bidOrders = bidOrders;
         this.askOrders = askOrders;
     }
@@ -37,7 +39,7 @@ public final class UnitsSelect extends QuantitySelectGui {
         getSubmitButton().setDisplayName(Component.text("Transacting amount: ").append(Component.text(newAmount, NamedTextColor.YELLOW)));
         List<Component> lore = List.of(
                 Component.empty(),
-                Component.text("Total value: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getType() == Order.OrderType.MARKET? lastDay.getClose()*newAmount: order.getPrice()*newAmount)),
+                Component.text("Total value: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getType() == Order.OrderType.MARKET?  assetData.getlastCandle().getClose()*newAmount: order.getPrice()*newAmount)),
                 Component.empty(),
                 GuiElement.clickAction(null, "Proceed with this amount")
         );
@@ -63,7 +65,7 @@ public final class UnitsSelect extends QuantitySelectGui {
     protected void onSubmitAmount(Player player, double amount) {
 
         this.getInventory().close();
-        new ConfirmOrder(new Order(null, null, asset.getCode(), order.isSideBuy(), order.getPrice(), amount, order.getType()), asset,lastDay, bidOrders, askOrders).openGui(player);
+        new ConfirmOrder(assetCache, assetData, new Order(null, null, assetData.getAsset().getCode(), order.isSideBuy(), order.getPrice(), amount, order.getType()), bidOrders, askOrders).openGui(player);
 
     }
 
@@ -72,10 +74,10 @@ public final class UnitsSelect extends QuantitySelectGui {
 
         if(order.getType() == Order.OrderType.MARKET){
             this.getInventory().close();
-            new OrderTypeGui(order, asset, lastDay, bidOrders, askOrders).openGui(player);
+            new OrderTypeGui(assetCache, assetData, order, bidOrders, askOrders).openGui(player);
         }else {
             this.getInventory().close();
-            new PriceSelect(order, asset, lastDay, bidOrders, askOrders).openGui(player);
+            new PriceSelect(assetCache, assetData, order, bidOrders, askOrders).openGui(player);
         }
 
     }

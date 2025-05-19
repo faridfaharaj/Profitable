@@ -5,13 +5,11 @@ import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
-import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetButtonData;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -134,7 +132,7 @@ public class AccountHoldings {
         return component;
     }
 
-    public static List<AssetButtonData> AssetBalancesToAssetData(String account) {
+    public static List<AssetCache> AssetBalancesToAssetData(String account) {
         String sql = "SELECT aa.asset_id, a.asset_type, aa.quantity, a.meta, " +
                 "IFNULL(c.close, 0) AS price, " +
                 "(aa.quantity * IFNULL(c.close, 0)) AS value " +
@@ -145,7 +143,7 @@ public class AccountHoldings {
                 "WHERE aa.world = ? AND aa.account_name = ? " +
                 "ORDER BY a.asset_type";
 
-        List<AssetButtonData> balances = new ArrayList<>();
+        List<AssetCache> balances = new ArrayList<>();
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
             stmt.setBytes(1, DataBase.getCurrentWorld());
@@ -169,7 +167,7 @@ public class AccountHoldings {
                         value = 1;
                     }
 
-                    balances.add(new AssetButtonData(asset, new Candle(0, value, 0,0, quantity)));
+                    balances.add(new AssetCache(asset, new Candle(0, value, 0,0, quantity)));
                 }
 
             }

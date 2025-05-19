@@ -7,6 +7,7 @@ import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.elements.ReturnButton;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
@@ -19,8 +20,6 @@ import java.util.List;
 public final class OrderTypeGui extends ChestGUI {
 
     Order order;
-    Asset asset;
-    Candle lastDay;
     List<Order> bidOrders;
     List<Order> askOrders;
 
@@ -28,13 +27,14 @@ public final class OrderTypeGui extends ChestGUI {
 
     boolean allowMarket;
 
-    public OrderTypeGui(Order order, Asset asset, Candle lastDay, List<Order> bidOrders, List<Order> askOrders) {
+    AssetCache[][] assetCache;
+    AssetCache assetData;
+    public OrderTypeGui(AssetCache[][] assetCache, AssetCache assetData, Order order, List<Order> bidOrders, List<Order> askOrders) {
         super(3, "Pick an order type.");
+        this.assetCache = assetCache;
+        this.assetData = assetData;
 
         this.order = order;
-        this.asset = asset;
-        this.lastDay = lastDay;
-        System.out.println(lastDay);
         this.bidOrders = bidOrders;
         this.askOrders = askOrders;
 
@@ -52,17 +52,18 @@ public final class OrderTypeGui extends ChestGUI {
 
         buttons[1] = new GuiElement(this, orderStack, Component.text("Market Order"),
                 List.of(
-                        Component.text(asset.getCode()),
+                        Component.text(assetData.getAsset().getCode()),
                         Component.empty(),
-                        Component.text(sideString).append(Component.text(" an asset ")).append(Component.text("Immediately", NamedTextColor.YELLOW)),
-                        Component.text("at the best price"),
+                        Component.text(sideString).append(Component.text(" immediately", NamedTextColor.YELLOW)),
+                        Component.text("at the best"),
+                        Component.text("price available"),
                         Component.empty(),
                         allowMarket?GuiElement.clickAction(null, "select Market"):Component.text("No " + (order.isSideBuy()? "sellers!":"buyers!"),Configuration.COLORERROR)
                 ), vectorSlotPosition(2, 1));
 
         buttons[2] = new GuiElement(this, orderStack, Component.text("Limit Order"),
                 List.of(
-                        Component.text(asset.getCode()),
+                        Component.text(assetData.getAsset().getCode()),
                         Component.empty(),
                         Component.text("Choose a ").append(Component.text("price", NamedTextColor.YELLOW)),
                         Component.text("and " + sideString + " once a"),
@@ -73,11 +74,11 @@ public final class OrderTypeGui extends ChestGUI {
 
         buttons[3] = new GuiElement(this, orderStack, Component.text("Stop-Limit order"),
                 List.of(
-                        Component.text(asset.getCode()),
+                        Component.text(assetData.getAsset().getCode()),
                         Component.empty(),
-                        Component.text(sideString).append(Component.text(" as limit order")),
-                        Component.text("once ").append(Component.text("market reaches", NamedTextColor.YELLOW)),
-                        Component.text("your price", NamedTextColor.YELLOW),
+                        Component.text(sideString).append(Component.text(" Limit Order", NamedTextColor.YELLOW)),
+                        Component.text("once price hits"),
+                        Component.text("your trigger"),
                         Component.empty(),
                         GuiElement.clickAction(null, "select Stop-Limit")
                 ), vectorSlotPosition(6, 1));
@@ -92,24 +93,24 @@ public final class OrderTypeGui extends ChestGUI {
 
                 if(button == buttons[0]){
                     this.getInventory().close();
-                    new BuySellGui(asset, lastDay, bidOrders, askOrders).openGui(player);
+                    new BuySellGui(assetCache, assetData, bidOrders, askOrders).openGui(player);
                 }
 
                 if(button == buttons[1]){
                     if(allowMarket){
                         this.getInventory().close();
-                        new UnitsSelect(new Order(order.getUuid(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.isSideBuy()?Double.MAX_VALUE:Double.MIN_VALUE, order.getUnits(), Order.OrderType.MARKET), asset,lastDay, bidOrders, askOrders).openGui(player);
+                        new UnitsSelect(assetCache, assetData, new Order(order.getUuid(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.isSideBuy()?Double.MAX_VALUE:Double.MIN_VALUE, order.getUnits(), Order.OrderType.MARKET), bidOrders, askOrders).openGui(player);
                     }
                 }
 
                 if(button == buttons[2]){
                     this.getInventory().close();
-                    new PriceSelect(new Order(order.getUuid(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), Order.OrderType.LIMIT), asset,lastDay, bidOrders, askOrders).openGui(player);
+                    new PriceSelect(assetCache, assetData, new Order(order.getUuid(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), Order.OrderType.LIMIT), bidOrders, askOrders).openGui(player);
                 }
 
                 if(button == buttons[3]){
                     this.getInventory().close();
-                    new PriceSelect(new Order(order.getUuid(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), Order.OrderType.STOP_LIMIT), asset,lastDay, bidOrders, askOrders).openGui(player);
+                    new PriceSelect(assetCache, assetData, new Order(order.getUuid(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), Order.OrderType.STOP_LIMIT), bidOrders, askOrders).openGui(player);
                 }
 
             }

@@ -2,8 +2,6 @@ package com.faridfaharaj.profitable.tasks.gui.elements.specific;
 
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
-import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.data.tables.Orders;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
@@ -13,7 +11,6 @@ import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -24,42 +21,40 @@ import java.util.List;
 
 public final class AssetButton extends GuiElement {
 
-    Asset asset;
-    Candle lastestDay;
-    boolean loaded = false;
+    int[] index;
+    boolean loaded;
 
-    public AssetButton(ChestGUI gui, AssetButtonData assetButtonData, int slot) {
+    public AssetButton(ChestGUI gui, AssetCache assetData, int[] index, int slot) {
         super(gui, new ItemStack(Material.PAPER), Component.text("Loading...", Configuration.COLOREMPTY), null, slot);
 
-        this.asset = assetButtonData.getAsset();
-        this.lastestDay = assetButtonData.getlastCandle();
-        double price = lastestDay.getClose(),
-                change = lastestDay.getClose()-lastestDay.getOpen(),
-                volume = lastestDay.getVolume(), Open = lastestDay.getOpen();
-        String symbol = asset.getAssetType() == 1? Configuration.MAINCURRENCYASSET.getCode() + "/" + asset.getCode():asset.getCode(),
+        this.index = index;
+        double price = assetData.getlastCandle().getClose(),
+                change = assetData.getlastCandle().getClose()-assetData.getlastCandle().getOpen(),
+                volume = assetData.getlastCandle().getVolume(), Open = assetData.getlastCandle().getOpen();
+        String symbol = assetData.getAsset().getAssetType() == 1? Configuration.MAINCURRENCYASSET.getCode() + "/" + assetData.getAsset().getCode():assetData.getAsset().getCode(),
                 priceStr = "$"+ price,
-                dayChange =  change+" "+ Math.ceil(change/lastestDay.getOpen()*10000)/100 + "% today";
+                dayChange =  change+" "+ Math.ceil(change/assetData.getlastCandle().getOpen()*10000)/100 + "% today";
 
-        if(asset.getAssetType() == 2){
-            this.display = new ItemStack(Material.getMaterial(asset.getCode()));
-        }if(asset.getAssetType() == 3){
-            this.display = new ItemStack(Material.getMaterial(asset.getCode()+"_SPAWN_EGG"));
-        }if(asset.getAssetType() == 1) {
+        if(assetData.getAsset().getAssetType() == 2){
+            this.display = new ItemStack(Material.getMaterial(assetData.getAsset().getCode()));
+        }if(assetData.getAsset().getAssetType() == 3){
+            this.display = new ItemStack(Material.getMaterial(assetData.getAsset().getCode()+"_SPAWN_EGG"));
+        }if(assetData.getAsset().getAssetType() == 1) {
             this.display = new ItemStack(Material.EMERALD);
         }
 
         List<Component> keyDataPoints = new ArrayList<>();
-        keyDataPoints.add(Component.text(NamingUtil.nameType(asset.getAssetType())));
+        keyDataPoints.add(Component.text(NamingUtil.nameType(assetData.getAsset().getAssetType())));
         keyDataPoints.add(Component.space());
         keyDataPoints.add(Component.text("Volume: " + volume));
         keyDataPoints.add(Component.text("Open: " + Open));
-        keyDataPoints.add(Component.text("Day's Range: " + lastestDay.getLow() + " to " + lastestDay.getHigh()));
+        keyDataPoints.add(Component.text("Day's Range: " + assetData.getlastCandle().getLow() + " to " + assetData.getlastCandle().getHigh()));
 
         keyDataPoints.add(Component.empty());
         keyDataPoints.add(GuiElement.clickAction(ClickType.LEFT, "Trade asset"));
         keyDataPoints.add(GuiElement.clickAction(ClickType.RIGHT, "Get graphs"));
 
-        setDisplayName(Component.text("").append(Component.text(symbol, asset.getColor()).hoverEvent(HoverEvent.showText(MessagingUtil.assetSummary(asset)))).append( Component.space().appendSpace().appendSpace().append(Component.text(priceStr)).appendSpace().appendSpace().appendSpace()).append(Component.text(dayChange,(change<0?Configuration.COLORBEARISH:Configuration.COLORBULLISH))));
+        setDisplayName(Component.text("").append(Component.text(symbol, assetData.getAsset().getColor()).hoverEvent(HoverEvent.showText(MessagingUtil.assetSummary(assetData.getAsset())))).append( Component.space().appendSpace().appendSpace().append(Component.text(priceStr)).appendSpace().appendSpace().appendSpace()).append(Component.text(dayChange,(change<0?Configuration.COLORBEARISH:Configuration.COLORBULLISH))));
         setLore(keyDataPoints);
 
         loaded = true;
@@ -68,19 +63,19 @@ public final class AssetButton extends GuiElement {
 
     }
 
-    public void trade(Player player){
+    public void trade(Player player, AssetCache[][] cache){
         if(loaded){
             player.getInventory().close();
             Profitable.getfolialib().getScheduler().runAsync(task -> {
-                new BuySellGui(asset, lastestDay, Orders.getBidAsk(asset.getCode(), true), Orders.getBidAsk(asset.getCode(), false)).openGui(player);
+                new BuySellGui(cache, cache[index[0]][index[1]], Orders.getBidAsk(cache[index[0]][index[1]].getAsset().getCode(), true), Orders.getBidAsk(cache[index[0]][index[1]].getAsset().getCode(), false)).openGui(player);
             });
         }
     }
 
-    public void graphs(Player player){
+    public void graphs(Player player, AssetCache[][] cache){
         if(loaded){
             player.getInventory().close();
-            new GraphsMenu(asset.getCode()).openGui(player);
+            new GraphsMenu(cache[index[0]][index[1]].getAsset().getCode(), cache).openGui(player);
         }
     }
 }

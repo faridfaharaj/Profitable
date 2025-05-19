@@ -5,7 +5,7 @@ import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
-import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetButtonData;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetHolderButton;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -21,7 +21,7 @@ public final class HoldingsMenu extends ChestGUI {
     GuiElement categoryButton;
     GuiElement pageButton = null;
 
-    List<AssetButtonData> assets = new ArrayList<>();
+    List<AssetCache> assets = new ArrayList<>();
     List<AssetHolderButton> assetButtons = new ArrayList<>();
 
     int page = 0;

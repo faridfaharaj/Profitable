@@ -10,6 +10,7 @@ import com.faridfaharaj.profitable.exchange.Books.Exchange;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.elements.ReturnButton;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -25,17 +26,17 @@ public final  class ConfirmOrder extends ChestGUI {
     GuiElement[] buttons = new GuiElement[2];
 
     Order order;
-    Asset asset;
-    Candle lastDay;
     List<Order> bidOrders;
     List<Order> askOrders;
 
-    public ConfirmOrder(Order order, Asset asset, Candle lastDay, List<Order> bidOrders, List<Order> askOrders) {
+    AssetCache[][] assetCache;
+    AssetCache assetData;
+    public ConfirmOrder(AssetCache[][] assetCache, AssetCache assetData, Order order, List<Order> bidOrders, List<Order> askOrders) {
         super(3, "Confirm?");
+        this.assetCache = assetCache;
+        this.assetData = assetData;
 
         this.order = order;
-        this.asset = asset;
-        this.lastDay = lastDay;
         this.bidOrders = bidOrders;
         this.askOrders = askOrders;
 
@@ -47,7 +48,7 @@ public final  class ConfirmOrder extends ChestGUI {
                         Component.text("Type: ").append(Component.text(order.getType().toString())),
                         Component.text("Side: ").append(order.isSideBuy()?Component.text("Buy",Configuration.COLORBULLISH):Component.text("Sell",Configuration.COLORBEARISH)),
                         Component.empty(),
-                        Component.text("Asset: ").append(Component.text(asset.getCode(),asset.getColor())),
+                        Component.text("Asset: ").append(Component.text(ConfirmOrder.this.assetData.getAsset().getCode(),ConfirmOrder.this.assetData.getAsset().getColor())),
                         Component.empty(),
                         Component.text("Units: ").append(Component.text(order.getUnits())),
                         Component.text("Price: ").append(order.getType() == Order.OrderType.MARKET?Component.text(order.isSideBuy()?"Lowest":"Highest"):Component.text(order.getPrice())),
@@ -65,14 +66,14 @@ public final  class ConfirmOrder extends ChestGUI {
 
                 if(button == buttons[0]){
                     this.getInventory().close();
-                    new UnitsSelect(order, asset, lastDay, bidOrders, askOrders).openGui(player);
+                    new UnitsSelect(assetCache, assetData, order, bidOrders, askOrders).openGui(player);
                 }
 
                 if(button == buttons[1]){
                     this.getInventory().close();
                     MessagingUtil.sendInfoNotice(player, "Processing Order...");
                     Profitable.getfolialib().getScheduler().runAsync(task -> {
-                        Exchange.sendNewOrder(player, new Order(UUID.randomUUID(), Accounts.getAccount(player), asset.getCode(), order.isSideBuy(), order.getPrice(), order.getUnits(), order.getType()));
+                        Exchange.sendNewOrder(player, new Order(UUID.randomUUID(), Accounts.getAccount(player), assetData.getAsset().getCode(), order.isSideBuy(), order.getPrice(), order.getUnits(), order.getType()));
                     });
                 }
 
