@@ -45,49 +45,49 @@ public final class BuySellGui extends ChestGUI {
 
 
         List<Component> sellLore = new ArrayList<>();
-        sellLore.add(Component.text(this.assetData.getAsset().getCode()));
+        sellLore.add(Component.text(this.assetData.getAsset().getCode(), Configuration.GUICOLORSUBTITLE));
         sellLore.add(Component.empty());
         if(!askOrders.isEmpty()){
-            sellLore.add(Component.text("Ask: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, askOrders.getFirst().getPrice())));
+            sellLore.add(Component.text("Ask: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, askOrders.getFirst().getPrice())));
             sellLore.add(Component.empty());
-            sellLore.add(Component.text("Lowest prices: "));
+            sellLore.add(Component.text("Lowest prices: ", Configuration.GUICOLORTEXT));
             for(int i = 0; i < 7; i++){
                 if(i < askOrders.size()){
                     Order iteratedAsk = askOrders.get(i);
-                    sellLore.add(Component.text(" - ").append(Component.text("[ "+formatVolume(iteratedAsk.getUnits())+" ] ",Configuration.COLORBEARISH)).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())));
+                    sellLore.add(Component.text(" - ", Configuration.GUICOLORTEXT).append(Component.text("[ "+formatVolume(iteratedAsk.getUnits())+" ] ",Configuration.COLORBEARISH)).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())));
                 }else {
                     break;
                 }
                 if(i == 6){
-                    sellLore.add(Component.text(" - ..."));
+                    sellLore.add(Component.text(" - ...", Configuration.GUICOLORTEXT));
                 }
             }
         }else {
-            sellLore.add(Component.text("No one is selling this asset yet!"));
+            sellLore.add(Component.text("No one is selling this asset yet!", Configuration.GUICOLORTEXT));
         }
         sellLore.add(Component.empty());
         sellLore.add(GuiElement.clickAction(null, "select sell"));
 
         List<Component> buyLore = new ArrayList<>();
-        buyLore.add(Component.text(this.assetData.getAsset().getCode()));
+        buyLore.add(Component.text(this.assetData.getAsset().getCode(),Configuration.GUICOLORSUBTITLE));
         buyLore.add(Component.empty());
         if(!bidOrders.isEmpty()){
-            buyLore.add(Component.text("Bid: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET,bidOrders.getFirst().getPrice())));
+            buyLore.add(Component.text("Bid: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET,bidOrders.getFirst().getPrice())));
             buyLore.add(Component.empty());
-            buyLore.add(Component.text("Highest prices: "));
+            buyLore.add(Component.text("Highest prices: ", Configuration.GUICOLORTEXT));
             for(int i = 0; i < 7; i++){
                 if(i < bidOrders.size()){
                     Order iteratedAsk = bidOrders.get(i);
-                    buyLore.add(Component.text(" - ").append(Component.text("[ "+formatVolume(iteratedAsk.getUnits())+" ] ",Configuration.COLORBULLISH)).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())));
+                    buyLore.add(Component.text(" - ", Configuration.GUICOLORTEXT).append(Component.text("[ "+formatVolume(iteratedAsk.getUnits())+" ] ",Configuration.COLORBULLISH)).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())));
                 }else {
                     break;
                 }
                 if(i == 6){
-                    sellLore.add(Component.text(" - ..."));
+                    sellLore.add(Component.text(" - ...", Configuration.GUICOLORTEXT));
                 }
             }
         }else {
-            buyLore.add(Component.text("No one is buying this asset yet!"));
+            buyLore.add(Component.text("No one is buying this asset yet!", Configuration.GUICOLORTEXT));
         }
         buyLore.add(Component.empty());
         buyLore.add(GuiElement.clickAction(null, "select buy"));

@@ -48,12 +48,12 @@ public final class AssetHolderButton extends GuiElement {
 
             List<Component> lore = new ArrayList<>();
 
-            lore.add(Component.text(NamingUtil.nameType(asset.getAssetType())));
+            lore.add(Component.text(NamingUtil.nameType(asset.getAssetType()), Configuration.GUICOLORSUBTITLE));
             lore.add(Component.empty());
-            lore.add(Component.text("Owned: ").append(MessagingUtil.assetAmmount(asset, lastestDay.getVolume())));
+            lore.add(Component.text("Owned: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(asset, lastestDay.getVolume())));
             lore.add(Component.empty());
-            lore.add(Component.text("Market price: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getClose())));
-            lore.add(Component.text("Total value: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getVolume()*lastestDay.getClose())));
+            lore.add(Component.text("Market price: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getClose())));
+            lore.add(Component.text("Total value: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getVolume()*lastestDay.getClose())));
             lore.add(Component.empty());
             lore.add(GuiElement.clickAction(ClickType.LEFT, "withdraw"));
             lore.add(GuiElement.clickAction(ClickType.RIGHT, "deposit"));

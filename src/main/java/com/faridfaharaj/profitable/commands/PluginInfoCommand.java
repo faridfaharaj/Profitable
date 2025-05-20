@@ -17,8 +17,8 @@ public class PluginInfoCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
         MessagingUtil.sendCustomMessage(sender, Component.text("Running ", TextColor.color(0x41B169)).append(Component.text("Profitable", TextColor.color(0x64FF9D)).decorate(TextDecoration.BOLD)).append(Component.text(" " + Profitable.getInstance().getDescription().getVersion(), TextColor.color(0x64FF9D))).clickEvent(ClickEvent.openUrl("https://github.com/faridfaharaj/Profitable")).hoverEvent(HoverEvent.showText(Component.text("link to download page", NamedTextColor.BLUE)))
-                .appendNewline().append(Component.text("[/profitable:help]",Configuration.COLORINFO).clickEvent(ClickEvent.runCommand("/profitable:help")).hoverEvent(HoverEvent.showText(Component.text("/profitable:help",Configuration.COLORINFO))))
-                .append(Component.text("  [/profitable:help admin]",Configuration.COLORINFO).clickEvent(ClickEvent.runCommand("/profitable:help admin")).hoverEvent(HoverEvent.showText(Component.text("/profitable:help admin",Configuration.COLORINFO))))
+                .appendNewline().append(Component.text("[/profitable:help]",Configuration.COLORHIGHLIGHT).clickEvent(ClickEvent.runCommand("/profitable:help")).hoverEvent(HoverEvent.showText(Component.text("/profitable:help",Configuration.COLORHIGHLIGHT))))
+                .append(Component.text("  [/profitable:help admin]",Configuration.COLORHIGHLIGHT).clickEvent(ClickEvent.runCommand("/profitable:help admin")).hoverEvent(HoverEvent.showText(Component.text("/profitable:help admin",Configuration.COLORHIGHLIGHT))))
 
         );
         return true;

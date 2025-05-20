@@ -37,13 +37,14 @@ public final class PriceSelect  extends QuantitySelectGui {
         this.askOrders = askOrders;
 
         List<Component> lore = new ArrayList<>();
+        lore.add(Component.text(assetData.getAsset().getCode(), Configuration.GUICOLORSUBTITLE));
         lore.add(Component.empty());
-        lore.add(Component.text("Current asset price: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, assetData.getlastCandle().getClose())));
+        lore.add(Component.text("Current asset price: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, assetData.getlastCandle().getClose())));
         if(!bidOrders.isEmpty()){
-            lore.add(Component.text("Bid: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, bidOrders.getFirst().getPrice())));
+            lore.add(Component.text("Bid: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, bidOrders.getFirst().getPrice())));
         }
         if(!askOrders.isEmpty()){
-            lore.add(Component.text("Ask: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, askOrders.getFirst().getPrice())));
+            lore.add(Component.text("Ask: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, askOrders.getFirst().getPrice())));
         }
         lore.add(Component.empty());
         lore.add(GuiElement.clickAction(null, "Proceed with this price"));
@@ -53,7 +54,7 @@ public final class PriceSelect  extends QuantitySelectGui {
 
     @Override
     protected void onAmountUpdate(double newPrice) {
-        getSubmitButton().setDisplayName(Component.text("Your price: ").append(Component.text(newPrice + " " + Configuration.MAINCURRENCYASSET.getCode(),NamedTextColor.YELLOW)));
+        getSubmitButton().setDisplayName(Component.text("Your price: ", Configuration.GUICOLORTITLE).append(Component.text(newPrice + " " + Configuration.MAINCURRENCYASSET.getCode(),Configuration.GUICOLORTITLEHIGHLIGHT)));
         getSubmitButton().show(this);
     }
 
@@ -62,7 +63,7 @@ public final class PriceSelect  extends QuantitySelectGui {
 
         ItemStack display = new ItemStack(Material.MAP);
 
-        Component name = Component.text("Your price: ").append(Component.text(this.amount + " " + Configuration.MAINCURRENCYASSET.getCode(),NamedTextColor.YELLOW));
+        Component name = Component.text("Your price: ", Configuration.GUICOLORTITLE).append(Component.text(this.amount + " " + Configuration.MAINCURRENCYASSET.getCode(),Configuration.GUICOLORTITLEHIGHLIGHT));
 
 
         return new GuiElement(this, display, name, null, slot);

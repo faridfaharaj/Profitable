@@ -12,7 +12,6 @@ import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.tasks.gui.guis.HoldingsMenu;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.hooks.VaultHook;
-import net.kyori.adventure.text.Component;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -338,8 +337,6 @@ public class WalletCommand implements CommandExecutor {
             }
 
         }
-
-        MessagingUtil.sendError(player, "Not enough " + asset.getCode());
 
     }
 

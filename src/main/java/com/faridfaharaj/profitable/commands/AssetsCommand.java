@@ -49,7 +49,7 @@ public class AssetsCommand implements CommandExecutor {
             component = component.append(
                     Component.text("["+foundAssets.get(i).getCode()+ "]").color(foundAssets.get(i).getColor())
                             .clickEvent(ClickEvent.runCommand(cmnd))
-                            .hoverEvent(HoverEvent.showText(Component.text(cmnd, Configuration.COLORINFO)))).appendNewline();
+                            .hoverEvent(HoverEvent.showText(Component.text(cmnd, Configuration.COLORHIGHLIGHT)))).appendNewline();
         }
         return component;
     }

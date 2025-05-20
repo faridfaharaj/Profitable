@@ -11,7 +11,7 @@ import java.util.List;
 public final class ReturnButton extends GuiElement{
 
     public ReturnButton(ChestGUI gui, int slot) {
-        super(gui, new ItemStack(Material.ARROW), Component.text("Return", NamedTextColor.RED), List.of(GuiElement.clickAction(null, "return to last menu")), slot);
+        super(gui, new ItemStack(Material.ARROW), Component.text("Return", NamedTextColor.RED), null, slot);
     }
 
 }

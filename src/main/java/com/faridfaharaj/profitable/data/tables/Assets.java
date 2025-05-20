@@ -249,7 +249,7 @@ public class Assets {
             //Base commodity items
             for(String item : Configuration.ALLOWEITEMS){
                 try {
-                    Assets.addAsset(item, 2, Asset.metaData(Configuration.COLOREMPTY.value(), NamingUtil.nameCommodity(item)));
+                    Assets.addAsset(item, 2, Asset.metaData(Configuration.COLORHIGHLIGHT.value(), NamingUtil.nameCommodity(item)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -258,7 +258,7 @@ public class Assets {
             //Base commodity entities
             for(String entity : Configuration.ALLOWENTITIES){
                 try {
-                    Assets.addAsset(entity, 3, Asset.metaData(Configuration.COLOREMPTY.value(), NamingUtil.nameCommodity(entity)));
+                    Assets.addAsset(entity, 3, Asset.metaData(Configuration.COLORHIGHLIGHT.value(), NamingUtil.nameCommodity(entity)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

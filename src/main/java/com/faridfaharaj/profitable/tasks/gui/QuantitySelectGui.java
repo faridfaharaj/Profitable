@@ -1,5 +1,6 @@
 package com.faridfaharaj.profitable.tasks.gui;
 
+import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.elements.ReturnButton;
@@ -52,13 +53,13 @@ public abstract class QuantitySelectGui extends ChestGUI {
         buttons[7] = new GuiElement(this, new ItemStack(Material.LIME_CANDLE, big), GuiElement.clickAction(null, "Add " + big), null, vectorSlotPosition(7, 2));
 
         // add 0
-        buttons[8] = new GuiElement(this, new ItemStack(Material.SHEARS), Component.text("Move dot to left"),
+        buttons[8] = new GuiElement(this, new ItemStack(Material.SHEARS), Component.text("Move point to left", Configuration.GUICOLORTITLE),
                 List.of(
                         GuiElement.clickAction(null, "0.X <-")
                 ), vectorSlotPosition(3, 4));
 
         // remove 0
-        buttons[9] = new GuiElement(this, new ItemStack(Material.SUGAR), Component.text("Move dot to right"),
+        buttons[9] = new GuiElement(this, new ItemStack(Material.SUGAR), Component.text("Move point to right", Configuration.GUICOLORTITLE),
                 List.of(
                         GuiElement.clickAction(null, "X.0 ->")
                 ), vectorSlotPosition(5, 4));
