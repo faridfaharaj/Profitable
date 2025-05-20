@@ -104,6 +104,18 @@ public class Candles {
         List<AssetCache> result = new ArrayList<>();
 
         String sql = """
+        WITH ranked_candles AS (
+            SELECT
+                *,
+                ROW_NUMBER() OVER (
+                    PARTITION BY world, asset_id
+                    ORDER BY 
+                        CASE WHEN time = ? THEN 0 ELSE 1 END,  -- prefer exact match
+                        time DESC
+                ) as rn
+            FROM candles_day
+            WHERE world = ?
+        )
         SELECT
             a.asset_id,
             a.asset_type,
@@ -114,18 +126,8 @@ public class Candles {
             c.low,
             c.volume
         FROM assets a
-        LEFT JOIN (
-            SELECT world, asset_id, time, open, close, high, low, volume
-            FROM candles_day
-            WHERE world = ? AND time = ?
-
-            UNION ALL
-
-            SELECT world, asset_id, MAX(time), close AS open, close, close AS high, close AS low, 0 AS volume
-            FROM candles_day
-            WHERE world = ?
-            GROUP BY world, asset_id
-        ) c ON a.world = c.world AND a.asset_id = c.asset_id
+        LEFT JOIN ranked_candles c
+            ON a.world = c.world AND a.asset_id = c.asset_id AND c.rn = 1
         WHERE a.world = ? AND a.asset_type = ?;
     """;
 
@@ -133,17 +135,16 @@ public class Candles {
         long roundedTime = (time / intervals[0]) * intervals[0];
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, world); // for exact candle
-            stmt.setLong(2, roundedTime);
-            stmt.setBytes(3, world); // for fallback
-            stmt.setBytes(4, world); // final filter
-            stmt.setInt(5, type);    // asset_type filter
+            stmt.setLong(1, roundedTime); // for ROW_NUMBER priority
+            stmt.setBytes(2, world);      // for candle filtering
+            stmt.setBytes(3, world);      // for final asset filter
+            stmt.setInt(4, type);         // for asset_type filter
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     String assetID = rs.getString("asset_id");
 
-                    if(!Objects.equals(assetID, Configuration.MAINCURRENCYASSET.getCode())){
+                    if (!Objects.equals(assetID, Configuration.MAINCURRENCYASSET.getCode())) {
                         int assetType = rs.getInt("asset_type");
                         byte[] meta = rs.getBytes("meta");
 
@@ -165,8 +166,6 @@ public class Candles {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        System.out.println("CACHED");
 
         return result;
     }

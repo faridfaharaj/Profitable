@@ -19,8 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.faridfaharaj.profitable.util.NamingUtil.formatVolume;
-
 public final class BuySellGui extends ChestGUI {
 
     List<Order> bidOrders;
@@ -54,7 +52,7 @@ public final class BuySellGui extends ChestGUI {
             for(int i = 0; i < 7; i++){
                 if(i < askOrders.size()){
                     Order iteratedAsk = askOrders.get(i);
-                    sellLore.add(Component.text(" - ", Configuration.GUICOLORTEXT).append(Component.text("[ "+formatVolume(iteratedAsk.getUnits())+" ] ",Configuration.COLORBEARISH)).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())));
+                    sellLore.add(Component.text(" - ", Configuration.GUICOLORTEXT).append(Component.text("[ "+MessagingUtil.formatVolume(iteratedAsk.getUnits())+" ] ",Configuration.COLORBEARISH)).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())));
                 }else {
                     break;
                 }
@@ -78,7 +76,7 @@ public final class BuySellGui extends ChestGUI {
             for(int i = 0; i < 7; i++){
                 if(i < bidOrders.size()){
                     Order iteratedAsk = bidOrders.get(i);
-                    buyLore.add(Component.text(" - ", Configuration.GUICOLORTEXT).append(Component.text("[ "+formatVolume(iteratedAsk.getUnits())+" ] ",Configuration.COLORBULLISH)).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())));
+                    buyLore.add(Component.text(" - ", Configuration.GUICOLORTEXT).append(Component.text("[ "+MessagingUtil.formatVolume(iteratedAsk.getUnits())+" ] ",Configuration.COLORBULLISH)).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())));
                 }else {
                     break;
                 }

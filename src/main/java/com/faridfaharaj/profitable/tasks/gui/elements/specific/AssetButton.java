@@ -35,8 +35,8 @@ public final class AssetButton extends GuiElement {
                 change = assetData.getlastCandle().getClose()-assetData.getlastCandle().getOpen(),
                 volume = assetData.getlastCandle().getVolume(), Open = assetData.getlastCandle().getOpen();
         String symbol = assetData.getAsset().getAssetType() == 1? Configuration.MAINCURRENCYASSET.getCode() + "/" + assetData.getAsset().getCode():assetData.getAsset().getCode(),
-                priceStr = "$"+ price,
-                dayChange =  change+" "+ Math.ceil(change/assetData.getlastCandle().getOpen()*10000)/100 + "% today";
+                priceStr = "$"+ MessagingUtil.formatNumber(price),
+                dayChange =  MessagingUtil.formatNumber(change)+" "+ MessagingUtil.formatNumber(Math.ceil(change/assetData.getlastCandle().getOpen()*10000)/100) + "% today";
 
         if(assetData.getAsset().getAssetType() == 2){
             this.display = new ItemStack(Material.getMaterial(assetData.getAsset().getCode()));
