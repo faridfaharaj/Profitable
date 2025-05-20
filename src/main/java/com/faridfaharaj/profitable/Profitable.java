@@ -130,9 +130,6 @@ public final class Profitable extends JavaPlugin {
         getCommand("assets").setExecutor(new AssetsCommand());
         getCommand("assets").setTabCompleter(new AssetsCommand.CommandTabCompleter());
 
-        getCommand("asset").setExecutor(new AssetCommand());
-        getCommand("asset").setTabCompleter(new AssetCommand.CommandTabCompleter());
-
         getCommand("top").setExecutor(new TopCommand());
         getCommand("top").setTabCompleter(new TopCommand.CommandTabCompleter());
 
