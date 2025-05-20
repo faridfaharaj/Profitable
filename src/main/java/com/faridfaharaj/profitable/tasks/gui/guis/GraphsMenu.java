@@ -60,34 +60,34 @@ public final class GraphsMenu extends ChestGUI {
     public void slotInteracted(Player player, int slot, ClickType click) {
 
         if(slot == returnButton.getSlot()){
-            this.getInventory().close();
+            player.closeInventory();
             new AssetExplorer(player, 2, cache).openGui(player);
         }else if(slot == graph1MButton.getSlot()){
-            this.getInventory().close();
+            player.closeInventory();
             MessagingUtil.sendSuccsess(player, "Preparing Graph...");
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 720000, "1M");
             });
         } else if (slot == graph3MButton.getSlot()) {
-            this.getInventory().close();
+            player.closeInventory();
             MessagingUtil.sendSuccsess(player, "Preparing Graph...");
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 2160000, "3M");
             });
         } else if (slot == graph6MButton.getSlot()) {
-            this.getInventory().close();
+            player.closeInventory();
             MessagingUtil.sendSuccsess(player, "Preparing Graph...");
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 4320000, "6M");
             });
         } else if (slot == graph1YButton.getSlot()) {
-            this.getInventory().close();
+            player.closeInventory();
             MessagingUtil.sendSuccsess(player, "Preparing Graph...");
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 8760000, "1Y");
             });
         } else if (slot == graph2YButton.getSlot()) {
-            this.getInventory().close();
+            player.closeInventory();
             MessagingUtil.sendSuccsess(player, "Preparing Graph...");
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 17520000, "2Y");

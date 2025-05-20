@@ -95,7 +95,7 @@ public final class UserOrdersGui extends ChestGUI {
         }
 
         if(returnButton.getSlot() == slot){
-            player.getInventory().close();
+            player.closeInventory();
             new AssetExplorer(player, 2, assetCache).openGui(player);
         }
 

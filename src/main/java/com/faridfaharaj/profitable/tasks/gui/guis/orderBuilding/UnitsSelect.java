@@ -67,7 +67,7 @@ public final class UnitsSelect extends QuantitySelectGui {
     @Override
     protected void onSubmitAmount(Player player, double amount) {
 
-        this.getInventory().close();
+        player.closeInventory();
         new ConfirmOrder(assetCache, assetData, new Order(null, null, assetData.getAsset().getCode(), order.isSideBuy(), order.getPrice(), amount, order.getType()), bidOrders, askOrders).openGui(player);
 
     }
@@ -76,10 +76,10 @@ public final class UnitsSelect extends QuantitySelectGui {
     protected void onReturn(Player player) {
 
         if(order.getType() == Order.OrderType.MARKET){
-            this.getInventory().close();
+            player.closeInventory();
             new OrderTypeGui(assetCache, assetData, order, bidOrders, askOrders).openGui(player);
         }else {
-            this.getInventory().close();
+            player.closeInventory();
             new PriceSelect(assetCache, assetData, order, bidOrders, askOrders).openGui(player);
         }
 

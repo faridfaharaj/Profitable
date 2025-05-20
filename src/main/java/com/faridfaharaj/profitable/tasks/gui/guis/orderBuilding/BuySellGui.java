@@ -104,17 +104,17 @@ public final class BuySellGui extends ChestGUI {
             if(button.getSlot() == slot){
 
                 if(button == buttons[0]){
-                    this.getInventory().close();
+                    player.closeInventory();
                     new AssetExplorer(player, assetData.getAsset().getAssetType(), assetCache).openGui(player);
                 }
 
                 if(button == buttons[1]){
-                    this.getInventory().close();
+                    player.closeInventory();
                     new OrderTypeGui(assetCache, assetData, new Order(null, null, assetData.getAsset().getCode(), false, 0, 0, null), bidOrders, askOrders).openGui(player);
                 }
 
                 if(button == buttons[2]){
-                    this.getInventory().close();
+                    player.closeInventory();
                     new OrderTypeGui(assetCache, assetData, new Order(null, null, assetData.getAsset().getCode(), true, 0, 0, null), bidOrders, askOrders).openGui(player);
                 }
 

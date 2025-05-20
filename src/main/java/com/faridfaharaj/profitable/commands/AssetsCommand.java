@@ -59,24 +59,8 @@ public class AssetsCommand implements CommandExecutor {
         @Override
         public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
 
-            List<String> suggestions = new ArrayList<>();
+            return null;
 
-            if(args.length == 1){
-
-                return List.of("categories");
-            }
-
-            if(args.length >= 2){
-
-                if (Objects.equals(args[0], "categories")) {
-                    if(args.length == 2){
-                        suggestions = List.of("forex", "commodity");
-                    }
-                }
-
-            }
-
-            return suggestions;
         }
 
     }

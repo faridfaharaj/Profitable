@@ -36,13 +36,7 @@ public class OrdersCommand  implements CommandExecutor {
         @Override
         public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
 
-            List<String> suggestions = new ArrayList<>();
-            if(args.length == 1){
-                suggestions = List.of("[<Page>]");
-
-            }
-
-            return suggestions;
+            return null;
 
         }
 
