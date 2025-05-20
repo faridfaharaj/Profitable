@@ -23,7 +23,7 @@ public class Configuration {
     public static TextColor COLORBULLISH;
     public static TextColor COLORBEARISH;
 
-    public static final TextColor COLORTEXT = NamedTextColor.WHITE;
+    public static final TextColor COLORTEXT = NamedTextColor.GRAY;
     public static final TextColor COLORHIGHLIGHT = NamedTextColor.GREEN;
 
     public static final TextColor GUICOLORTEXT = NamedTextColor.GRAY;
@@ -35,7 +35,7 @@ public class Configuration {
     public static final TextColor COLORERROR = NamedTextColor.RED;
     public static final TextColor COLORWARN = NamedTextColor.YELLOW;
 
-    public static final TextColor COLOREMPTY = NamedTextColor.GRAY;
+    public static final TextColor COLOREMPTY = NamedTextColor.DARK_GRAY;
 
     public static boolean MULTIWORLD;
     public static boolean GENERATEASSETS;
