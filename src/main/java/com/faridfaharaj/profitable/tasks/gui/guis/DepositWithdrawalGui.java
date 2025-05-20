@@ -56,7 +56,7 @@ public final class DepositWithdrawalGui extends QuantitySelectGui {
     @Override
     protected void onSubmitAmount(Player player, double amount) {
 
-        this.getInventory().close();
+        player.closeInventory();
         if(depositing){
 
             WalletCommand.depositAsset(asset, amount, player);

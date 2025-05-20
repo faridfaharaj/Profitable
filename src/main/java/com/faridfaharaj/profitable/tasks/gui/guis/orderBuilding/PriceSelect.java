@@ -71,13 +71,13 @@ public final class PriceSelect  extends QuantitySelectGui {
 
     @Override
     protected void onSubmitAmount(Player player, double amount) {
-        this.getInventory().close();
+        player.closeInventory();
         new UnitsSelect(assetCache, assetData, new Order(order.getUuid(), order.getOwner(), order.getAsset(), order.isSideBuy(), amount, order.getUnits(), order.getType()), bidOrders, askOrders).openGui(player);
     }
 
     @Override
     protected void onReturn(Player player) {
-        this.getInventory().close();
+        player.closeInventory();
         new OrderTypeGui(assetCache, assetData, order, bidOrders, askOrders).openGui(player);
     }
 }

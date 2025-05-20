@@ -72,7 +72,7 @@ public abstract class QuantitySelectGui extends ChestGUI {
             if(button.getSlot() == slot){
 
                 if(button == buttons[0]){
-                    this.getInventory().close();
+                    player.closeInventory();
                     onReturn(player);
                     return;
                 }

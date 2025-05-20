@@ -92,24 +92,24 @@ public final class OrderTypeGui extends ChestGUI {
             if(button.getSlot() == slot){
 
                 if(button == buttons[0]){
-                    this.getInventory().close();
+                    player.closeInventory();
                     new BuySellGui(assetCache, assetData, bidOrders, askOrders).openGui(player);
                 }
 
                 if(button == buttons[1]){
                     if(allowMarket){
-                        this.getInventory().close();
+                        player.closeInventory();
                         new UnitsSelect(assetCache, assetData, new Order(order.getUuid(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.isSideBuy()?Double.MAX_VALUE:Double.MIN_VALUE, order.getUnits(), Order.OrderType.MARKET), bidOrders, askOrders).openGui(player);
                     }
                 }
 
                 if(button == buttons[2]){
-                    this.getInventory().close();
+                    player.closeInventory();
                     new PriceSelect(assetCache, assetData, new Order(order.getUuid(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), Order.OrderType.LIMIT), bidOrders, askOrders).openGui(player);
                 }
 
                 if(button == buttons[3]){
-                    this.getInventory().close();
+                    player.closeInventory();
                     new PriceSelect(assetCache, assetData, new Order(order.getUuid(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), Order.OrderType.STOP_LIMIT), bidOrders, askOrders).openGui(player);
                 }
 

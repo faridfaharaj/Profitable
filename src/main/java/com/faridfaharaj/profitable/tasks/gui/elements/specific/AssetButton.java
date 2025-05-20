@@ -72,7 +72,7 @@ public final class AssetButton extends GuiElement {
 
     public void trade(Player player, AssetCache[][] cache){
         if(loaded){
-            player.getInventory().close();
+            player.closeInventory();
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 new BuySellGui(cache, cache[index[0]][index[1]], Orders.getBidAsk(cache[index[0]][index[1]].getAsset().getCode(), true), Orders.getBidAsk(cache[index[0]][index[1]].getAsset().getCode(), false)).openGui(player);
             });
@@ -81,7 +81,7 @@ public final class AssetButton extends GuiElement {
 
     public void graphs(Player player, AssetCache[][] cache){
         if(loaded){
-            player.getInventory().close();
+            player.closeInventory();
             new GraphsMenu(cache[index[0]][index[1]].getAsset().getCode(), cache).openGui(player);
         }
     }

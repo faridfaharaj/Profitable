@@ -156,8 +156,6 @@ public final class Profitable extends JavaPlugin {
         getCommand("help").setExecutor(new HelpCommand());
         getCommand("help").setTabCompleter(new HelpCommand.CommandTabCompleter());
 
-        getCommand("profitable").setExecutor(new PluginInfoCommand());
-
         //event handler------------------
         getServer().getPluginManager().registerEvents(new Events(), this);
 

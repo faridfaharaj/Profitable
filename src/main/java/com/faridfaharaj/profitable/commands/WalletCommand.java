@@ -53,7 +53,14 @@ public class WalletCommand implements CommandExecutor {
 
             if(args[0].equals("deposit")){
 
-                Asset asset = Assets.getAssetData(args[1]);
+                String assetid;
+                if(args[1].equals("hand")){
+                    assetid = player.getInventory().getItemInMainHand().getType().name();
+                }else {
+                    assetid = args[1].toUpperCase();
+                }
+
+                Asset asset = Assets.getAssetData(assetid);
 
                 if(asset == null){
                     MessagingUtil.sendError(sender, "Invalid asset");
@@ -63,6 +70,9 @@ public class WalletCommand implements CommandExecutor {
                 double ammount;
                 try{
                     ammount = Double.parseDouble(args[2]);
+                    if(asset.getAssetType() == 2 || asset.getAssetType() == 3){
+                        ammount = (int) ammount;
+                    }
                     if(ammount <= 0){
                         MessagingUtil.sendError(sender, "Invalid amount");
                         return true;
@@ -77,7 +87,14 @@ public class WalletCommand implements CommandExecutor {
                 return true;
             }else if(args[0].equals("withdraw")){
 
-                Asset asset = Assets.getAssetData(args[1]);
+                String assetid;
+                if(args[1].equals("hand")){
+                    assetid = player.getInventory().getItemInMainHand().getType().name();
+                }else {
+                    assetid = args[1].toUpperCase();
+                }
+
+                Asset asset = Assets.getAssetData(assetid);
 
                 if(asset == null){
                     MessagingUtil.sendError(sender, "Invalid asset");
@@ -87,6 +104,9 @@ public class WalletCommand implements CommandExecutor {
                 double ammount;
                 try{
                     ammount = Double.parseDouble(args[2]);
+                    if(asset.getAssetType() == 2 || asset.getAssetType() == 3){
+                        ammount = (int) ammount;
+                    }
                     if(ammount <= 0){
                         MessagingUtil.sendError(sender, "Invalid amount");
                         return true;
@@ -118,21 +138,15 @@ public class WalletCommand implements CommandExecutor {
 
             List<String> suggestions = new ArrayList<>();
 
-            if(args.length == 1 && Configuration.HOOKED){
+            if(args.length == 1){
                 suggestions = List.of("deposit", "withdraw");
             }else{
 
                 if(Objects.equals(args[0], "deposit")){
 
                     if(args.length == 2){
-                        Set<String> currencies = new HashSet<>();
-                        if(VaultHook.isConnected()){
-                            currencies.add(VaultHook.getAsset().getCode());
-                        }
-                        if(PlayerPointsHook.isConnected()){
-                            currencies.add(PlayerPointsHook.getAsset().getCode());
-                        }
-                        suggestions.addAll(currencies);
+                        suggestions.add("[<Asset>]");
+                        suggestions.add("hand");
                     }
 
                     if(args.length == 3){
@@ -144,14 +158,7 @@ public class WalletCommand implements CommandExecutor {
                 if(Objects.equals(args[0], "withdraw")){
 
                     if(args.length == 2){
-                        Set<String> currencies = new HashSet<>();
-                        if(VaultHook.isConnected()){
-                            currencies.add(VaultHook.getAsset().getCode());
-                        }
-                        if(PlayerPointsHook.isConnected()){
-                            currencies.add(PlayerPointsHook.getAsset().getCode());
-                        }
-                        suggestions.addAll(currencies);
+                        suggestions.add("[<Asset>]");
                     }
 
                     if(args.length == 3){

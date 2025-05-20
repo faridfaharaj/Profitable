@@ -150,22 +150,22 @@ public final class AssetExplorer extends ChestGUI {
         }
 
         if(walletButton.getSlot() == slot){
-            player.getInventory().close();
+            player.closeInventory();
             new HoldingsMenu(player, assetCache).openGui(player);
         }
 
         if(ordersButton.getSlot() == slot){
-            player.getInventory().close();
+            player.closeInventory();
             new UserOrdersGui(player, assetCache).openGui(player);
         }
 
         if(deliveryButton.getSlot() == slot){
             if(click.isLeftClick()){
-                player.getInventory().close();
+                player.closeInventory();
                 TemporalItems.sendDeliveryStick(player, true);
             }
             if(click.isRightClick()){
-                player.getInventory().close();
+                player.closeInventory();
                 TemporalItems.sendDeliveryStick(player, false);
             }
         }
