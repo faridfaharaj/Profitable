@@ -395,7 +395,7 @@ public class Orders {
 
         Orders.deleteOrder(order.getUuid());
 
-        MessagingUtil.sendCustomMessage(player, Component.text("Cancelled ").append(order.toStringSimplified()));
+        MessagingUtil.sendCustomMessage(player, Component.text("Cancelled ", Configuration.COLORTEXT).append(order.toStringSimplified()));
         MessagingUtil.sendPaymentNotice(player, ammountToSendBack, 0, asset);
 
         return true;

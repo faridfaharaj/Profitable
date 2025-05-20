@@ -39,7 +39,7 @@ public final class GraphsMenu extends ChestGUI {
         this.cache = cache;
 
         List<Component> buttonInstructions = new ArrayList<>();
-        buttonInstructions.add(Component.text(assetID));
+        buttonInstructions.add(Component.text(assetID, Configuration.GUICOLORSUBTITLE));
         buttonInstructions.add(Component.empty());
         buttonInstructions.add(GuiElement.clickAction(null, "view graph"));
 
@@ -49,11 +49,11 @@ public final class GraphsMenu extends ChestGUI {
 
         ItemStack mapStack = new ItemStack(Material.FILLED_MAP);
 
-        graph1MButton = new GuiElement(this, mapStack, Component.text("1 Month", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(2,1));
-        graph3MButton = new GuiElement(this, mapStack, Component.text("3 Months", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(3,1));
-        graph6MButton = new GuiElement(this, mapStack, Component.text("6 Months", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(4,1));
-        graph1YButton = new GuiElement(this, mapStack, Component.text("1 Year", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(5,1));
-        graph2YButton = new GuiElement(this, mapStack, Component.text("2 Years", NamedTextColor.YELLOW), buttonInstructions, vectorSlotPosition(6,1));
+        graph1MButton = new GuiElement(this, mapStack, Component.text("1 Month", Configuration.GUICOLORTITLE), buttonInstructions, vectorSlotPosition(2,1));
+        graph3MButton = new GuiElement(this, mapStack, Component.text("3 Months", Configuration.GUICOLORTITLE), buttonInstructions, vectorSlotPosition(3,1));
+        graph6MButton = new GuiElement(this, mapStack, Component.text("6 Months", Configuration.GUICOLORTITLE), buttonInstructions, vectorSlotPosition(4,1));
+        graph1YButton = new GuiElement(this, mapStack, Component.text("1 Year", Configuration.GUICOLORTITLE), buttonInstructions, vectorSlotPosition(5,1));
+        graph2YButton = new GuiElement(this, mapStack, Component.text("2 Years", Configuration.GUICOLORTITLE), buttonInstructions, vectorSlotPosition(6,1));
     }
 
     @Override

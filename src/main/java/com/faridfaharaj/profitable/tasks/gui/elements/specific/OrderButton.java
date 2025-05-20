@@ -21,14 +21,14 @@ public final class OrderButton extends GuiElement{
     public OrderButton(ChestGUI gui, Order order, int slot, String clickAction) {
         super(gui, order.isSideBuy()?new ItemStack(Material.PAPER):new ItemStack(Material.MAP), order.isSideBuy()?Component.text("Buy order", Configuration.COLORBULLISH):Component.text("Sell order", Configuration.COLORBEARISH),
                 List.of(
-                        Component.text("Type: " + order.getType()),
+                        Component.text(order.getAsset(),Configuration.GUICOLORSUBTITLE),
                         Component.empty(),
-                        Component.text("Asset: " + order.getAsset()),
+                        Component.text("Type:", Configuration.GUICOLORTEXT).append(Component.text(" " + order.getType(),Configuration.GUICOLORHIGHLIGHT)),
                         Component.empty(),
-                        Component.text("Units: " + order.getUnits()),
-                        Component.text("Price: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getPrice())),
+                        Component.text("Units:", Configuration.GUICOLORTEXT).append(Component.text(" " + order.getUnits(),Configuration.GUICOLORHIGHLIGHT)),
+                        Component.text("Price: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getPrice())),
                         Component.empty(),
-                        Component.text("Total value: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getPrice()*order.getUnits())),
+                        Component.text("Total value: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getPrice()*order.getUnits())),
                         Component.empty(),
                         GuiElement.clickAction(null, clickAction)
                 ), slot);

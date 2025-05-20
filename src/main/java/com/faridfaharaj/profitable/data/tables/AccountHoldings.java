@@ -87,7 +87,7 @@ public class AccountHoldings {
                 "WHERE aa.world = ? AND aa.account_name = ? " +
                 "ORDER BY a.asset_type";
 
-        Component component = Component.text("Currency:");
+        Component component = Component.text("Currency", Configuration.COLORTEXT);
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
             stmt.setBytes(1, DataBase.getCurrentWorld());
             stmt.setString(2, account);
@@ -102,13 +102,13 @@ public class AccountHoldings {
                     int iteratedType = rs.getInt("asset_type");
                     if(type != iteratedType){
                         type = iteratedType;
-                        component = component.appendNewline().appendNewline().append(Component.text(NamingUtil.nameType(iteratedType)+ ":"));
+                        component = component.appendNewline().append(Component.text(NamingUtil.nameType(iteratedType), Configuration.COLORTEXT));
                     }
 
                     Asset asset = Asset.assetFromMeta(assetCode, iteratedType, meta);
 
                     double quantity = rs.getDouble("quantity");
-                    component = component.appendNewline().append(MessagingUtil.assetAmmount(asset, quantity));
+                    component = component.appendNewline().append(Component.text(" - ")).append(MessagingUtil.assetAmmount(asset, quantity));
 
                     if(!Objects.equals(assetCode, Configuration.MAINCURRENCYASSET.getCode())){
                         totalValue += rs.getDouble("value");
@@ -119,9 +119,8 @@ public class AccountHoldings {
 
                 if(totalValue == 0){
                     component = Component.text("Empty").color(Configuration.COLOREMPTY);
-                }else{
-                    component = component.appendNewline().appendNewline().append(Component.text("Portfolio Value: ")).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, totalValue));
                 }
+                component = component.appendNewline().append(Component.text("Portfolio Value: ", Configuration.COLORTEXT)).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, totalValue));
 
             }
 

@@ -47,8 +47,7 @@ public class Exchange {
                     return;
                 }
                 if(Accounts.getItemDelivery(order.getOwner()) == null){
-                    MessagingUtil.sendWarning(player, "You must set a location for delivery");
-                    MessagingUtil.sendButton(player, "[/delivery set item]", "/delivery set item");
+                    MessagingUtil.sendCustomMessage(player, Component.text("You must set a location for delivery ", Configuration.COLORWARN).append(MessagingUtil.buttonComponent("[Click here!]","/delivery set item")));
                     TemporalItems.sendDeliveryStick(player, true);
                     return;
                 }
@@ -60,8 +59,7 @@ public class Exchange {
                     return;
                 }
                 if(Accounts.getEntityDelivery(order.getOwner()) == null){
-                    MessagingUtil.sendWarning(player, "You must set a location for delivery");
-                    MessagingUtil.sendButton(player, "[/delivery set entity]", "/delivery set entity");
+                    MessagingUtil.sendCustomMessage(player, Component.text("You must set a location for delivery ", Configuration.COLORWARN).append(MessagingUtil.buttonComponent("[Click here!]","/delivery set entity")));
                     TemporalItems.sendDeliveryStick(player, false);
                     return;
                 }
@@ -263,7 +261,6 @@ public class Exchange {
             }else{
                 MessagingUtil.sendPaymentNotice(player, money, fee, Configuration.MAINCURRENCYASSET);
             }
-
 
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
                 Location location = player.getLocation();

@@ -38,71 +38,71 @@ public class TransactCommand implements CommandExecutor {
                     asset = args[0].toUpperCase();
                 }
 
-                MessagingUtil.sendInfoNotice(player, "Processing Order...");
-                Profitable.getfolialib().getScheduler().runAsync(async -> {
+                boolean sideBuy;
+                if(command.getName().equals("buy")){
+                    sideBuy = true;
+                }else if(command.getName().equals("sell")){
+                    sideBuy = false;
+                }else{
+                    return;
+                }
 
-                    boolean sideBuy;
-                    if(command.getName().equals("buy")){
-                        sideBuy = true;
-                    }else if(command.getName().equals("sell")){
-                        sideBuy = false;
-                    }else{
+                Order.OrderType orderType;
+                double price;
+
+                if (args.length > 2) {
+                    orderType = Order.OrderType.LIMIT;
+
+                    try{
+                        price = Double.parseDouble(args[2]);
+                    }catch (Exception e){
+                        MessagingUtil.sendError(sender, "Invalid Price");
                         return;
                     }
 
-                    Order.OrderType orderType;
-                    double price;
+                }else {
+                    orderType = Order.OrderType.MARKET;
+                    price = sideBuy?Double.MAX_VALUE:Double.MIN_VALUE;
+                }
 
-                    if (args.length > 2) {
-                        orderType = Order.OrderType.LIMIT;
-
-                        try{
-                            price = Double.parseDouble(args[2]);
-                        }catch (Exception e){
-                            MessagingUtil.sendError(sender, "Invalid Price");
-                            return;
+                if(args.length > 3){
+                    switch (args[3]) {
+                        case "stop-limit" -> orderType = Order.OrderType.STOP_LIMIT;
+                        case "stop-market" -> orderType = Order.OrderType.STOP_MARKET;
+                        case "limit" -> {
                         }
+                        case "market" -> {
 
-                    }else {
-                        orderType = Order.OrderType.MARKET;
-                        price = sideBuy?Double.MAX_VALUE:Double.MIN_VALUE;
-                    }
-
-                    if(args.length > 3){
-                        switch (args[3]) {
-                            case "stop-limit" -> orderType = Order.OrderType.STOP_LIMIT;
-                            case "stop-market" -> orderType = Order.OrderType.STOP_MARKET;
-                            case "limit" -> {
-                            }
-                            case "market" -> {
-
-                                MessagingUtil.sendWarning(sender, "Ignoring price for market order");
-                                price = sideBuy ? Double.MAX_VALUE : Double.MIN_VALUE;
-                                orderType = Order.OrderType.MARKET;
-                            }
-                            default -> {
-                                MessagingUtil.sendError(sender, "Invalid Order Type");
-                                return;
-                            }
+                            MessagingUtil.sendWarning(sender, "Ignoring price for market order");
+                            price = sideBuy ? Double.MAX_VALUE : Double.MIN_VALUE;
+                            orderType = Order.OrderType.MARKET;
                         }
-                    }
-
-                    double units;
-                    if(args.length <= 1){
-
-                        units = 1d;
-
-                    }else{
-                        try{
-                            units = Double.parseDouble(args[1]);
-                        }catch (Exception e){
-                            MessagingUtil.sendError(sender, "Invalid Units");
+                        default -> {
+                            MessagingUtil.sendError(sender, "Invalid Order Type");
                             return;
                         }
                     }
+                }
 
-                    double finalPrice = price;
-                    Order.OrderType finalOrderType = orderType;
+                double units;
+                if(args.length <= 1){
+
+                    units = 1d;
+
+                }else{
+                    try{
+                        units = Double.parseDouble(args[1]);
+                    }catch (Exception e){
+                        MessagingUtil.sendError(sender, "Invalid Units");
+                        return;
+                    }
+                }
+
+                double finalPrice = price;
+                Order.OrderType finalOrderType = orderType;
+
+                MessagingUtil.sendPlain(player, "Processing Order...");
+                Profitable.getfolialib().getScheduler().runAsync(async -> {
 
                     Exchange.sendNewOrder(player, new Order(UUID.randomUUID(), Accounts.getAccount(player), asset, sideBuy, finalPrice, units, finalOrderType));
 

@@ -50,35 +50,35 @@ public final class OrderTypeGui extends ChestGUI {
             allowMarket = !bidOrders.isEmpty();
         }
 
-        buttons[1] = new GuiElement(this, orderStack, Component.text("Market Order"),
+        buttons[1] = new GuiElement(this, orderStack, Component.text("Market Order", Configuration.GUICOLORTITLE),
                 List.of(
-                        Component.text(assetData.getAsset().getCode()),
+                        Component.text(assetData.getAsset().getCode(), Configuration.GUICOLORSUBTITLE),
                         Component.empty(),
-                        Component.text(sideString).append(Component.text(" immediately", NamedTextColor.YELLOW)),
-                        Component.text("at the best"),
-                        Component.text("price available"),
+                        Component.text(sideString, Configuration.GUICOLORTEXT).append(Component.text(" immediately", NamedTextColor.YELLOW)),
+                        Component.text("at the best", Configuration.GUICOLORTEXT),
+                        Component.text("price available", Configuration.GUICOLORTEXT),
                         Component.empty(),
                         allowMarket?GuiElement.clickAction(null, "select Market"):Component.text("No " + (order.isSideBuy()? "sellers!":"buyers!"),Configuration.COLORERROR)
                 ), vectorSlotPosition(2, 1));
 
-        buttons[2] = new GuiElement(this, orderStack, Component.text("Limit Order"),
+        buttons[2] = new GuiElement(this, orderStack, Component.text("Limit Order", Configuration.GUICOLORTITLE),
                 List.of(
-                        Component.text(assetData.getAsset().getCode()),
+                        Component.text(assetData.getAsset().getCode(), Configuration.GUICOLORSUBTITLE),
                         Component.empty(),
-                        Component.text("Choose a ").append(Component.text("price", NamedTextColor.YELLOW)),
-                        Component.text("and " + sideString + " once a"),
-                        Component.text("match is found"),
+                        Component.text("Choose a ",Configuration.GUICOLORTEXT).append(Component.text("price", NamedTextColor.YELLOW)),
+                        Component.text("and " + sideString + " once a", Configuration.GUICOLORTEXT),
+                        Component.text("match is found", Configuration.GUICOLORTEXT),
                         Component.empty(),
                         GuiElement.clickAction(null, "select Limit")
                 ), vectorSlotPosition(4, 1));
 
-        buttons[3] = new GuiElement(this, orderStack, Component.text("Stop-Limit order"),
+        buttons[3] = new GuiElement(this, orderStack, Component.text("Stop-Limit order", Configuration.GUICOLORTITLE),
                 List.of(
-                        Component.text(assetData.getAsset().getCode()),
+                        Component.text(assetData.getAsset().getCode(), Configuration.GUICOLORSUBTITLE),
                         Component.empty(),
-                        Component.text(sideString).append(Component.text(" Limit Order", NamedTextColor.YELLOW)),
-                        Component.text("once price hits"),
-                        Component.text("your trigger"),
+                        Component.text(sideString, Configuration.GUICOLORTEXT).append(Component.text(" Limit Order", NamedTextColor.YELLOW)),
+                        Component.text("once price hits", Configuration.GUICOLORTEXT),
+                        Component.text("your trigger", Configuration.GUICOLORTEXT),
                         Component.empty(),
                         GuiElement.clickAction(null, "select Stop-Limit")
                 ), vectorSlotPosition(6, 1));

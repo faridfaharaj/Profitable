@@ -285,7 +285,7 @@ public class Candles {
                         double change = close-open;
 
                         component = component.append(
-                                Component.text((i+1)+"- ")).append(Component.text("["+asset+"]", Configuration.COLORINFO).clickEvent(ClickEvent.runCommand("/asset "+ asset)).hoverEvent(HoverEvent.showText(Component.text("/asset "+ asset, Configuration.COLORINFO)))).append(Component.text("   $" + close + "   ")).append(Component.text("$"+change+"  "+ Math.ceil(change/open*10000)/100 + "% month").color(change<0? Configuration.COLORBEARISH:Configuration.COLORBULLISH));
+                                Component.text((i+1)+"- ")).append(Component.text("["+asset+"]", Configuration.COLORHIGHLIGHT).clickEvent(ClickEvent.runCommand("/asset "+ asset)).hoverEvent(HoverEvent.showText(Component.text("/asset "+ asset, Configuration.COLORHIGHLIGHT)))).append(Component.text("   $" + close + "   ")).append(Component.text("$"+change+"  "+ Math.ceil(change/open*10000)/100 + "% month").color(change<0? Configuration.COLORBEARISH:Configuration.COLORBULLISH));
 
                     }else{
                         component = component.append(Component.text((i+1)+"- -----   $--.--   $--.--  --.--% -----"));

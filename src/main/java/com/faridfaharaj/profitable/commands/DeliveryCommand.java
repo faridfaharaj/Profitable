@@ -43,13 +43,12 @@ public class DeliveryCommand implements CommandExecutor {
                     Location itemDelivery = Accounts.getItemDelivery(account);
 
                     MessagingUtil.sendCustomMessage(sender,
-                            MessagingUtil.profitableTopSeparator("Delivery","----------------").appendNewline()
-                                    .append(Component.text("Item Delivery Location:")).appendNewline()
-                                    .append(Component.text((itemDelivery == null?"Not set":itemDelivery.toVector() + " (" + itemDelivery.getWorld().getName()+")")).color(Configuration.COLORINFO)).appendNewline()
+                            Component.newline()
+                                    .append(Component.text("Item Delivery Location:",Configuration.COLORTEXT)).appendNewline()
+                                    .appendSpace().appendSpace().append(Component.text((itemDelivery == null?"Not set":itemDelivery.toVector() + " (" + itemDelivery.getWorld().getName()+")")).color(Configuration.COLORHIGHLIGHT)).appendNewline()
+                                    .append(Component.text("Entity Delivery Location:",Configuration.COLORTEXT)).appendNewline()
+                                    .appendSpace().appendSpace().append(Component.text((entityDelivery == null?"Not set":entityDelivery.toVector() + " (" + entityDelivery.getWorld().getName()+")")).color(Configuration.COLORHIGHLIGHT))
                                     .appendNewline()
-                                    .append(Component.text("Entity Delivery Location:")).appendNewline()
-                                    .append(Component.text((entityDelivery == null?"Not set":entityDelivery.toVector() + " (" + entityDelivery.getWorld().getName()+")")).color(Configuration.COLORINFO)).appendNewline()
-                                    .append(MessagingUtil.profitableBottomSeparator())
                     );
                 });
 

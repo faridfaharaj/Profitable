@@ -1,5 +1,6 @@
 package com.faridfaharaj.profitable.tasks.gui.guis;
 
+import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.tables.Candles;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
@@ -46,7 +47,7 @@ public final class AssetExplorer extends ChestGUI {
 
         categoryButton = new GuiElement(this, new ItemStack(Material.ENDER_EYE), Component.text("Category"),
                 List.of(
-                        Component.text("Assets"),
+                        Component.text("Assets", Configuration.GUICOLORSUBTITLE),
                         Component.empty(),
                         Component.text("♦ ", NamedTextColor.WHITE).append(Component.text("Forex", assetType == 1? NamedTextColor.WHITE:NamedTextColor.GRAY)),
                         Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Item)", assetType == 2? NamedTextColor.GREEN:NamedTextColor.GRAY)),
@@ -64,7 +65,7 @@ public final class AssetExplorer extends ChestGUI {
 
         walletButton = new GuiElement(this, new ItemStack(Material.CHEST), Component.text("Manage owned assets"),
                 List.of(
-                        Component.text("Asset portfolio"),
+                        Component.text("Asset portfolio", Configuration.GUICOLORSUBTITLE),
                         Component.empty(),
                         GuiElement.clickAction(null, "view portfolio")
 
@@ -72,7 +73,7 @@ public final class AssetExplorer extends ChestGUI {
 
         ordersButton = new GuiElement(this, new ItemStack(Material.BOOK), Component.text("Manage orders"),
                 List.of(
-                        Component.text("Orders"),
+                        Component.text("Orders", Configuration.GUICOLORSUBTITLE),
                         Component.empty(),
                         GuiElement.clickAction(null, "view active orders")
 
@@ -80,7 +81,7 @@ public final class AssetExplorer extends ChestGUI {
 
         deliveryButton = new GuiElement(this, new ItemStack(Material.CARROT_ON_A_STICK), Component.text("Set delivery location"),
                 List.of(
-                        Component.text("Delivery"),
+                        Component.text("Delivery", Configuration.GUICOLORSUBTITLE),
                         Component.empty(),
                         GuiElement.clickAction(null, "set item delivery"),
                         GuiElement.clickAction(null, "set entity delivery")
@@ -175,11 +176,11 @@ public final class AssetExplorer extends ChestGUI {
                 assetType = 1;
             }
             categoryButton.setLore(List.of(
-                    Component.text("Assets"),
+                    Component.text("Assets", Configuration.GUICOLORSUBTITLE),
                     Component.empty(),
-                    Component.text("♦ ", NamedTextColor.WHITE).append(Component.text("Forex", assetType == 1? NamedTextColor.WHITE:NamedTextColor.GRAY)),
-                    Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Item)", assetType == 2? NamedTextColor.GREEN:NamedTextColor.GRAY)),
-                    Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Entity)", assetType == 3? NamedTextColor.GREEN:NamedTextColor.GRAY)),
+                    Component.text("♦ ", NamedTextColor.WHITE).append(Component.text("Forex", assetType == 1? NamedTextColor.WHITE: Configuration.GUICOLORTEXT)),
+                    Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Item)", assetType == 2? NamedTextColor.GREEN:Configuration.GUICOLORTEXT)),
+                    Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Entity)", assetType == 3? NamedTextColor.GREEN:Configuration.GUICOLORTEXT)),
                     Component.empty(),
                     GuiElement.clickAction(null, "cycle")
 

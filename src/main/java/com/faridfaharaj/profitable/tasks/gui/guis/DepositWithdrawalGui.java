@@ -20,7 +20,7 @@ public final class DepositWithdrawalGui extends QuantitySelectGui {
 
     AssetCache[][] assetCache;
     public DepositWithdrawalGui(Asset asset, boolean depositing, AssetCache[][] assetCache) {
-        super("Select amount to " + (depositing?"deposit.":"withdraw."), true, asset.getAssetType() == 2 && asset.getAssetType() == 3, 1);
+        super("Select amount to " + (depositing?"deposit.":"withdraw."), asset.getAssetType() != 2 && asset.getAssetType() != 3, asset.getAssetType() == 2 || asset.getAssetType() == 3, 1);
         this.assetCache = assetCache;
         this.depositing = depositing;
         this.asset = asset;

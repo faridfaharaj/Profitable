@@ -25,21 +25,24 @@ public final class UnitsSelect extends QuantitySelectGui {
     AssetCache[][] assetCache;
     AssetCache assetData;
     public UnitsSelect(AssetCache[][] assetCache, AssetCache assetData, Order order, List<Order> bidOrders, List<Order> askOrders) {
-        super("How much are you " + (order.isSideBuy()?"buying.":"selling."), assetData.getAsset().getAssetType() != 2, assetData.getAsset().getAssetType() == 2 || assetData.getAsset().getAssetType() == 3, 1);
+        super("How much are you " + (order.isSideBuy()?"buying.":"selling."), assetData.getAsset().getAssetType() != 2 && assetData.getAsset().getAssetType() != 3, assetData.getAsset().getAssetType() == 2 || assetData.getAsset().getAssetType() == 3, 1);
         this.assetCache = assetCache;
         this.assetData = assetData;
 
         this.order = order;
         this.bidOrders = bidOrders;
         this.askOrders = askOrders;
+
+        onAmountUpdate(amount);
     }
 
     @Override
     protected void onAmountUpdate(double newAmount) {
-        getSubmitButton().setDisplayName(Component.text("Transacting amount: ").append(Component.text(newAmount, NamedTextColor.YELLOW)));
+        getSubmitButton().setDisplayName(Component.text("Transacting amount: ",Configuration.GUICOLORTITLE).append(Component.text(newAmount, Configuration.GUICOLORTITLEHIGHLIGHT)));
         List<Component> lore = List.of(
+                Component.text(order.getAsset(), Configuration.GUICOLORSUBTITLE),
                 Component.empty(),
-                Component.text("Total value: ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getType() == Order.OrderType.MARKET?  assetData.getlastCandle().getClose()*newAmount: order.getPrice()*newAmount)),
+                Component.text("Total value: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getType() == Order.OrderType.MARKET?  assetData.getlastCandle().getClose()*newAmount: order.getPrice()*newAmount)),
                 Component.empty(),
                 GuiElement.clickAction(null, "Proceed with this amount")
         );
@@ -52,7 +55,7 @@ public final class UnitsSelect extends QuantitySelectGui {
 
         ItemStack display = new ItemStack(Material.PAPER);
 
-        Component name = Component.text("Transacting amount: ").append(Component.text(1.0, NamedTextColor.YELLOW));
+        Component name = Component.text("Transacting amount: ",Configuration.GUICOLORTITLE).append(Component.text(1.0, Configuration.GUICOLORTITLEHIGHLIGHT));
         List<Component> lore = List.of(
                 Component.empty(),
                 GuiElement.clickAction(null, "Proceed with this amount")

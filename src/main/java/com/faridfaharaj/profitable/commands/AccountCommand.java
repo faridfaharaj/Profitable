@@ -33,10 +33,10 @@ public class AccountCommand implements CommandExecutor {
             if(sender instanceof Player player){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     String account = Accounts.getAccount(player);
-                    MessagingUtil.sendCustomMessage(sender, Component.text("").append(MessagingUtil.profitablePrefix()).append(Component.text("Account: "))
+                    MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Account: "))
                             .append((Objects.equals(account, player.getUniqueId().toString()) ?
                                     Component.text("(Default)").color(Configuration.COLOREMPTY):
-                                    Component.text(account).color(Configuration.COLORINFO))));
+                                    Component.text(account).color(Configuration.COLORHIGHLIGHT))));
                 });
                 return true;
             }
@@ -60,7 +60,7 @@ public class AccountCommand implements CommandExecutor {
                 if(args[2].length() < 32){
                     Profitable.getfolialib().getScheduler().runAsync(task -> {
                         if(Accounts.registerAccount(args[1], args[2])){
-                            MessagingUtil.sendSuccsess(sender, "Account " + args[1] + " registered successfully");
+                            MessagingUtil.sendSuccsess(sender, "Account registered successfully");
                         }else{
                             MessagingUtil.sendError(sender, "Account already exists");
                         }
@@ -147,7 +147,7 @@ public class AccountCommand implements CommandExecutor {
                     }
 
                     if(Accounts.logIn(player.getUniqueId(), args[1], args[2])){
-                        MessagingUtil.sendSuccsess(sender,"successfully logged into " + args[1]);
+                        MessagingUtil.sendCustomMessage(sender, Component.text("Successfully logged into ", Configuration.COLORTEXT).append(Component.text(args[1], Configuration.COLORHIGHLIGHT)));
                     }else{
                         MessagingUtil.sendError(sender, "Incorrect account or password");
                     }

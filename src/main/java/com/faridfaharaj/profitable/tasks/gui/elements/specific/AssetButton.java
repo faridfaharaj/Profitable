@@ -50,12 +50,12 @@ public final class AssetButton extends GuiElement {
         }
 
         List<Component> keyDataPoints = new ArrayList<>();
-        keyDataPoints.add(Component.text(NamingUtil.nameType(assetData.getAsset().getAssetType())));
+        keyDataPoints.add(Component.text(NamingUtil.nameType(assetData.getAsset().getAssetType()), Configuration.GUICOLORSUBTITLE));
         keyDataPoints.add(Component.empty());
-        keyDataPoints.add(Component.text(assetData.getAsset().getName()));
-        keyDataPoints.add(Component.text(" - Volume: " + volume));
-        keyDataPoints.add(Component.text(" - Open: " + Open));
-        keyDataPoints.add(Component.text(" - Day's Range: " + assetData.getlastCandle().getLow() + " to " + assetData.getlastCandle().getHigh()));
+        keyDataPoints.add(Component.text(assetData.getAsset().getName(), Configuration.GUICOLORTEXT));
+        keyDataPoints.add(Component.text(" - ", Configuration.GUICOLORSUBTITLE).append(Component.text("Volume: ", Configuration.GUICOLORTEXT)).append(Component.text(volume, Configuration.GUICOLORHIGHLIGHT)));
+        keyDataPoints.add(Component.text(" - ", Configuration.GUICOLORSUBTITLE).append(Component.text("Open: ", Configuration.GUICOLORTEXT)).append(Component.text(Open, Configuration.GUICOLORHIGHLIGHT)));
+        keyDataPoints.add(Component.text(" - ", Configuration.GUICOLORSUBTITLE).append(Component.text("Day's Range: ", Configuration.GUICOLORTEXT)).append(Component.text(assetData.getlastCandle().getLow() + " to " + assetData.getlastCandle().getHigh(), Configuration.GUICOLORHIGHLIGHT)));
 
         keyDataPoints.add(Component.empty());
         keyDataPoints.add(GuiElement.clickAction(ClickType.LEFT, "Trade asset"));
