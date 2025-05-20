@@ -193,4 +193,22 @@ public class MessagingUtil {
         return new UUID(buffer.getLong(),buffer.getLong());
     }
 
+    public static String formatVolume(double number) {
+        if (number >= 1_000_000) {
+            return String.format("%.1fM", number / 1_000_000).replaceAll("\\.0$", "");
+        } else if (number >= 1_000) {
+            return String.format("%.1fk", number / 1_000).replaceAll("\\.0$", "");
+        } else {
+            if (number < 10) {
+                return String.valueOf(number);
+            } else {
+                return String.format("%.0f", number);
+            }
+        }
+    }
+
+    public static String formatNumber(double number){
+        return decimalFormat.format(number);
+    }
+
 }
