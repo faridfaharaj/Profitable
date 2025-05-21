@@ -23,11 +23,11 @@ public class MessagingUtil {
 
     static DecimalFormat decimalFormat = new DecimalFormat("0.0####");
 
-    public static void sendButton(CommandSender sender, String text, String command){
+    public static Component buttonComponent(String text, String command){
 
-        sendCustomMessage(sender, Component.text(text).color(Configuration.COLORINFO)
+        return Component.text(text).color(NamedTextColor.GREEN)
                 .clickEvent(ClickEvent.runCommand(command))
-                .hoverEvent(HoverEvent.showText(Component.text(command).color(Configuration.COLORINFO))));
+                .hoverEvent(HoverEvent.showText(Component.text(command).color(NamedTextColor.GREEN)));
 
     }
 
@@ -58,9 +58,7 @@ public class MessagingUtil {
     }
 
     public static Component profitablePrefix(){
-        return Component.text("").append(Component.text("[",Configuration.COLORPROFITABLE))
-                .append(Component.text("PRFT",Configuration.COLORPROFITABLE).decorate(TextDecoration.BOLD))
-                .append(Component.text("] ",Configuration.COLORPROFITABLE));
+        return Component.text("", Configuration.COLORTEXT);
     }
 
     public static Component profitableTopSeparator(String text, String sides){
@@ -81,26 +79,17 @@ public class MessagingUtil {
         Component component;
 
         if(0 < current){
-            component = Component.text("-------------", Configuration.COLORPROFITABLE)
-                    .append(Component.text(" [past] ")
-                            .clickEvent(ClickEvent.runCommand(cmndpast))
-                            .hoverEvent(HoverEvent.showText(Component.text(cmndpast, Configuration.COLORINFO))));
+            component = Component.text("             ", Configuration.COLORPROFITABLE)
+                    .append(MessagingUtil.buttonComponent(" [Past] ", cmndpast));
         }else {
-            component = Component.text("------------------ ", Configuration.COLORPROFITABLE);
+            component = Component.text("                   ", Configuration.COLORPROFITABLE);
         }
 
         component = component.append(Component.text("<" + current + "/" + total  + ">"));
 
         if(total > current){
 
-            component = component.append(Component.text(" [next] ")
-                    .clickEvent(ClickEvent.runCommand(cmndnext))
-                    .hoverEvent(HoverEvent.showText(Component.text(cmndnext, Configuration.COLORINFO))))
-                    .append(Component.text("-------------"));
-
-        }else{
-
-            component = component.append(Component.text(" ------------------"));
+            component = component.append(MessagingUtil.buttonComponent(" [Next] ", cmndnext));
 
         }
 
@@ -138,13 +127,18 @@ public class MessagingUtil {
 
     public static void sendInfoNotice(CommandSender sender, String text){
 
-        sendCustomMessage(sender, profitablePrefix().append(Component.text(text).color(Configuration.COLORINFO)));
+        sendCustomMessage(sender, profitablePrefix().append(Component.text(text).color(Configuration.COLORHIGHLIGHT)));
 
     }
 
     public static void sendSuccsess(CommandSender sender, String text){
 
-        sendCustomMessage(sender, profitablePrefix().append(Component.text(text)));
+        sendCustomMessage(sender, profitablePrefix().append(Component.text(text, Configuration.COLORTEXT)));
+    }
+
+    public static void sendPlain(CommandSender sender, String text){
+
+        sendCustomMessage(sender, profitablePrefix().append(Component.text(text, Configuration.COLORTEXT)));
     }
 
     public static void sendChargeNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
@@ -197,6 +191,24 @@ public class MessagingUtil {
         ByteBuffer buffer = ByteBuffer.wrap(uuid);
 
         return new UUID(buffer.getLong(),buffer.getLong());
+    }
+
+    public static String formatVolume(double number) {
+        if (number >= 1_000_000) {
+            return String.format("%.1fM", number / 1_000_000).replaceAll("\\.0$", "");
+        } else if (number >= 1_000) {
+            return String.format("%.1fk", number / 1_000).replaceAll("\\.0$", "");
+        } else {
+            if (number < 10) {
+                return String.valueOf(number);
+            } else {
+                return String.format("%.0f", number);
+            }
+        }
+    }
+
+    public static String formatNumber(double number){
+        return decimalFormat.format(number);
     }
 
 }

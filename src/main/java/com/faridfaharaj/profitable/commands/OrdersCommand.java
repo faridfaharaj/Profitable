@@ -1,15 +1,9 @@
 package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
-import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
-import com.faridfaharaj.profitable.data.holderClasses.Order;
-import com.faridfaharaj.profitable.data.tables.Accounts;
-import com.faridfaharaj.profitable.data.tables.Orders;
+import com.faridfaharaj.profitable.tasks.gui.guis.UserOrdersGui;
 import com.faridfaharaj.profitable.util.MessagingUtil;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -29,62 +23,8 @@ public class OrdersCommand  implements CommandExecutor {
         }
         if(sender instanceof Player player){
 
-            if(args.length > 0 && args[0].equals("cancel")){
+            new UserOrdersGui(player, null).openGui(player);
 
-                if(!sender.hasPermission("profitable.account.manage.orders.cancel")){
-                    MessagingUtil.sendGenericMissingPerm(sender);
-                    return true;
-                }
-
-                if(args.length == 1){
-
-                    MessagingUtil.sendError(sender, "/orders cancel <Order ID>");
-                    return true;
-
-                }
-
-                Profitable.getfolialib().getScheduler().runAsync(task -> {
-                    if(!Orders.cancelOrder(UUID.fromString(args[1]), player)){
-                        MessagingUtil.sendError(sender, "Couldn't cancel that order");
-                    }
-                });
-                return true;
-            }
-
-            if(!sender.hasPermission("profitable.account.info.orders")){
-                MessagingUtil.sendGenericMissingPerm(sender);
-                return true;
-            }
-
-            int page;
-            try {
-                page = args.length == 0? 0 : Integer.parseInt(args[0]);
-            }catch (Exception e){
-                MessagingUtil.sendError(sender, "Invalid page number");
-                return true;
-            }
-
-            Profitable.getfolialib().getScheduler().runAsync(task -> {
-                List<Order> orders = Orders.getAccountOrders(Accounts.getAccount(player));
-                if(orders.isEmpty()){
-                    MessagingUtil.sendEmptyNotice(player, "No active orders on this account");
-                }else {
-                    int totalPages = (orders.size()-1)/2;
-                    Component component = MessagingUtil.profitableTopSeparator("Orders", "-----------------");
-                    for(int i = page*2; i<Math.min(page*2+2,orders.size()); i++){
-                        Order order = orders.get(i);
-                        String cmnd = "/orders cancel " + order.getUuid();
-                        component = component.appendNewline().append(order.toComponent()).appendNewline()
-                                .append(Component.text("[Click to cancel]",Configuration.COLORINFO)
-                                        .clickEvent(ClickEvent.runCommand(cmnd))
-                                        .hoverEvent(HoverEvent.showText(Component.text(cmnd,Configuration.COLORINFO))))
-                                .appendNewline();
-                    }
-                    component = component.appendNewline().append(MessagingUtil.profitablePaginator(page, totalPages, "/orders"));
-                    MessagingUtil.sendCustomMessage(sender, component);
-
-                }
-            });
         }else{
             MessagingUtil.sendGenericCantConsole(sender);
         }
@@ -96,13 +36,7 @@ public class OrdersCommand  implements CommandExecutor {
         @Override
         public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
 
-            List<String> suggestions = new ArrayList<>();
-            if(args.length == 1){
-                suggestions = List.of("[<Page>]");
-
-            }
-
-            return suggestions;
+            return null;
 
         }
 

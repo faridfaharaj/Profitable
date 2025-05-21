@@ -60,11 +60,11 @@ public class HelpCommand implements CommandExecutor {
 > /wallet
 §e Displays all asset balances on your account §r
 -----
-> /wallet deposit <Currency> <amount>
-§e Transfers desired amount from economy to your profitable's account wallet §r
+> /wallet deposit <Asset> <amount>
+§e Transfers desired amount to your profitable's account wallet §r
 -----
-> /wallet withdraw <Currency> <amount>
-§e Transfers desired amount from your wallet to your economy §r
+> /wallet withdraw <Asset> <amount>
+§e Transfers desired amount from your wallet to you §r
 -----
 > /orders
 §e Displays all active orders on your account §r
@@ -98,9 +98,6 @@ public class HelpCommand implements CommandExecutor {
 -----
 > /assets categories currency
 §e Displays all assets from type currency §r
------
-> /asset <Asset>
-§e Gives you market information about specified asset §r
 -----
 > /asset <Asset> graph <Time frame>
 §e Gives you a map containing a candles graph showcasing price movements across a certain time frame §r""", """

@@ -151,45 +151,40 @@ public class Orders {
         return orders;
     }
 
-    public static double getBid(String asset) {
-        Double bid = -1d;
+    public static List<Order> getBidAsk(String asset, boolean isBid) {
+        List<Order> orders = new ArrayList<>();
+        String orderDirection = isBid ? "DESC" : "ASC";
 
-        String sqlBid = "SELECT price FROM orders WHERE world = ? AND asset_id = ? AND sideBuy = true AND order_type = " + Order.OrderType.LIMIT.getValue() + " ORDER BY price DESC LIMIT 1;";
+        String sql = "SELECT price, SUM(units) as units FROM orders " +
+                "WHERE world = ? AND asset_id = ? AND sideBuy = ? AND order_type = ? " +
+                "GROUP BY price " +
+                "ORDER BY price " + orderDirection + " " +
+                "LIMIT 7;";
 
-        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sqlBid)) {
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
             stmt.setBytes(1, DataBase.getCurrentWorld());
             stmt.setString(2, asset);
+            stmt.setBoolean(3, isBid);
+            stmt.setInt(4, Order.OrderType.LIMIT.getValue());
+
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    bid = rs.getDouble("price");
+                while (rs.next()) {
+                    orders.add(new Order(
+                            null,
+                            null,
+                            null,
+                            isBid,
+                            rs.getDouble("price"),
+                            rs.getDouble("units"),
+                            null
+                    ));
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return bid;
-    }
-
-    public static double getAsk(String asset) {
-
-        Double ask = -1d;
-
-        String sqlAsk = "SELECT price FROM orders WHERE world = ? AND asset_id = ? AND sideBuy = false AND order_type = " + Order.OrderType.LIMIT.getValue() + " ORDER BY price ASC LIMIT 1;";
-
-        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sqlAsk)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
-            stmt.setString(2, asset);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    ask = rs.getDouble("price");
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return ask;
+        return orders;
     }
 
     public static List<Order> getAccountOrders(String owner) {
@@ -400,7 +395,7 @@ public class Orders {
 
         Orders.deleteOrder(order.getUuid());
 
-        MessagingUtil.sendCustomMessage(player, Component.text("Cancelled ").append(order.toStringSimplified()));
+        MessagingUtil.sendCustomMessage(player, Component.text("Cancelled ", Configuration.COLORTEXT).append(order.toStringSimplified()));
         MessagingUtil.sendPaymentNotice(player, ammountToSendBack, 0, asset);
 
         return true;

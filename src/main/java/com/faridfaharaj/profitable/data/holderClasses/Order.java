@@ -89,13 +89,13 @@ public class Order{
     //Asset: VLT Side: buy
     //Price: 23 Units: 32
     public Component toComponent(){
-        return  Component.text("Asset: ").append(Component.text(asset,NamedTextColor.GRAY)).append(Component.text(" Side: ")).append((sideBuy? Component.text("buy",Configuration.COLORBULLISH) : Component.text("sell",Configuration.COLORBEARISH))).append(Component.text(" Type: ")).append(Component.text(type.toString().replace("_", "-"), NamedTextColor.GRAY)).appendNewline()
-                .append(Component.text("Price: ")).append(Component.text(price,NamedTextColor.GRAY)).append(Component.text(" Units: ")).append(Component.text(units,NamedTextColor.GRAY));
+        return  Component.text("Asset: ", Configuration.COLORTEXT).append(Component.text(asset, Configuration.COLORHIGHLIGHT)).append(Component.text(" Side: ")).append((sideBuy? Component.text("buy",Configuration.COLORBULLISH) : Component.text("sell",Configuration.COLORBEARISH))).append(Component.text(" Type: ")).append(Component.text(type.toString().replace("_", "-"), Configuration.COLORHIGHLIGHT)).appendNewline()
+                .append(Component.text("Price: ")).append(Component.text(price, Configuration.COLORHIGHLIGHT)).append(Component.text(" Units: ")).append(Component.text(units, Configuration.COLORHIGHLIGHT));
     }
 
     // [ sell 32 VLT $23 ]
     public Component toStringSimplified() {
-        return Component.text("[ "+ type.toString().replace("_", "-") +(sideBuy? " buy " : " sell ") + units + " " + asset + " $" + price + " ]", NamedTextColor.GRAY);
+        return Component.text("[ "+ type.toString().replace("_", "-") +(sideBuy? " buy " : " sell ") + units + " " + asset + " $" + price + " ]", Configuration.COLORHIGHLIGHT);
     }
 
 }

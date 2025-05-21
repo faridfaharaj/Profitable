@@ -12,10 +12,6 @@ softdepend:
 folia-supported: true
 
 commands:
-  profitable:
-    description: Returns info about the plugin
-    usage: /profitable
-    aliases: [prft]
 
   help:
     description: Returns command usage and functions
@@ -33,14 +29,9 @@ commands:
     aliases: [ ]
 
   assets:
-    description: sends you a list of all tradeable assets
+    description: displays all registered assets
     usage: /assets <Asset Type>
-    aliases: [ ]
-
-  asset:
-    description: gets market information about an asset
-    usage: /asset <Asset>
-    aliases: [ ]
+    aliases: [gui, profitable]
 
   top:
     description: Lets you view the most popular assets

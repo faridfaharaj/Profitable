@@ -123,7 +123,7 @@ public class AdminCommand implements CommandExecutor {
 
                 MessagingUtil.sendCustomMessage(sender,
 
-                        Component.text("Showing all registered assets in Profitable:").color(Configuration.COLORINFO).appendNewline()
+                        Component.text("Showing all registered assets in Profitable:").color(Configuration.COLORHIGHLIGHT).appendNewline()
                                 .append(Component.text("--------------------------------------------")).appendNewline()
                                 .append(Component.text(Assets.getAll().toString()).color(Configuration.COLORTEXT)).appendNewline()
                                 .append(Component.text("--------------------------------------------"))
@@ -509,7 +509,7 @@ public class AdminCommand implements CommandExecutor {
                     ordersString.add(order.toString());
                 }
 
-                Component component = Component.text("Showing all active orders for " + args[2] + ":").color(Configuration.COLORINFO).appendNewline()
+                Component component = Component.text("Showing all active orders for " + args[2] + ":").color(Configuration.COLORHIGHLIGHT).appendNewline()
                         .append(Component.text("--------------------------------------------")).appendNewline();
                 for(Order order : orders){
                     component = component.append(order.toComponent()).appendNewline()
@@ -788,7 +788,7 @@ public class AdminCommand implements CommandExecutor {
             }else {
 
 
-                Component component = Component.text("Showing all active orders on account " + account + ":").color(Configuration.COLORINFO).appendNewline()
+                Component component = Component.text("Showing all active orders on account " + account + ":").color(Configuration.COLORHIGHLIGHT).appendNewline()
                         .append(Component.text("--------------------------------------------")).appendNewline();
                 for(Order order : orders){
                     component = component.append(order.toComponent()).appendNewline()
@@ -818,7 +818,7 @@ public class AdminCommand implements CommandExecutor {
                 Location itemDelivery = Accounts.getItemDelivery(account);
 
                 MessagingUtil.sendCustomMessage(sender,
-                        Component.text("Delivery " + account + ":").color(Configuration.COLORINFO).appendNewline()
+                        Component.text("Delivery " + account + ":").color(Configuration.COLORHIGHLIGHT).appendNewline()
                                 .append(Component.text("--------------------------------------------")).appendNewline()
                                 .append(Component.text("Item Delivery Location:").color(Configuration.COLORTEXT)).appendNewline()
                                 .append(Component.text(itemDelivery == null?"Not set":itemDelivery.toVector() + " (" + itemDelivery.getWorld().getName()+")")).appendNewline()
@@ -911,7 +911,7 @@ public class AdminCommand implements CommandExecutor {
 
             String claimId = Accounts.getEntityClaimId(account);
             if(claimId != null){
-                MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text(account + "'s Entity claim id: ")).append(Component.text(claimId).color(Configuration.COLORINFO)));
+                MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text(account + "'s Entity claim id: ")).append(Component.text(claimId).color(Configuration.COLORHIGHLIGHT)));
             }else{
                 MessagingUtil.sendError(sender, "Could not get this claim id");
             }

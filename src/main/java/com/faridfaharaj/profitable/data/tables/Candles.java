@@ -4,7 +4,9 @@ package com.faridfaharaj.profitable.data.tables;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
+import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
+import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -15,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Candles {
 
@@ -95,6 +98,76 @@ public class Candles {
         }
 
         return new Candle(0, 0, 0, 0, 0);
+    }
+
+    public static List<AssetCache> getAssetsNPrice(int type, long time) {
+        List<AssetCache> result = new ArrayList<>();
+
+        String sql = """
+        WITH ranked_candles AS (
+            SELECT
+                *,
+                ROW_NUMBER() OVER (
+                    PARTITION BY world, asset_id
+                    ORDER BY 
+                        CASE WHEN time = ? THEN 0 ELSE 1 END,  -- prefer exact match
+                        time DESC
+                ) as rn
+            FROM candles_day
+            WHERE world = ?
+        )
+        SELECT
+            a.asset_id,
+            a.asset_type,
+            a.meta,
+            c.open,
+            c.close,
+            c.high,
+            c.low,
+            c.volume
+        FROM assets a
+        LEFT JOIN ranked_candles c
+            ON a.world = c.world AND a.asset_id = c.asset_id AND c.rn = 1
+        WHERE a.world = ? AND a.asset_type = ?;
+    """;
+
+        byte[] world = DataBase.getCurrentWorld();
+        long roundedTime = (time / intervals[0]) * intervals[0];
+
+        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
+            stmt.setLong(1, roundedTime); // for ROW_NUMBER priority
+            stmt.setBytes(2, world);      // for candle filtering
+            stmt.setBytes(3, world);      // for final asset filter
+            stmt.setInt(4, type);         // for asset_type filter
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    String assetID = rs.getString("asset_id");
+
+                    if (!Objects.equals(assetID, Configuration.MAINCURRENCYASSET.getCode())) {
+                        int assetType = rs.getInt("asset_type");
+                        byte[] meta = rs.getBytes("meta");
+
+                        Asset asset = Asset.assetFromMeta(assetID, assetType, meta);
+
+                        double open = rs.getDouble("open");
+                        double close = rs.getDouble("close");
+                        double high = rs.getDouble("high");
+                        double low = rs.getDouble("low");
+                        double volume = rs.getDouble("volume");
+
+                        Candle candle = new Candle(open, close, high, low, volume);
+
+                        result.add(new AssetCache(asset, candle));
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     public static List<Candle> getInterval(String asset, long time, int interval) {
@@ -211,7 +284,7 @@ public class Candles {
                         double change = close-open;
 
                         component = component.append(
-                                Component.text((i+1)+"- ")).append(Component.text("["+asset+"]", Configuration.COLORINFO).clickEvent(ClickEvent.runCommand("/asset "+ asset)).hoverEvent(HoverEvent.showText(Component.text("/asset "+ asset, Configuration.COLORINFO)))).append(Component.text("   $" + close + "   ")).append(Component.text("$"+change+"  "+ Math.ceil(change/open*10000)/100 + "% month").color(change<0? Configuration.COLORBEARISH:Configuration.COLORBULLISH));
+                                Component.text((i+1)+"- ")).append(Component.text("["+asset+"]", Configuration.COLORHIGHLIGHT).clickEvent(ClickEvent.runCommand("/asset "+ asset)).hoverEvent(HoverEvent.showText(Component.text("/asset "+ asset, Configuration.COLORHIGHLIGHT)))).append(Component.text("   $" + close + "   ")).append(Component.text("$"+change+"  "+ Math.ceil(change/open*10000)/100 + "% month").color(change<0? Configuration.COLORBEARISH:Configuration.COLORBULLISH));
 
                     }else{
                         component = component.append(Component.text((i+1)+"- -----   $--.--   $--.--  --.--% -----"));
