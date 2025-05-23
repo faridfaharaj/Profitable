@@ -167,15 +167,11 @@ public class MessagingUtil {
     }
 
     public static void sendGenericMissingPerm(CommandSender sender){
-        sendError(sender, "You don't have permission to do that");
+        sendError(sender, Profitable.getLang().get("error.missing-perm"));
     }
 
     public static void sendGenericCantConsole(CommandSender sender){
-        sendError(sender, "Cant use this command from the console");
-    }
-
-    public static void genericInvalidSubcom(CommandSender sender, String subcom){
-        sendError(sender, "Invalid Subcommand " + subcom);
+        sendError(sender, Profitable.getLang().get("error.cant-console"));
     }
 
     public static byte[] UUIDtoBytes(UUID uuid) throws IOException {

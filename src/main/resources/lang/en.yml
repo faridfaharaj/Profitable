@@ -1,0 +1,3 @@
+error:
+  missing-perm: "You don't have permission to do that"
+  cant-console: "Cant use this command from the console"

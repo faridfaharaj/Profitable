@@ -46,10 +46,16 @@ public final class Profitable extends JavaPlugin {
     private static Profitable instance;
     private static BukkitAudiences audiences;
     private static FoliaLib foliaLib;
+    private static Lang lang;
 
     public static Profitable getInstance() {
         return instance;
     }
+
+    public static Lang getLang(){
+        return lang;
+    }
+
     public static BukkitAudiences getBukkitAudiences() {
         return audiences;
     }
@@ -64,6 +70,7 @@ public final class Profitable extends JavaPlugin {
         instance = this;
         audiences = BukkitAudiences.create(this);
         foliaLib = new FoliaLib(this);
+        lang = new Lang(this);
 
         foliaLib.getScheduler().runAsync(task -> {
             checkForUpdate(this);

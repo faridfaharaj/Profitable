@@ -30,7 +30,7 @@ commands:
 
   assets:
     description: displays all registered assets
-    usage: /assets <Asset Type>
+    usage: /assets
     aliases: [gui, profitable]
 
   top:
@@ -46,7 +46,7 @@ commands:
   wallet:
     description: Displays all asset balances on your account
     usage: /wallet or /wallet <Subcommand>
-    aliases: [wal]
+    aliases: [wal, portfolio]
 
   delivery:
     description: Displays and sets where should your items and entities arrive
