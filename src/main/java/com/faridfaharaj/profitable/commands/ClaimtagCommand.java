@@ -17,30 +17,24 @@ public class ClaimtagCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] strings) {
 
-        if(!sender.hasPermission("profitable.account.claim")){
-            MessagingUtil.sendGenericMissingPerm(sender);
-            return true;
-        }
+        if(sender instanceof Player player){
 
-        if(Configuration.MULTIWORLD){
-            DataBase.universalUpdateWorld(sender);
-        }
+            if(!sender.hasPermission("profitable.account.claim")){
+                MessagingUtil.sendGenericMissingPerm(sender);
+                return true;
+            }
 
-        Player player = null;
-        if(sender instanceof Player got){
-            player = got;
-        }
-        if(player != null){
+            if(Configuration.MULTIWORLD){
+                DataBase.universalUpdateWorld(sender);
+            }
 
             TemporalItems.sendClaimingTag(player);
 
-            return true;
-
-        }else{
+        }else {
             MessagingUtil.sendGenericCantConsole(sender);
         }
 
-        return false;
+        return true;
 
 
     }

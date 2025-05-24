@@ -18,10 +18,11 @@ public class OrdersCommand  implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
 
-        if(Configuration.MULTIWORLD){
-            DataBase.universalUpdateWorld(sender);
-        }
         if(sender instanceof Player player){
+
+            if(Configuration.MULTIWORLD){
+                DataBase.universalUpdateWorld(sender);
+            }
 
             new UserOrdersGui(player, null).openGui(player);
 

@@ -174,6 +174,10 @@ public class MessagingUtil {
         sendError(sender, Profitable.getLang().get("error.cant-console"));
     }
 
+    public static void sendGenericInvalidSubCom(CommandSender sender, String subCommand){
+        sendError(sender, Profitable.getLang().get("error.invalid-subcommand").replace("%sub_command%", subCommand));
+    }
+
     public static byte[] UUIDtoBytes(UUID uuid) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(16);
 

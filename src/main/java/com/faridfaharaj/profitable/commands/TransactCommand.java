@@ -22,11 +22,11 @@ public class TransactCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if(Configuration.MULTIWORLD){
-            DataBase.universalUpdateWorld(sender);
-        }
-
         if(sender instanceof Player player){
+
+            if(Configuration.MULTIWORLD){
+                DataBase.universalUpdateWorld(sender);
+            }
 
 
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
@@ -109,6 +109,10 @@ public class TransactCommand implements CommandExecutor {
                 });
             });
             return true;
+
+        }else{
+
+            MessagingUtil.sendGenericCantConsole(sender);
 
         }
 

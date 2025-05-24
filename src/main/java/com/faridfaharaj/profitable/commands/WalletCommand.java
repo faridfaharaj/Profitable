@@ -26,22 +26,19 @@ import static com.faridfaharaj.profitable.data.holderClasses.Asset.retrieveCommo
 
 public class WalletCommand implements CommandExecutor {
 
-    AssetCache[][] assetCache;
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
 
-        if(!sender.hasPermission("profitable.account.info.wallet")){
-            MessagingUtil.sendGenericMissingPerm(sender);
-            return true;
-        }
-
-        if(Configuration.MULTIWORLD){
-            DataBase.universalUpdateWorld(sender);
-        }
-
         if(sender instanceof Player player){
 
+            if(!sender.hasPermission("profitable.account.info.wallet")){
+                MessagingUtil.sendGenericMissingPerm(sender);
+                return true;
+            }
 
+            if(Configuration.MULTIWORLD){
+                DataBase.universalUpdateWorld(sender);
+            }
 
             if(args.length == 0){
 
@@ -128,7 +125,7 @@ public class WalletCommand implements CommandExecutor {
 
 
 
-        return false;
+        return true;
     }
 
     public static class CommandTabCompleter implements TabCompleter {

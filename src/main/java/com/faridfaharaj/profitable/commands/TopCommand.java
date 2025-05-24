@@ -73,7 +73,7 @@ public class TopCommand  implements CommandExecutor {
                 });
 
             }else{
-                MessagingUtil.sendError(sender, "Invalid Subcommand");
+                MessagingUtil.sendGenericInvalidSubCom(sender, args[0]);
                 return true;
             }
 
@@ -86,7 +86,7 @@ public class TopCommand  implements CommandExecutor {
         }
 
 
-        return false;
+        return true;
     }
 
     public static class CommandTabCompleter implements TabCompleter {

@@ -24,10 +24,11 @@ public class DeliveryCommand implements CommandExecutor {
     @Override
     public boolean onCommand( CommandSender sender,  Command command,  String s,  String[] args) {
 
-        if(Configuration.MULTIWORLD){
-            DataBase.universalUpdateWorld(sender);
-        }
         if(sender instanceof Player player){
+
+            if(Configuration.MULTIWORLD){
+                DataBase.universalUpdateWorld(sender);
+            }
 
             String account = Accounts.getAccount(player);
 
@@ -89,9 +90,11 @@ public class DeliveryCommand implements CommandExecutor {
                 MessagingUtil.sendError(player, "/account delivery set item OR /account delivery set entity");
             }
 
+        }else {
+            MessagingUtil.sendGenericCantConsole(sender);
         }
 
-        return false;
+        return true;
     }
 
     public static class CommandTabCompleter implements TabCompleter {

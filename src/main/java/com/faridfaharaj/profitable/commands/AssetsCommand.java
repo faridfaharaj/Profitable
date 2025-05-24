@@ -17,10 +17,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 
 public class AssetsCommand implements CommandExecutor {
@@ -28,30 +26,20 @@ public class AssetsCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if(Configuration.MULTIWORLD){
-            DataBase.universalUpdateWorld(sender);
-        }
-
         if(sender instanceof Player player){
+
+            if(Configuration.MULTIWORLD){
+                DataBase.universalUpdateWorld(sender);
+            }
+
             new AssetExplorer(player, 2, null).openGui(player);
             return true;
+        }else {
+            MessagingUtil.sendGenericCantConsole(sender);
         }
 
 
-        return false;
-    }
-
-    private static Component getAssetList(int page, List<Asset> foundAssets) {
-        Component component = Component.text("");
-
-        for(int i = page *8; i<Math.min(page *8+8, foundAssets.size()); i++){
-            String cmnd = "/asset " + foundAssets.get(i).getCode();
-            component = component.append(
-                    Component.text("["+foundAssets.get(i).getCode()+ "]").color(foundAssets.get(i).getColor())
-                            .clickEvent(ClickEvent.runCommand(cmnd))
-                            .hoverEvent(HoverEvent.showText(Component.text(cmnd, Configuration.COLORHIGHLIGHT)))).appendNewline();
-        }
-        return component;
+        return true;
     }
 
     public static class CommandTabCompleter implements TabCompleter {
@@ -59,7 +47,7 @@ public class AssetsCommand implements CommandExecutor {
         @Override
         public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
 
-            return null;
+            return Collections.emptyList();
 
         }
 

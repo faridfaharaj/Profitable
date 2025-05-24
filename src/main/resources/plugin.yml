@@ -20,12 +20,12 @@ commands:
 
   buy:
     description: Command used to buy assets on the exchange
-    usage: /buy <Asset> <Order type> <units> <price>
+    usage: /buy <Asset> <units> <price> <Order Type>
     aliases: [ ]
 
   sell:
     description: Command used to sell assets on the exchange
-    usage: /sell <Asset> <Order type> <units> <price>
+    usage: /sell <Asset> <units> <price> <Order Type>
     aliases: [ ]
 
   assets:

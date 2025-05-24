@@ -93,7 +93,7 @@ public class AdminCommand implements CommandExecutor {
                 MessagingUtil.sendSuccsess(sender, "Successfully reloaded config file");
                 MessagingUtil.sendWarning(sender, "Some properties require restarting the server");
             }else{
-                MessagingUtil.sendError(sender, "Invalid Subcommand");
+                MessagingUtil.sendGenericInvalidSubCom(sender, args[1]);
                 return true;
             }
 
@@ -660,7 +660,7 @@ public class AdminCommand implements CommandExecutor {
 
             }
 
-            MessagingUtil.sendError(sender, "Invalid Subcommand");
+            MessagingUtil.sendGenericInvalidSubCom(sender, args[1]);
             return true;
 
         }

@@ -78,17 +78,18 @@ public class AccountCommand implements CommandExecutor {
 
         if(args[0].equals("delete")){
 
-            if(!sender.hasPermission("profitable.account.manage.delete")){
-                MessagingUtil.sendGenericMissingPerm(sender);
-                return true;
-            }
-
-            if(args.length < 3){
-                MessagingUtil.sendError(sender, "/account delete <Account> <password>");
-                return true;
-            }
-
             if(sender instanceof Player player){
+
+                if(!sender.hasPermission("profitable.account.manage.delete")){
+                    MessagingUtil.sendGenericMissingPerm(sender);
+                    return true;
+                }
+
+                if(args.length < 3){
+                    MessagingUtil.sendError(sender, "/account delete <Account> <password>");
+                    return true;
+                }
+
                 String account = args[1];
                 UUID playerid = player.getUniqueId();
 
@@ -119,7 +120,7 @@ public class AccountCommand implements CommandExecutor {
                 return true;
 
             }else{
-                MessagingUtil.sendError(sender, "cannot run this from console");
+                MessagingUtil.sendGenericCantConsole(sender);
                 return true;
             }
 
@@ -186,17 +187,18 @@ public class AccountCommand implements CommandExecutor {
 
         if(args[0].equals("password")){
 
-            if(!sender.hasPermission("profitable.account.manage.password")){
-                MessagingUtil.sendGenericMissingPerm(sender);
-                return true;
-            }
-
-            if(args.length < 3){
-                MessagingUtil.sendError(sender,"/account password <Old password> <New password>");
-                return true;
-            }
-
             if(sender instanceof Player player){
+
+                if(!sender.hasPermission("profitable.account.manage.password")){
+                    MessagingUtil.sendGenericMissingPerm(sender);
+                    return true;
+                }
+
+                if(args.length < 3){
+                    MessagingUtil.sendError(sender,"/account password <Old password> <New password>");
+                    return true;
+                }
+
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     String account = Accounts.getAccount(player);
                     if(Accounts.comparePasswords(account, args[1])){
@@ -218,7 +220,7 @@ public class AccountCommand implements CommandExecutor {
 
 
 
-        MessagingUtil.sendError(sender, "Invalid Subcommand");
+        MessagingUtil.sendGenericInvalidSubCom(sender, args[0]);
         return true;
     }
 
