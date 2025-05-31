@@ -56,7 +56,7 @@ public class TransactCommand implements CommandExecutor {
                     try{
                         price = Double.parseDouble(args[2]);
                     }catch (Exception e){
-                        MessagingUtil.sendError(sender, "Invalid Price");
+                        MessagingUtil.sendGenericInvalidAmount(sender, args[2]);
                         return;
                     }
 
@@ -78,7 +78,7 @@ public class TransactCommand implements CommandExecutor {
                             orderType = Order.OrderType.MARKET;
                         }
                         default -> {
-                            MessagingUtil.sendError(sender, "Invalid Order Type");
+                            MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("exchange.error.invalid-order-type"));
                             return;
                         }
                     }
@@ -93,7 +93,7 @@ public class TransactCommand implements CommandExecutor {
                     try{
                         units = Double.parseDouble(args[1]);
                     }catch (Exception e){
-                        MessagingUtil.sendError(sender, "Invalid Units");
+                        MessagingUtil.sendGenericInvalidAmount(sender, args[1]);
                         return;
                     }
                 }

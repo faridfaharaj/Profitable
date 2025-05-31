@@ -111,10 +111,9 @@ public class Events implements Listener {
             runItmCooldown(Material.NAME_TAG, event.getPlayer(), () -> {
                 Entity entity = event.getRightClicked();
                 if(entity.getCustomName() != null){
-                    MessagingUtil.sendError(player, "Cannot claim named entities");
+                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.cant-reclaim-entity"));
                 }else if(!Configuration.ALLOWENTITIES.contains(entity.getType().name())){
-
-                    MessagingUtil.sendError(player, "Owning this entity isn't allowed");
+                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.cant-claim-entity"));
 
                 } else {
 
@@ -122,19 +121,14 @@ public class Events implements Listener {
                         Profitable.getfolialib().getScheduler().runAtEntity(entity, task -> {
                             entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));
                         });
-                        MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName()))
-                                .append(Configuration.ENTITYCLAIMINGFEES == 0?
-                                        Component.text(" FOR FREE", NamedTextColor.GREEN):
-                                        Component.text(" using ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
-                                )
-                        );
+                        MessagingUtil.sendMiniMessage(player,Profitable.getLang().get("assets.entity-claim-notice").replace("%entity%", entity.getName()).replace("%asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES)));
                     };
 
 
                     if(Configuration.ENTITYCLAIMINGFEES <= 0){
                         claim.run();
                     }else {
-                        Asset.chargeAndRun(player, "Could't claim "+ entity.getName() , Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES, claim);
+                        Asset.chargeAndRun(player, Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES, claim);
                     }
 
                 }
@@ -177,7 +171,7 @@ public class Events implements Listener {
                     Block block = event.getClickedBlock();
                     if(block != null){
                         if(!(block.getState() instanceof Container)){
-                            MessagingUtil.sendError(player, "Item delivery location must be a container");
+                            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("delivery.error.items-must-be-container"));
                             return;
                         }
                         Location correctedlocation = block.getLocation();
@@ -185,8 +179,6 @@ public class Events implements Listener {
                             MessagingUtil.sendCustomMessage(player, Component.text("Updated item delivery to: ", Configuration.COLORTEXT).append(Component.text(correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")", Configuration.COLORHIGHLIGHT)));
 
                             TemporalItems.removeTempItem(player);
-                        }else {
-                            MessagingUtil.sendError(player, "Could not update Item delivery");
                         }
                     }
                 });
@@ -201,8 +193,6 @@ public class Events implements Listener {
                         if(Accounts.changeEntityDelivery(Accounts.getAccount(player), correctedlocation)){
                             MessagingUtil.sendCustomMessage(player, Component.text("Updated entity delivery to: ", Configuration.COLORTEXT).append(Component.text(correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")", Configuration.COLORHIGHLIGHT)));
                             TemporalItems.removeTempItem(player);
-                        }else {
-                            MessagingUtil.sendError(player, "Could not update Entity delivery");
                         }
                     }
 

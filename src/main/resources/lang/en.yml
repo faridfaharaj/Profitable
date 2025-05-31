@@ -1,4 +1,66 @@
-error:
-  cant-console: "Cant use this command from the console"
-  missing-perm: "You don't have permission to do that"
-  invalid-subcommand: "Invalid subcommand: %sub_command%"
+generic:
+  error:
+    cant-console: "<red>Cant use this command from the console</red>"
+    missing-perm: "<red>You don't have permission to do that</red>"
+    invalid-subcommand: "<red>Invalid subcommand: %sub_command%</red>"
+    invalid-amount: "<red>Invalid amount %invalid_amount%</red>"
+
+naming:
+  orders:
+    order-types:
+      limit-order: "limit order"
+      market-order: "market order"
+      stop-limit-order: "stop-limit"
+    sides:
+      buy: "buy"
+      sell: "sell"
+
+
+account-command:
+  error:
+    account-already-exists: "<red>An account with this name already exists</red>"
+    password-too-long: "<red>Max password length is 32 characters</red>"
+    password-mismatch: "<red>Passwords do not match</red>"
+    cant-delete-default: "<red>Cannot delete default account</red>"
+    wrong-password: "<red>Incorrect password or account</red>"
+    cant-delete-active-account: "<red>Someone else is still using this account, cannot delete</red>"
+    active-account-mismatch: "<red>Account name doesn't match with active account's</red>"
+
+exchange:
+  fee-display: "<red>(incl. %amount% %asset% fee)</red>"
+  charge-notice: "Charged %asset_amount% %fee%"
+  payment-notice: "Received %asset_amount% %fee%"
+  selling-notice: "<bullish>Bought</bullish> %base_asset_amount% for %quote_asset_amount%"
+  buying-notice: "<bearish>Sold</bearish> %base_asset_amount% for %quote_asset_amount%"
+  new-order-notice: "New %order_type% order %side% %base_asset_amount% at %quote_asset_amount% each"
+  error:
+    invalid-order-type: "<red>Invalid Order Type</red>"
+    identical-assets: "<red>You must trade between two different assets</red>"
+    invalid-sell-stop-trigger: "<red>Stop trigger price must be lower than market's when selling</red>"
+    invalid-buy-stop-trigger: "<red>Stop trigger price must be higher than market's when buying</red>"
+    cant-self-transact: "<red>You can't transact with yourself!, cancel current order first</red>"
+    no-orders-found: "<red>No orders available, use limit order instead!</red>"
+
+assets:
+  amount-display: "%amount% %asset%"
+  auto-deposit-notice: "Automatically deposited %asset_amount% <red>(+ fees)</red>"
+  entity-claim-notice: "Claimed %entity% using %asset_amount%"
+  error:
+    asset-not-found: "<red>Cannot trade %asset% here</red>"
+    cant-fractional: "<red>Asset %asset% cant be fractional</red>"
+    minimum-deposit: "<red>Cannot deposit less than %asset_amount%</red>"
+    non-depositable: "<red>Cannot deposit or withdraw %asset%</red>"
+    not-enough-asset: "<red>Not enough %asset%</red>"
+    cant-reclaim-entity: "<red>Cannot claim owned entities</red>"
+    cant-claim-entity: "<red>Owning this entity isn't allowed</red>"
+
+delivery:
+  error:
+    items-must-be-container: "<red>Item delivery location must be a container</red>"
+
+hooks:
+  error:
+    insufficient-funds: "Insufficient funds"
+
+
+gui:

@@ -59,7 +59,7 @@ public class Lang {
     }
 
     public String get(String path) {
-        return lang.getString(path, "_missing translation:[" + path + "]!_");
+        return lang.getString(path, "<red>_missing translation:[" + path + "]!_</red>");
     }
 
 }

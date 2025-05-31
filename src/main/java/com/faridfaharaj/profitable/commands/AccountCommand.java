@@ -33,10 +33,9 @@ public class AccountCommand implements CommandExecutor {
             if(sender instanceof Player player){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     String account = Accounts.getAccount(player);
-                    MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("Account: "))
-                            .append((Objects.equals(account, player.getUniqueId().toString()) ?
-                                    Component.text("(Default)").color(Configuration.COLOREMPTY):
-                                    Component.text(account).color(Configuration.COLORHIGHLIGHT))));
+                    MessagingUtil.sendCustomMessage(sender, Component.text("Account: ", Configuration.GUICOLORTEXT).append((Objects.equals(account, player.getUniqueId().toString()) ?
+                            Component.text("(Default)").color(Configuration.COLOREMPTY):
+                            Component.text(account).color(Configuration.COLORHIGHLIGHT))));
                 });
                 return true;
             }
@@ -52,7 +51,7 @@ public class AccountCommand implements CommandExecutor {
             }
 
             if(args.length < 4){
-                MessagingUtil.sendError(sender, "/account register <Username> <Password> <Repeat Password>");
+                MessagingUtil.sendSyntaxError(sender, "/account register <Username> <Password> <Repeat Password>");
                 return true;
             }
 
@@ -62,15 +61,15 @@ public class AccountCommand implements CommandExecutor {
                         if(Accounts.registerAccount(args[1], args[2])){
                             MessagingUtil.sendSuccsess(sender, "Account registered successfully");
                         }else{
-                            MessagingUtil.sendError(sender, "Account already exists");
+                            MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.account-already-exists"));
                         }
                     });
                     return true;
                 }else{
-                    MessagingUtil.sendError(sender, "Max password length is 32 characters");
+                    MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.password-too-long"));
                 }
             }else {
-                MessagingUtil.sendError(sender, "Passwords don't match");
+                MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.password-mismatch"));
                 return true;
             }
 
@@ -86,7 +85,7 @@ public class AccountCommand implements CommandExecutor {
                 }
 
                 if(args.length < 3){
-                    MessagingUtil.sendError(sender, "/account delete <Account> <password>");
+                    MessagingUtil.sendSyntaxError(sender, "/account delete <Account> <password>");
                     return true;
                 }
 
@@ -94,26 +93,26 @@ public class AccountCommand implements CommandExecutor {
                 UUID playerid = player.getUniqueId();
 
                 if(Objects.equals(playerid.toString(), args[2])){
-                    MessagingUtil.sendError(sender, "Cannot delete default account");
+                    MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.cant-delete-default"));
                 }
 
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     if(Objects.equals(account, Accounts.getAccount(player))){
                         if(!Accounts.comparePasswords(account, args[2])){
-                            MessagingUtil.sendError(sender, "Passwords don't match");
+                            MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.wrong-password"));
                             return;
                         }
 
                         Accounts.logOut(playerid);
                         if(Accounts.getCurrentAccounts().containsValue(account)) {
-                            MessagingUtil.sendError(sender, "Someone else is still using this account, cannot delete");
+                            MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.cant-delete-active-account"));
                         }else{
                             Accounts.deleteAccount(account);
-                            MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("DELETED account: " + account).color(NamedTextColor.RED)));
+                            MessagingUtil.sendCustomMessage(sender, Component.text("DELETED account: " + account,NamedTextColor.RED));
                         }
 
                     }else{
-                        MessagingUtil.sendError(sender, "Account name doesn't match with active account's");
+                        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.active-account-mismatch"));
                     }
                 });
 
@@ -134,7 +133,7 @@ public class AccountCommand implements CommandExecutor {
             }
 
             if(args.length < 3){
-                MessagingUtil.sendError(sender, "/account login <Account> <Password>");
+                MessagingUtil.sendSyntaxError(sender, "/account login <Account> <Password>");
                 return true;
             }
 
@@ -142,15 +141,10 @@ public class AccountCommand implements CommandExecutor {
 
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
 
-                    if(Objects.equals(args[1], Accounts.getAccount(player))){
-                        MessagingUtil.sendError(sender, "Already logged in");
-                        return;
-                    }
-
                     if(Accounts.logIn(player.getUniqueId(), args[1], args[2])){
                         MessagingUtil.sendCustomMessage(sender, Component.text("Successfully logged into ", Configuration.COLORTEXT).append(Component.text(args[1], Configuration.COLORHIGHLIGHT)));
                     }else{
-                        MessagingUtil.sendError(sender, "Incorrect account or password");
+                        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.wrong-password"));
                     }
 
                 });
@@ -171,10 +165,6 @@ public class AccountCommand implements CommandExecutor {
 
             if(sender instanceof Player player){
                 UUID playerid = player.getUniqueId();
-                if(!Accounts.getCurrentAccounts().containsKey(playerid)){
-                    MessagingUtil.sendError(sender, "No active account found");
-                    return true;
-                }
 
                 Accounts.logOut(playerid);
 
@@ -195,7 +185,7 @@ public class AccountCommand implements CommandExecutor {
                 }
 
                 if(args.length < 3){
-                    MessagingUtil.sendError(sender,"/account password <Old password> <New password>");
+                    MessagingUtil.sendSyntaxError(sender,"/account password <Old password> <New password>");
                     return true;
                 }
 
@@ -206,10 +196,10 @@ public class AccountCommand implements CommandExecutor {
                             Accounts.changePassword(account, args[2]);
                             MessagingUtil.sendSuccsess(sender, "Password updated successfully");
                         }else{
-                            MessagingUtil.sendError(sender, "Max password length is 32 characters");
+                            MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.password-too-long"));
                         }
                     }else{
-                        MessagingUtil.sendError(sender,"Incorrect password");
+                        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.wrong-password"));
                     }
                 });
             }else{

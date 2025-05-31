@@ -8,6 +8,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
@@ -31,8 +32,8 @@ public class MessagingUtil {
 
     }
 
-    public static Component assetAmmount(Asset asset, double amount){
-        return Component.text(decimalFormat.format(amount) + " " + asset.getCode(), asset.getColor()).hoverEvent(assetSummary(asset));
+    public static String assetAmmount(Asset asset, double amount){
+        return MiniMessage.miniMessage().serialize(Component.text(decimalFormat.format(amount) + " " + asset.getCode(), asset.getColor()).hoverEvent(assetSummary(asset)));
     }
 
     public static Component assetSummary(Asset asset){
@@ -57,10 +58,6 @@ public class MessagingUtil {
         return  component;
     }
 
-    public static Component profitablePrefix(){
-        return Component.text("", Configuration.COLORTEXT);
-    }
-
     public static Component profitableTopSeparator(String text, String sides){
         return Component.text("").append(Component.text(sides + " [",Configuration.COLORPROFITABLE))
                 .append(Component.text(text,Configuration.COLORPROFITABLE).decorate(TextDecoration.BOLD))
@@ -69,33 +66,6 @@ public class MessagingUtil {
 
     public static Component profitableBottomSeparator(){
         return Component.text("--------------------------------------------",Configuration.COLORPROFITABLE);
-    }
-
-    public static Component profitablePaginator(int current, int total, String command){
-
-        String cmndpast = command + " " + (current-1);
-        String cmndnext = command + " " + (current+1);
-
-        Component component;
-
-        if(0 < current){
-            component = Component.text("             ", Configuration.COLORPROFITABLE)
-                    .append(MessagingUtil.buttonComponent(" [Past] ", cmndpast));
-        }else {
-            component = Component.text("                   ", Configuration.COLORPROFITABLE);
-        }
-
-        component = component.append(Component.text("<" + current + "/" + total  + ">"));
-
-        if(total > current){
-
-            component = component.append(MessagingUtil.buttonComponent(" [Next] ", cmndnext));
-
-        }
-
-        return component;
-
-
     }
 
     public static void sendCustomMessage(CommandSender sender, Component component){
@@ -119,63 +89,92 @@ public class MessagingUtil {
         }
     }
 
-    public static void sendEmptyNotice(CommandSender sender, String text){
+    public static void sendMiniMessage(CommandSender sender, String message){
 
-        sendCustomMessage(sender, profitablePrefix().append(Component.text(text).color(Configuration.COLOREMPTY)));
+        Component component = MiniMessage.miniMessage().deserialize(message);
 
+        if(Profitable.getfolialib().isSpigot()){
+
+            String jsonMessage = GsonComponentSerializer.gson().serialize(component);
+            sender.spigot().sendMessage(ComponentSerializer.parse(jsonMessage));
+
+        }else {
+
+            if(sender instanceof Player player){
+                Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
+                    sender.sendMessage(component);
+                });
+            }else{
+                Profitable.getfolialib().getScheduler().runNextTick(task -> {
+                    sender.sendMessage(component);
+                });
+            }
+
+        }
     }
 
-    public static void sendInfoNotice(CommandSender sender, String text){
+    public static void sendEmptyNotice(CommandSender sender, String text){
 
-        sendCustomMessage(sender, profitablePrefix().append(Component.text(text).color(Configuration.COLORHIGHLIGHT)));
+        sendCustomMessage(sender, Component.text(text, Configuration.GUICOLORTEXT).color(Configuration.COLOREMPTY));
 
     }
 
     public static void sendSuccsess(CommandSender sender, String text){
 
-        sendCustomMessage(sender, profitablePrefix().append(Component.text(text, Configuration.COLORTEXT)));
+        sendCustomMessage(sender, Component.text(text, Configuration.COLORTEXT));
     }
 
     public static void sendPlain(CommandSender sender, String text){
 
-        sendCustomMessage(sender, profitablePrefix().append(Component.text(text, Configuration.COLORTEXT)));
+        sendCustomMessage(sender, Component.text(text, Configuration.COLORTEXT));
     }
 
     public static void sendChargeNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
+        String feeString;
         if(fee != 0){
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(assetAmmount(assetCharged, amount+fee)).append(Component.text(" (incl. " + decimalFormat.format(fee) + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
+            feeString = Profitable.getLang().get("asset.fee-display").replace("%amount%", decimalFormat.format(fee)).replace("%asset%", assetCharged.getCode());
         }else {
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(assetAmmount(assetCharged, amount+fee)));
+            feeString = "";
         }
+
+        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("exchange.charge-notice").replace("%asset_amount%", MessagingUtil.assetAmmount(assetCharged, amount+fee)).replace("%fee%", feeString));
+
     }
 
     public static void sendPaymentNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
+
+        String feeString;
         if(fee != 0){
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(assetAmmount(assetCharged, amount-fee)).append(Component.text(" (incl. " + decimalFormat.format(fee) + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
+            feeString = Profitable.getLang().get("asset.fee-display").replace("%amount%", decimalFormat.format(fee)).replace("%asset%", assetCharged.getCode());
         }else {
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(assetAmmount(assetCharged, amount-fee)));
+            feeString = "";
         }
+
+        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("exchange.payment-notice").replace("%asset_amount%", MessagingUtil.assetAmmount(assetCharged, amount+fee)).replace("%fee%", feeString));
     }
 
     public static void sendWarning(CommandSender sender, String text){
-
-        sendCustomMessage(sender, profitablePrefix().append(Component.text(text).color(Configuration.COLORWARN)));
+        sendCustomMessage(sender, Component.text(text, Configuration.COLORWARN));
     }
 
-    public static void sendError(CommandSender sender, String text){
-        sendCustomMessage(sender, Component.text(text).color(Configuration.COLORERROR));
+    public static void sendSyntaxError(CommandSender sender, String text){
+        sendCustomMessage(sender, Component.text(text, Configuration.COLORERROR));
+    }
+
+    public static void sendGenericInvalidAmount(CommandSender sender, String amount){
+        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("generic.error.invalid-amount").replace("%invalid_amount%", amount));
     }
 
     public static void sendGenericMissingPerm(CommandSender sender){
-        sendError(sender, Profitable.getLang().get("error.missing-perm"));
+        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("generic.error.missing-perm"));
     }
 
     public static void sendGenericCantConsole(CommandSender sender){
-        sendError(sender, Profitable.getLang().get("error.cant-console"));
+        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("generic.error.cant-console"));
     }
 
     public static void sendGenericInvalidSubCom(CommandSender sender, String subCommand){
-        sendError(sender, Profitable.getLang().get("error.invalid-subcommand").replace("%sub_command%", subCommand));
+        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("generic.error.invalid-subcommand").replace("%sub_command%", subCommand));
     }
 
     public static byte[] UUIDtoBytes(UUID uuid) throws IOException {

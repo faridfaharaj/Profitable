@@ -28,13 +28,13 @@ public class Exchange {
         // validation -------------------------
 
         if(Objects.equals(order.getAsset(), Configuration.MAINCURRENCYASSET.getCode())){
-            MessagingUtil.sendError(player, "Cannot trade " + order.getAsset() + " using " + order.getAsset());
+            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.error.identical-assets"));
             return;
         }
 
         Asset tradedAsset = Assets.getAssetData(order.getAsset());
         if(tradedAsset == null){
-            MessagingUtil.sendError(player, "That asset cannot be traded here");
+            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.asset-not-found").replace("%asset%", order.getAsset()));
             return;
         }
 
@@ -43,7 +43,7 @@ public class Exchange {
 
             if(tradedAsset.getAssetType() == 2){
                 if(!player.hasPermission("profitable.market.trade.asset.item")){
-                    MessagingUtil.sendError(player, "You don't have permission to trade items");
+                    MessagingUtil.sendGenericMissingPerm(player);
                     return;
                 }
                 if(Accounts.getItemDelivery(order.getOwner()) == null){
@@ -55,7 +55,7 @@ public class Exchange {
 
             }else if(tradedAsset.getAssetType() == 3){
                 if(!player.hasPermission("profitable.market.trade.asset.entity")){
-                    MessagingUtil.sendError(player, "You don't have permission to trade entities");
+                    MessagingUtil.sendGenericMissingPerm(player);
                     return;
                 }
                 if(Accounts.getEntityDelivery(order.getOwner()) == null){
@@ -66,7 +66,7 @@ public class Exchange {
 
 
             }else if(!player.hasPermission("profitable.market.trade.asset."+ assetTypeName.toLowerCase())){
-                MessagingUtil.sendError(player, "You don't have permission to trade assets from type: " + assetTypeName);
+                MessagingUtil.sendGenericMissingPerm(player);
                 return;
             }
 
@@ -75,12 +75,12 @@ public class Exchange {
         if(tradedAsset.getAssetType() == 2 || tradedAsset.getAssetType() == 3) order.setUnits((int) order.getUnits());
 
         if(order.getUnits() <= 0){
-            MessagingUtil.sendError(player, "Units must be at least 1");
+            MessagingUtil.sendGenericInvalidAmount(player, String.valueOf(order.getUnits()));
             return;
         }
 
         if(order.getPrice() <= 0){
-            MessagingUtil.sendError(player, "Invalid price");
+            MessagingUtil.sendGenericInvalidAmount(player, String.valueOf(order.getPrice()));
             return;
         }
 
@@ -93,19 +93,17 @@ public class Exchange {
         if(order.getType() == Order.OrderType.STOP_LIMIT){
 
             if(order.isSideBuy()?lastday.getClose() >= order.getPrice(): lastday.getClose() <= order.getPrice()){
-                MessagingUtil.sendError(player, (order.isSideBuy()? "Stop price must be higher than market's when buying": "Stop price must be lower than market's when selling"));
+                if(order.isSideBuy()){
+                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.error.invalid-sell-stop-trigger"));
+                }else {
+                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.error.invalid-buy-stop-trigger"));
+                }
                 return;
             }
 
             addToBook(player, order, Configuration.MAINCURRENCYASSET, tradedAsset, collateralAsset);
             return;
         }else if(order.getType() == Order.OrderType.STOP_MARKET){
-
-            if(order.isSideBuy()?order.getPrice() <= lastday.getClose() : lastday.getClose() <= order.getPrice()){
-                MessagingUtil.sendError(player, (order.isSideBuy()? "Stop price must be higher than market's when buying": "Stop price must be lower than market's when selling"));
-                return;
-            }
-
             addToBook(player, order, Configuration.MAINCURRENCYASSET, tradedAsset, collateralAsset);
             return;
         }
@@ -117,7 +115,7 @@ public class Exchange {
 
             //Market
             if(order.getType() == Order.OrderType.MARKET){
-                MessagingUtil.sendError(player, "No orders available, use limit order instead");
+                MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.error.no-orders-found"));
                 return;
             }
 
@@ -134,7 +132,7 @@ public class Exchange {
 
             // Prevent self transact
             if(Objects.equals(iteratedOrder.getOwner(), order.getOwner())){
-                MessagingUtil.sendError(player, "You can't transact with yourself!, cancel current order first");
+                MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.error.cant-self-transact"));
                 return;
             }
 
@@ -160,7 +158,7 @@ public class Exchange {
         double takerFee = !Configuration.ASSETFEES[tradedAsset.getAssetType()][0].endsWith("%")? Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][0], 23): Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][0], moneyTransacted);
         double finalMoneyTransacted = moneyTransacted;
         Order finalPartialOrder = partialOrder;
-        Asset.chargeAndRun(player, "Cannot fulfill your order", collateralAsset, order.isSideBuy()?moneyTransacted+ takerFee :unitsTransacted, () -> {
+        Asset.chargeAndRun(player, collateralAsset, order.isSideBuy()?moneyTransacted+ takerFee :unitsTransacted, () -> {
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 List<Order> ordersToDelete = new ArrayList<>(orders);
                 if(finalPartialOrder != null){
@@ -216,13 +214,12 @@ public class Exchange {
     }
 
     public static void sendTransactionNotice(Player player, boolean sideBuy, Asset tradedAsset, double units, double money, double fee){
-        MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix()
-                        .append(sideBuy?Component.text("Bought ", Configuration.COLORBULLISH):Component.text("Sold ", Configuration.COLORBEARISH))
-                        .append(Component.text(units + " " + tradedAsset.getCode(), tradedAsset.getColor()))
-                        .append(Component.text(" for "))
-                        .append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, money))
 
-                );
+        MessagingUtil.sendMiniMessage(player,
+                (sideBuy?Profitable.getLang().get("exchange.buying-notice"):Profitable.getLang().get("exchange.selling-notice"))
+                        .replace("%base_asset_amount%", MessagingUtil.assetAmmount(tradedAsset, units))
+                        .replace("%quote_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, money))
+        );
 
         if(sideBuy){
             MessagingUtil.sendChargeNotice(player, money, fee, Configuration.MAINCURRENCYASSET);
@@ -248,12 +245,10 @@ public class Exchange {
 
         Player player = Profitable.getInstance().getServer().getPlayer(playerid);
         if(player != null){
-            MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix()
-                    .append(sideBuy?Component.text("Bought ", Configuration.COLORBULLISH):Component.text("Sold ", Configuration.COLORBEARISH))
-                    .append(Component.text(units + " " + tradedAsset.getCode(), tradedAsset.getColor()))
-                    .append(Component.text(" for "))
-                    .append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, money))
-
+            MessagingUtil.sendMiniMessage(player,
+                    (sideBuy?Profitable.getLang().get("exchange.buying-notice"):Profitable.getLang().get("exchange.selling-notice"))
+                            .replace("%base_asset_amount%", MessagingUtil.assetAmmount(tradedAsset, units))
+                            .replace("%quote_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, money))
             );
 
             if(sideBuy){
@@ -277,18 +272,23 @@ public class Exchange {
         double cost = order.getPrice()*order.getUnits();
         double makerFee = Configuration.parseFee(Configuration.ASSETFEES[tradedasset.getAssetType()][1], cost);
 
-        Asset.chargeAndRun(player, "Order couldn't be added", collateralAsset, order.isSideBuy()? cost+makerFee: order.getUnits(), () -> {
+        Asset.chargeAndRun(player, collateralAsset, order.isSideBuy()? cost+makerFee: order.getUnits(), () -> {
             // Insert
             Orders.insertOrder(UUID.randomUUID(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), order.getType());
 
             // Feedback
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> player.playSound(player, Sound.ITEM_BOOK_PAGE_TURN, 1 , 1));
-            MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix()
-                    .append(Component.text("New " + order.getType().toString().replace("_","-").toLowerCase() + " order ")).append(order.isSideBuy()?Component.text("Buy ", Configuration.COLORBULLISH):Component.text("Sell ", Configuration.COLORBEARISH))
-                    .append(MessagingUtil.assetAmmount(tradedasset, order.getUnits()))
-                    .append(Component.text(" at "))
-                    .append(MessagingUtil.assetAmmount(currency, order.getPrice()))
-                    .append(Component.text(" each"))
+
+            MessagingUtil.sendMiniMessage(player,Profitable.getLang().get("exchange.new-order-notice")
+                    .replace("%order_type%", order.getType().toString()
+                            .replace("_","-").toLowerCase()
+                    )
+                    .replace("%side%", order.isSideBuy()?
+                            Profitable.getLang().get("naming.orders.sides.buy"):
+                            Profitable.getLang().get("naming.orders.sides.sell")
+                    )
+                    .replace("%base_asset_amount%", MessagingUtil.assetAmmount(tradedasset, order.getUnits()))
+                    .replace("%base_asset_amount%", MessagingUtil.assetAmmount(currency, order.getPrice()))
             );
 
             if(order.isSideBuy()){

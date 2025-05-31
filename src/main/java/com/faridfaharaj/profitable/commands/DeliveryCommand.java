@@ -64,7 +64,7 @@ public class DeliveryCommand implements CommandExecutor {
                 }
 
                 if(args.length < 2){
-                    MessagingUtil.sendError(player, "/account delivery set item OR /account delivery set entity");
+                    MessagingUtil.sendSyntaxError(player, "/account delivery set <entity/item>");
                     return true;
                 }
 
@@ -79,7 +79,7 @@ public class DeliveryCommand implements CommandExecutor {
 
                     return true;
                 }else{
-                    MessagingUtil.sendError(player, "Invalid delivery");
+                    MessagingUtil.sendGenericInvalidSubCom(sender, args[1]);
 
                 }
 
@@ -87,7 +87,7 @@ public class DeliveryCommand implements CommandExecutor {
 
 
             }else{
-                MessagingUtil.sendError(player, "/account delivery set item OR /account delivery set entity");
+                MessagingUtil.sendSyntaxError(player, "/account delivery set <entity/item>");
             }
 
         }else {
