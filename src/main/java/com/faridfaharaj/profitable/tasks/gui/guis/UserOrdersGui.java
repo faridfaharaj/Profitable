@@ -70,7 +70,7 @@ public final class UserOrdersGui extends ChestGUI {
             if(index >= orders.size()){
                 getInventory().clear(slot);
             }else {
-                orderButtons.add(new OrderButton(this, orders.get(index), slot, "cancel this order"));
+                orderButtons.add(new OrderButton(this, orders.get(index), slot, true));
             }
 
         }

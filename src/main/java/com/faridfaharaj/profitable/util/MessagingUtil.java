@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Player;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
+import java.util.Map;
 import java.util.UUID;
 
 public class MessagingUtil {
@@ -33,7 +35,7 @@ public class MessagingUtil {
     }
 
     public static String assetAmmount(Asset asset, double amount){
-        return MiniMessage.miniMessage().serialize(Component.text(decimalFormat.format(amount) + " " + asset.getCode(), asset.getColor()).hoverEvent(assetSummary(asset)));
+        return "<color:" + asset.getColor().asHexString() + ">" + decimalFormat.format(amount) + " " + asset.getCode() + "</color>";
     }
 
     public static Component assetSummary(Asset asset){
@@ -132,7 +134,10 @@ public class MessagingUtil {
     public static void sendChargeNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
         String feeString;
         if(fee != 0){
-            feeString = Profitable.getLang().get("asset.fee-display").replace("%amount%", decimalFormat.format(fee)).replace("%asset%", assetCharged.getCode());
+            feeString = Profitable.getLang().get("exchange.fee-display",
+                    Map.entry("%amount%", decimalFormat.format(fee)),
+                    Map.entry("%asset%", assetCharged.getCode())
+            );
         }else {
             feeString = "";
         }
@@ -145,7 +150,10 @@ public class MessagingUtil {
 
         String feeString;
         if(fee != 0){
-            feeString = Profitable.getLang().get("asset.fee-display").replace("%amount%", decimalFormat.format(fee)).replace("%asset%", assetCharged.getCode());
+            feeString = Profitable.getLang().get("exchange.fee-display",
+                    Map.entry("%amount%", decimalFormat.format(fee)),
+                    Map.entry("%asset%", assetCharged.getCode())
+            );
         }else {
             feeString = "";
         }

@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.tasks.gui.guis.orderBuilding;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
@@ -15,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Map;
 
 public final class UnitsSelect extends QuantitySelectGui {
 
@@ -39,13 +41,11 @@ public final class UnitsSelect extends QuantitySelectGui {
     @Override
     protected void onAmountUpdate(double newAmount) {
         getSubmitButton().setDisplayName(Component.text("Transacting amount: ",Configuration.GUICOLORTITLE).append(Component.text(newAmount, Configuration.GUICOLORTITLEHIGHLIGHT)));
-        List<Component> lore = List.of(
-                Component.text(order.getAsset(), Configuration.GUICOLORSUBTITLE),
-                Component.empty(),
-                Component.text("Total value: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getType() == Order.OrderType.MARKET?  assetData.getlastCandle().getClose()*newAmount: order.getPrice()*newAmount)),
-                Component.empty(),
-                GuiElement.clickAction(null, "Proceed with this amount")
-        );
+        List<Component> lore;
+        lore = Profitable.getLang().langToLore("gui.order-building.units-select.buttons.submit.lore",
+                Map.entry("%asset%", order.getAsset()),
+                Map.entry("%value_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getType() == Order.OrderType.MARKET?  assetData.getlastCandle().getClose()*newAmount: order.getPrice()*newAmount))
+                );
         getSubmitButton().setLore(lore);
         getSubmitButton().show(this);
     }

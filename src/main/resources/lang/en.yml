@@ -5,6 +5,10 @@ generic:
     invalid-subcommand: "<red>Invalid subcommand: %sub_command%</red>"
     invalid-amount: "<red>Invalid amount %invalid_amount%</red>"
 
+temp-items:
+  error:
+    main-hand-occupied: "<red>Main hand must be free</red>"
+
 naming:
   orders:
     order-types:
@@ -12,8 +16,8 @@ naming:
       market-order: "market order"
       stop-limit-order: "stop-limit"
     sides:
-      buy: "buy"
-      sell: "sell"
+      buy: "buy order"
+      sell: "sell order"
 
 
 account-command:
@@ -28,11 +32,11 @@ account-command:
 
 exchange:
   fee-display: "<red>(incl. %amount% %asset% fee)</red>"
-  charge-notice: "Charged %asset_amount% %fee%"
-  payment-notice: "Received %asset_amount% %fee%"
-  selling-notice: "<bullish>Bought</bullish> %base_asset_amount% for %quote_asset_amount%"
-  buying-notice: "<bearish>Sold</bearish> %base_asset_amount% for %quote_asset_amount%"
-  new-order-notice: "New %order_type% order %side% %base_asset_amount% at %quote_asset_amount% each"
+  charge-notice: "<gray>Charged %asset_amount% %fee%</gray>"
+  payment-notice: "<gray>Received %asset_amount% %fee%</gray>"
+  selling-notice: "<gray><bullish>Bought</bullish> %base_asset_amount% for %quote_asset_amount%</gray>"
+  buying-notice: "<gray><bearish>Sold</bearish> %base_asset_amount% for %quote_asset_amount%</gray>"
+  new-order-notice: "<gray>New %order_type% %side% %base_asset_amount% at %quote_asset_amount% each</gray>"
   error:
     invalid-order-type: "<red>Invalid Order Type</red>"
     identical-assets: "<red>You must trade between two different assets</red>"
@@ -64,3 +68,118 @@ hooks:
 
 
 gui:
+  generic:
+    buttons:
+      return:
+        name: "<red>return</red>"
+        lore:
+          - ""
+          - "<yellow>Click to go to last menu</yellow>"
+  wallet:
+    title: "Portfolio"
+    buttons:
+      asset-holding:
+        name: "%asset%"
+        lore:
+          - "<dark_gray>%asset_type%</dark_gray>"
+          - ""
+          - "<gray>Owned: %owned_asset_amount%</gray>"
+          - ""
+          - "<gray>Market price: %price_asset_amount%</gray>"
+          - "<gray>Total value: %value_asset_amount%</gray>"
+          - ""
+          - "<yellow>Left click to withdraw</yellow>"
+          - "<yellow>Right click to deposit</yellow>"
+  orders:
+    title: "Active orders"
+    buttons:
+      order:
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<gray>Type: %order_type%</gray>"
+          - ""
+          - "<gray>Units: <white>%base_asset_amount%</white></gray>"
+          - "<gray>Price: %quote_asset_amount%</gray>"
+          - ""
+          - "<gray>Total value: %value_asset_amount%</gray>"
+          - ""
+          - "<yellow>Left click to cancel</yellow>"
+
+  order-building:
+    buy-sell:
+      title: "Pick a side."
+      buttons:
+        sell:
+          name: "%side% order"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Ask: %ask_asset_amount%</gray>"
+            - ""
+            - "<gray>Lowest prices:</gray>"
+            - "%price_list%"
+            - ""
+            - "<yellow>Left click to pick sell</yellow>"
+          no-orders-lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>No one is selling this asset yet!</gray>"
+            - ""
+            - "<yellow>Left click to pick sell</yellow>"
+        buy:
+          name: "%side% order"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Bid: %bid_asset_amount%</gray>"
+            - ""
+            - "<gray>Highest prices:</gray>"
+            - "%price_list%"
+            - ""
+            - "<yellow>Left click to pick buy</yellow>"
+          no-orders-lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>No one is buying this asset yet!</gray>"
+            - ""
+            - "<yellow>Left click to pick sell</yellow>"
+
+    price-select:
+      title: "Select a price."
+      buttons:
+        submit:
+          name: "<yellow>Your price: %asset_amount%</yellow>"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Current asset price: %price_asset_amount%</gray>"
+            - ""
+            - "<yellow>Click to proceed with this price</yellow>"
+    units-select:
+      title: "Select units."
+      buttons:
+        submit:
+          name: "<yellow>Transacting amount: %asset_amount%</yellow>"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Total value: %value_asset_amount%</gray>"
+            - ""
+            - "<yellow>Click to proceed with this amount</yellow>"
+    confirmation:
+      title: "Confirm?"
+      buttons:
+        submit:
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Type: %order_type%</gray>"
+            - ""
+            - "<gray>Units: <white>%base_asset_amount%</white></gray>"
+            - "<gray>Price: %quote_asset_amount%</gray>"
+            - ""
+            - "<gray>Total value: %value_asset_amount%</gray>"
+            - ""
+            - "<yellow>Left click to send this order</yellow>"
+

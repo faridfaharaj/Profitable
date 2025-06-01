@@ -1,12 +1,14 @@
 package com.faridfaharaj.profitable;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Set;
+import java.util.*;
 
 public class Lang {
 
@@ -58,8 +60,45 @@ public class Lang {
         }
     }
 
-    public String get(String path) {
-        return lang.getString(path, "<red>_missing translation:[" + path + "]!_</red>");
+    public String get(String path, Map.Entry<String, String>... placeHolders) {
+
+        String text = lang.getString(path, "<red>_missing translation:[" + path + "]!_</red>");
+
+        for(Map.Entry<String, String> placeHolder : placeHolders){
+            text = text.replace(placeHolder.getKey(), placeHolder.getValue());
+        }
+
+        return text;
+    }
+
+    public Component getComponent(String path, Map.Entry<String, String>... placeHolders) {
+
+        return MiniMessage.miniMessage().deserialize(get(path, placeHolders));
+
+    }
+
+    public List<Component> langToLore(String path, Map.Entry<String, String>... placeHolders){
+        List<String> lines = lang.getStringList(path);
+
+        List<Component> lore = new ArrayList<>();
+        for (String line : lines){
+
+            String miniMessage = line;
+            for(Map.Entry<String, String> placeHolder : placeHolders){
+                miniMessage = miniMessage.replace(placeHolder.getKey(), placeHolder.getValue());
+            }
+            if(miniMessage.contains("%&new_line&%")){
+                String[] newLines = miniMessage.split("%&new_line&%");
+                for(String newLine : newLines){
+                    lore.add(MiniMessage.miniMessage().deserialize(newLine));
+                }
+            }else {
+                lore.add(MiniMessage.miniMessage().deserialize(miniMessage));
+            }
+
+        }
+
+        return lore;
     }
 
 }

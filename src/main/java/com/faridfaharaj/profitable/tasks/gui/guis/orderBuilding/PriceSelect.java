@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.tasks.gui.guis.orderBuilding;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
@@ -16,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class PriceSelect  extends QuantitySelectGui {
 
@@ -37,17 +39,10 @@ public final class PriceSelect  extends QuantitySelectGui {
         this.askOrders = askOrders;
 
         List<Component> lore = new ArrayList<>();
-        lore.add(Component.text(assetData.getAsset().getCode(), Configuration.GUICOLORSUBTITLE));
-        lore.add(Component.empty());
-        lore.add(Component.text("Current asset price: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, assetData.getlastCandle().getClose())));
-        if(!bidOrders.isEmpty()){
-            lore.add(Component.text("Bid: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, bidOrders.getFirst().getPrice())));
-        }
-        if(!askOrders.isEmpty()){
-            lore.add(Component.text("Ask: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, askOrders.getFirst().getPrice())));
-        }
-        lore.add(Component.empty());
-        lore.add(GuiElement.clickAction(null, "Proceed with this price"));
+        lore = Profitable.getLang().langToLore("gui.order-building.price-select.buttons.submit.lore",
+                Map.entry("%asset%", assetData.getAsset().getCode()),
+                Map.entry("%price_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, assetData.getlastCandle().getClose()))
+        );
         getSubmitButton().setLore(lore);
         getSubmitButton().show(this);
     }

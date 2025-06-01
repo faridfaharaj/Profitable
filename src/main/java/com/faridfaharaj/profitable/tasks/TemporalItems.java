@@ -56,7 +56,7 @@ public class TemporalItems {
     public static void sendClaimingTag(Player player){
 
         if(player.getInventory().getItemInMainHand().getType() != Material.AIR){
-            MessagingUtil.sendError(player, "you must have your main hand free");
+            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("temp-items.error.main-hand-occupied"));
             return;
         }
 
@@ -73,7 +73,7 @@ public class TemporalItems {
     public static void sendDeliveryStick(Player player, boolean items){
 
         if(player.getInventory().getItemInMainHand().getType() != Material.AIR){
-            MessagingUtil.sendError(player, "you must have your main hand free");
+            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("temp-items.error.main-hand-occupied"));
             return;
         }
 
@@ -86,14 +86,14 @@ public class TemporalItems {
     public static void sendGraphMap(Player player, String assetid, long time, String interval){
 
         if(player.getInventory().getItemInMainHand().getType() != Material.AIR){
-            MessagingUtil.sendError(player, "you must have your main hand free");
+            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("temp-items.error.main-hand-occupied"));
             return;
         }
 
         Asset asset = Assets.getAssetData(assetid);
 
         if(asset == null){
-            MessagingUtil.sendError(player, "This asset isn't traded here");
+            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.asset-not-found").replace("%asset%", assetid));
             return;
         }
 

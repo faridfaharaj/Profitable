@@ -288,7 +288,7 @@ public class Exchange {
                             Profitable.getLang().get("naming.orders.sides.sell")
                     )
                     .replace("%base_asset_amount%", MessagingUtil.assetAmmount(tradedasset, order.getUnits()))
-                    .replace("%base_asset_amount%", MessagingUtil.assetAmmount(currency, order.getPrice()))
+                    .replace("%quote_asset_amount%", MessagingUtil.assetAmmount(currency, order.getPrice()))
             );
 
             if(order.isSideBuy()){

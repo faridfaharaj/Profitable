@@ -13,25 +13,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Map;
 
 public final class OrderButton extends GuiElement{
 
     Order order;
 
-    public OrderButton(ChestGUI gui, Order order, int slot, String clickAction) {
+    public OrderButton(ChestGUI gui, Order order, int slot, boolean actionCancel) {
         super(gui, order.isSideBuy()?new ItemStack(Material.PAPER):new ItemStack(Material.MAP), order.isSideBuy()?Component.text("Buy order", Configuration.COLORBULLISH):Component.text("Sell order", Configuration.COLORBEARISH),
-                List.of(
-                        Component.text(order.getAsset(),Configuration.GUICOLORSUBTITLE),
-                        Component.empty(),
-                        Component.text("Type:", Configuration.GUICOLORTEXT).append(Component.text(" " + order.getType(),Configuration.GUICOLORHIGHLIGHT)),
-                        Component.empty(),
-                        Component.text("Units:", Configuration.GUICOLORTEXT).append(Component.text(" " + order.getUnits(),Configuration.GUICOLORHIGHLIGHT)),
-                        Component.text("Price: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getPrice())),
-                        Component.empty(),
-                        Component.text("Total value: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getPrice()*order.getUnits())),
-                        Component.empty(),
-                        GuiElement.clickAction(null, clickAction)
-                ), slot);
+                Profitable.getLang().langToLore(actionCancel?"gui.orders.buttons.order.lore":"gui.order-building.confirmation.buttons.submit.lore",
+                        Map.entry("%asset%", order.getAsset()),
+                        Map.entry("%order_type%", order.getType().toString()),
+                        Map.entry("%base_asset_amount%", String.valueOf(order.getUnits())),
+                        Map.entry("%quote_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getPrice())),
+                        Map.entry("%value_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, order.getPrice()*order.getUnits()))
+                ),
+                slot);
 
         this.order = order;
 

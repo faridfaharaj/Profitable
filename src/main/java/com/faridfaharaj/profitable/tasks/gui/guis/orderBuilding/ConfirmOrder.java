@@ -44,7 +44,7 @@ public final  class ConfirmOrder extends ChestGUI {
         fillAll(Material.BLACK_STAINED_GLASS_PANE);
         buttons[0] = new ReturnButton(this, vectorSlotPosition(0, 2));
 
-        buttons[1] = new OrderButton(this, order, vectorSlotPosition(4, 1), "confirm this order");
+        buttons[1] = new OrderButton(this, order, vectorSlotPosition(4, 1), false);
 
     }
 

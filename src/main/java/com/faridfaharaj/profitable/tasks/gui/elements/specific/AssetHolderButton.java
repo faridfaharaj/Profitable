@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class AssetHolderButton extends GuiElement {
 
@@ -46,19 +47,15 @@ public final class AssetHolderButton extends GuiElement {
 
             setDisplayName(Component.text(asset.getCode(),asset.getColor()));
 
-            List<Component> lore = new ArrayList<>();
-
-            lore.add(Component.text(NamingUtil.nameType(asset.getAssetType()), Configuration.GUICOLORSUBTITLE));
-            lore.add(Component.empty());
-            lore.add(Component.text("Owned: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(asset, lastestDay.getVolume())));
-            lore.add(Component.empty());
-            lore.add(Component.text("Market price: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getClose())));
-            lore.add(Component.text("Total value: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getVolume()*lastestDay.getClose())));
-            lore.add(Component.empty());
-            lore.add(GuiElement.clickAction(ClickType.LEFT, "withdraw"));
-            lore.add(GuiElement.clickAction(ClickType.RIGHT, "deposit"));
+            List<Component> lore = Profitable.getLang().langToLore("gui.wallet.buttons.asset-holding.lore",
+                    Map.entry("%asset_type%", NamingUtil.nameType(asset.getAssetType())),
+                    Map.entry("%owned_asset_amount%", MessagingUtil.assetAmmount(asset, lastestDay.getVolume())),
+                    Map.entry("%price_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getClose())),
+                    Map.entry("%value_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getVolume()*lastestDay.getClose()))
+            );
 
             setLore(lore);
+
 
             loaded = true;
 
