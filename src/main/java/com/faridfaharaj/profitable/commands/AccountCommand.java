@@ -14,10 +14,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class AccountCommand implements CommandExecutor {
 
@@ -33,9 +30,11 @@ public class AccountCommand implements CommandExecutor {
             if(sender instanceof Player player){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     String account = Accounts.getAccount(player);
-                    MessagingUtil.sendCustomMessage(sender, Component.text("Account: ", Configuration.GUICOLORTEXT).append((Objects.equals(account, player.getUniqueId().toString()) ?
-                            Component.text("(Default)").color(Configuration.COLOREMPTY):
-                            Component.text(account).color(Configuration.COLORHIGHLIGHT))));
+
+                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("account-command.account-display",
+                            Map.entry("%account%", Objects.equals(account, player.getUniqueId().toString())? "Default" : account)
+                    ));
+
                 });
                 return true;
             }
@@ -59,7 +58,11 @@ public class AccountCommand implements CommandExecutor {
                 if(args[2].length() < 32){
                     Profitable.getfolialib().getScheduler().runAsync(task -> {
                         if(Accounts.registerAccount(args[1], args[2])){
-                            MessagingUtil.sendSuccsess(sender, "Account registered successfully");
+
+                            MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.registry",
+                                    Map.entry("%account%", args[1])
+                            ));
+
                         }else{
                             MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.account-already-exists"));
                         }
@@ -108,7 +111,9 @@ public class AccountCommand implements CommandExecutor {
                             MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.cant-delete-active-account"));
                         }else{
                             Accounts.deleteAccount(account);
-                            MessagingUtil.sendCustomMessage(sender, Component.text("DELETED account: " + account,NamedTextColor.RED));
+                            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("account-command.account-delete",
+                                    Map.entry("%account%", account)
+                            ));
                         }
 
                     }else{
@@ -142,7 +147,10 @@ public class AccountCommand implements CommandExecutor {
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
 
                     if(Accounts.logIn(player.getUniqueId(), args[1], args[2])){
-                        MessagingUtil.sendCustomMessage(sender, Component.text("Successfully logged into ", Configuration.COLORTEXT).append(Component.text(args[1], Configuration.COLORHIGHLIGHT)));
+                        MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("account-command.login",
+                                Map.entry("%account%", args[1])
+                        ));
+
                     }else{
                         MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.wrong-password"));
                     }
@@ -168,7 +176,8 @@ public class AccountCommand implements CommandExecutor {
 
                 Accounts.logOut(playerid);
 
-                MessagingUtil.sendSuccsess(sender,"Logged out successfully");
+                MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.logout"));
+
                 return  true;
 
             }
@@ -194,7 +203,9 @@ public class AccountCommand implements CommandExecutor {
                     if(Accounts.comparePasswords(account, args[1])){
                         if(args[2].length() < 32){
                             Accounts.changePassword(account, args[2]);
-                            MessagingUtil.sendSuccsess(sender, "Password updated successfully");
+                            MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.password-update"));
+
+
                         }else{
                             MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("account-command.error.password-too-long"));
                         }

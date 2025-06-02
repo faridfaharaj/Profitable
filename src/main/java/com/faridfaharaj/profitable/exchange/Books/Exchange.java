@@ -13,13 +13,11 @@ import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class Exchange {
 
@@ -47,7 +45,16 @@ public class Exchange {
                     return;
                 }
                 if(Accounts.getItemDelivery(order.getOwner()) == null){
-                    MessagingUtil.sendCustomMessage(player, Component.text("You must set a location for delivery ", Configuration.COLORWARN).append(MessagingUtil.buttonComponent("[Click here!]","/delivery set item")));
+                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("delivery.error.missing-item-delivery"));
+                    System.out.println(
+
+                            MiniMessage.miniMessage().serialize(
+
+                                    Component.text("You must set a location for delivery ", Configuration.COLORWARN).append(MessagingUtil.buttonComponent("[Click here!]","/delivery set item"))
+
+                            )
+
+                    );
                     TemporalItems.sendDeliveryStick(player, true);
                     return;
                 }
@@ -59,7 +66,18 @@ public class Exchange {
                     return;
                 }
                 if(Accounts.getEntityDelivery(order.getOwner()) == null){
-                    MessagingUtil.sendCustomMessage(player, Component.text("You must set a location for delivery ", Configuration.COLORWARN).append(MessagingUtil.buttonComponent("[Click here!]","/delivery set entity")));
+                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("delivery.error.missing-entity-delivery"));
+
+                    System.out.println(
+
+                            MiniMessage.miniMessage().serialize(
+
+                                    Component.text("You must set a location for delivery ", Configuration.COLORWARN).append(MessagingUtil.buttonComponent("[Click here!]","/delivery set entity"))
+
+                            )
+
+                    );
+
                     TemporalItems.sendDeliveryStick(player, false);
                     return;
                 }
@@ -198,7 +216,7 @@ public class Exchange {
         if(takerOrder.getType() == Order.OrderType.MARKET){
 
             if(unitsTransacted != takerOrder.getUnits()){
-                MessagingUtil.sendWarning(player, "Partially filled because no more orders are available");
+                MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.warning.partial-fill-low-liquidity"));
             }
 
         }else{
@@ -284,8 +302,8 @@ public class Exchange {
                             .replace("_","-").toLowerCase()
                     )
                     .replace("%side%", order.isSideBuy()?
-                            Profitable.getLang().get("naming.orders.sides.buy"):
-                            Profitable.getLang().get("naming.orders.sides.sell")
+                            Profitable.getLang().get("orders.sides.buy"):
+                            Profitable.getLang().get("orders.sides.sell")
                     )
                     .replace("%base_asset_amount%", MessagingUtil.assetAmmount(tradedasset, order.getUnits()))
                     .replace("%quote_asset_amount%", MessagingUtil.assetAmmount(currency, order.getPrice()))
@@ -299,7 +317,12 @@ public class Exchange {
                 MessagingUtil.sendChargeNotice(player, order.getUnits(), 0, collateralAsset);
 
                 if(makerFee >= cost){
-                    MessagingUtil.sendWarning(player, "This order is worth less than its fee ($" + makerFee + ") there will be no profit!");
+
+                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.selling-notice",
+
+                            Map.entry("%fee_asset_amount%", MessagingUtil.assetAmmount(currency, makerFee))
+
+                    ));
                 }
             }
         });

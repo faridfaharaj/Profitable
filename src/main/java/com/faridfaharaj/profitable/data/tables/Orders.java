@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.data.tables;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
@@ -14,10 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class Orders {
 
@@ -395,7 +393,9 @@ public class Orders {
 
         Orders.deleteOrder(order.getUuid());
 
-        MessagingUtil.sendCustomMessage(player, Component.text("Cancelled ", Configuration.COLORTEXT).append(order.toStringSimplified()));
+        MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("orders.cancel",
+                        Map.entry("%order%", order.toStringSimplified()))
+                );
         MessagingUtil.sendPaymentNotice(player, ammountToSendBack, 0, asset);
 
         return true;

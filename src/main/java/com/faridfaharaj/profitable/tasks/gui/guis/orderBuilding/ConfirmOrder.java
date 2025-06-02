@@ -61,7 +61,7 @@ public final  class ConfirmOrder extends ChestGUI {
 
                 if(button == buttons[1]){
                     player.closeInventory();
-                    MessagingUtil.sendPlain(player, "Processing Order...");
+                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.loading-order"));
                     Profitable.getfolialib().getScheduler().runAsync(task -> {
                         Exchange.sendNewOrder(player, new Order(UUID.randomUUID(), Accounts.getAccount(player), assetData.getAsset().getCode(), order.isSideBuy(), order.getPrice(), order.getUnits(), order.getType()));
                     });

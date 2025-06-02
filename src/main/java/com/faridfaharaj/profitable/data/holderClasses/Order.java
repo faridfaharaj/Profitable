@@ -94,8 +94,8 @@ public class Order{
     }
 
     // [ sell 32 VLT $23 ]
-    public Component toStringSimplified() {
-        return Component.text("[ "+ type.toString().replace("_", "-") +(sideBuy? " buy " : " sell ") + units + " " + asset + " $" + price + " ]", Configuration.COLORHIGHLIGHT);
+    public String toStringSimplified() {
+        return "[ "+ type.toString().replace("_", "-") +(sideBuy? " buy " : " sell ") + units + " " + asset + " $" + price + " ]";
     }
 
 }

@@ -195,11 +195,14 @@ public class HelpCommand implements CommandExecutor {
             page = 0;
         }
 
+        /*
         MessagingUtil.sendCustomMessage(sender,
                 MessagingUtil.profitableTopSeparator("Help", "-------------------").appendNewline()
                         .append(Component.text(pages[page])).appendNewline()
                         .append(MessagingUtil.profitableBottomSeparator())
         );
+
+         */
 
         return true;
     }

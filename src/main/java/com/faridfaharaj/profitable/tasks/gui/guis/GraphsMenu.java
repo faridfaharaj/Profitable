@@ -64,31 +64,31 @@ public final class GraphsMenu extends ChestGUI {
             new AssetExplorer(player, 2, cache).openGui(player);
         }else if(slot == graph1MButton.getSlot()){
             player.closeInventory();
-            MessagingUtil.sendSuccsess(player, "Preparing Graph...");
+            MessagingUtil.sendMiniMessage(player, "assets.loading-graph");
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 720000, "1M");
             });
         } else if (slot == graph3MButton.getSlot()) {
             player.closeInventory();
-            MessagingUtil.sendSuccsess(player, "Preparing Graph...");
+            MessagingUtil.sendMiniMessage(player, "assets.loading-graph");
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 2160000, "3M");
             });
         } else if (slot == graph6MButton.getSlot()) {
             player.closeInventory();
-            MessagingUtil.sendSuccsess(player, "Preparing Graph...");
+            MessagingUtil.sendMiniMessage(player, "assets.loading-graph");
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 4320000, "6M");
             });
         } else if (slot == graph1YButton.getSlot()) {
             player.closeInventory();
-            MessagingUtil.sendSuccsess(player, "Preparing Graph...");
+            MessagingUtil.sendMiniMessage(player, "assets.loading-graph");
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 8760000, "1Y");
             });
         } else if (slot == graph2YButton.getSlot()) {
             player.closeInventory();
-            MessagingUtil.sendSuccsess(player, "Preparing Graph...");
+            MessagingUtil.sendMiniMessage(player, "assets.loading-graph");
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 17520000, "2Y");
             });

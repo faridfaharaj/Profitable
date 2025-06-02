@@ -73,7 +73,7 @@ public class TransactCommand implements CommandExecutor {
                         }
                         case "market" -> {
 
-                            MessagingUtil.sendWarning(sender, "Ignoring price for market order");
+                            MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("exchange.warning.market-ignores-price"));
                             price = sideBuy ? Double.MAX_VALUE : Double.MIN_VALUE;
                             orderType = Order.OrderType.MARKET;
                         }
@@ -101,7 +101,8 @@ public class TransactCommand implements CommandExecutor {
                 double finalPrice = price;
                 Order.OrderType finalOrderType = orderType;
 
-                MessagingUtil.sendPlain(player, "Processing Order...");
+                MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("exchange.loading-order"));
+
                 Profitable.getfolialib().getScheduler().runAsync(async -> {
 
                     Exchange.sendNewOrder(player, new Order(UUID.randomUUID(), Accounts.getAccount(player), asset, sideBuy, finalPrice, units, finalOrderType));

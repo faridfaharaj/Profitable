@@ -9,18 +9,27 @@ temp-items:
   error:
     main-hand-occupied: "<red>Main hand must be free</red>"
 
-naming:
-  orders:
-    order-types:
-      limit-order: "limit order"
-      market-order: "market order"
-      stop-limit-order: "stop-limit"
-    sides:
-      buy: "buy order"
-      sell: "sell order"
+orders:
+  cancel: "<gray>Cancelled <yellow>%order%</yellow></gray>"
+  order-types:
+    limit-order: "limit order"
+    market-order: "market order"
+    stop-limit-order: "stop-limit"
+  sides:
+    buy: "buy order"
+    sell: "sell order"
+  warning:
+    market-ignores-price: "<yellow>Ignoring price for market order</yellow>"
+
 
 
 account-command:
+  account-display: "<gray>Active account: <yellow>(%account%)</yellow></gray>"
+  account-delete: "<red>DELETED account: %account%</red>"
+  login: "<gray>Successfully logged into <yellow>%account%</yellow>!</gray>"
+  registry: "<gray>Account <yellow>%account%</yellow> registered successfully!</gray>"
+  logout: "<gray>Logged out successfully!</gray>"
+  password-update: "<gray>Password updated successfully!</gray>"
   error:
     account-already-exists: "<red>An account with this name already exists</red>"
     password-too-long: "<red>Max password length is 32 characters</red>"
@@ -30,6 +39,7 @@ account-command:
     cant-delete-active-account: "<red>Someone else is still using this account, cannot delete</red>"
     active-account-mismatch: "<red>Account name doesn't match with active account's</red>"
 
+
 exchange:
   fee-display: "<red>(incl. %amount% %asset% fee)</red>"
   charge-notice: "<gray>Charged %asset_amount% %fee%</gray>"
@@ -37,6 +47,12 @@ exchange:
   selling-notice: "<gray><bullish>Bought</bullish> %base_asset_amount% for %quote_asset_amount%</gray>"
   buying-notice: "<gray><bearish>Sold</bearish> %base_asset_amount% for %quote_asset_amount%</gray>"
   new-order-notice: "<gray>New %order_type% %side% %base_asset_amount% at %quote_asset_amount% each</gray>"
+  loading-order: "<gray>Processing order...</gray>"
+  claim-fee-notice: "Claiming fees are %fee_asset_amount% per entity"
+  warning:
+    partial-fill: "<yellow>Partially filled</yellow>"
+    partial-fill-low-liquidity: "<yellow>Partially filled because no more orders were available</yellow>"
+    fee-higher-than-profit: "<yellow>This order is worth less than its fee (%fee_asset_amount%) there will be no profit!</yellow>"
   error:
     invalid-order-type: "<red>Invalid Order Type</red>"
     identical-assets: "<red>You must trade between two different assets</red>"
@@ -49,6 +65,7 @@ assets:
   amount-display: "%amount% %asset%"
   auto-deposit-notice: "Automatically deposited %asset_amount% <red>(+ fees)</red>"
   entity-claim-notice: "Claimed %entity% using %asset_amount%"
+  loading-graph: "Loading graph..."
   error:
     asset-not-found: "<red>Cannot trade %asset% here</red>"
     cant-fractional: "<red>Asset %asset% cant be fractional</red>"
@@ -59,8 +76,13 @@ assets:
     cant-claim-entity: "<red>Owning this entity isn't allowed</red>"
 
 delivery:
+  display: "<br><gray>Item Delivery Location: <yellow>%i_position%</yellow></gray><br><gray>Entity Delivery Location: <yellow>%e_position%</yellow></gray><br>"
+  updated-item: "<gray>Updated item delivery to: <yellow>%position%</yellow></gray>"
+  updated-entity: "<gray>Updated entity delivery to: <yellow>%position%</yellow></gray>"
   error:
     items-must-be-container: "<red>Item delivery location must be a container</red>"
+    missing-item-delivery:
+    missing-entity-delivery:
 
 hooks:
   error:

@@ -60,37 +60,6 @@ public class MessagingUtil {
         return  component;
     }
 
-    public static Component profitableTopSeparator(String text, String sides){
-        return Component.text("").append(Component.text(sides + " [",Configuration.COLORPROFITABLE))
-                .append(Component.text(text,Configuration.COLORPROFITABLE).decorate(TextDecoration.BOLD))
-                .append(Component.text("] " + sides,Configuration.COLORPROFITABLE));
-    }
-
-    public static Component profitableBottomSeparator(){
-        return Component.text("--------------------------------------------",Configuration.COLORPROFITABLE);
-    }
-
-    public static void sendCustomMessage(CommandSender sender, Component component){
-        if(Profitable.getfolialib().isSpigot()){
-
-            String jsonMessage = GsonComponentSerializer.gson().serialize(component);
-            sender.spigot().sendMessage(ComponentSerializer.parse(jsonMessage));
-
-        }else {
-
-            if(sender instanceof Player player){
-                Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
-                    sender.sendMessage(component);
-                });
-            }else{
-                Profitable.getfolialib().getScheduler().runNextTick(task -> {
-                    sender.sendMessage(component);
-                });
-            }
-
-        }
-    }
-
     public static void sendMiniMessage(CommandSender sender, String message){
 
         Component component = MiniMessage.miniMessage().deserialize(message);
@@ -113,22 +82,6 @@ public class MessagingUtil {
             }
 
         }
-    }
-
-    public static void sendEmptyNotice(CommandSender sender, String text){
-
-        sendCustomMessage(sender, Component.text(text, Configuration.GUICOLORTEXT).color(Configuration.COLOREMPTY));
-
-    }
-
-    public static void sendSuccsess(CommandSender sender, String text){
-
-        sendCustomMessage(sender, Component.text(text, Configuration.COLORTEXT));
-    }
-
-    public static void sendPlain(CommandSender sender, String text){
-
-        sendCustomMessage(sender, Component.text(text, Configuration.COLORTEXT));
     }
 
     public static void sendChargeNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
@@ -161,12 +114,8 @@ public class MessagingUtil {
         MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("exchange.payment-notice").replace("%asset_amount%", MessagingUtil.assetAmmount(assetCharged, amount+fee)).replace("%fee%", feeString));
     }
 
-    public static void sendWarning(CommandSender sender, String text){
-        sendCustomMessage(sender, Component.text(text, Configuration.COLORWARN));
-    }
-
     public static void sendSyntaxError(CommandSender sender, String text){
-        sendCustomMessage(sender, Component.text(text, Configuration.COLORERROR));
+        MessagingUtil.sendMiniMessage(sender, "<red>"+text+"</red>");
     }
 
     public static void sendGenericInvalidAmount(CommandSender sender, String amount){

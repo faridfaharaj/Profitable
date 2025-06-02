@@ -61,7 +61,13 @@ public class TemporalItems {
         }
 
         if(Configuration.ENTITYCLAIMINGFEES != 0){
-            MessagingUtil.sendWarning(player,"Claiming fees are " + Configuration.ENTITYCLAIMINGFEES + " " + Configuration.MAINCURRENCYASSET.getCode() + " per entity");
+
+            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.claim-fee-notice",
+
+                    Map.entry("%fee_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
+
+            ));
+
         }
 
         TemporalItems.addTemp(player, TemporalItem.CLAIMINGTAG);

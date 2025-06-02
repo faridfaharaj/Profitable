@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class DeliveryCommand implements CommandExecutor {
@@ -43,14 +44,11 @@ public class DeliveryCommand implements CommandExecutor {
                     Location entityDelivery = Accounts.getEntityDelivery(account);
                     Location itemDelivery = Accounts.getItemDelivery(account);
 
-                    MessagingUtil.sendCustomMessage(sender,
-                            Component.newline()
-                                    .append(Component.text("Item Delivery Location:",Configuration.COLORTEXT)).appendNewline()
-                                    .appendSpace().appendSpace().append(Component.text((itemDelivery == null?"Not set":itemDelivery.toVector() + " (" + itemDelivery.getWorld().getName()+")")).color(Configuration.COLORHIGHLIGHT)).appendNewline()
-                                    .append(Component.text("Entity Delivery Location:",Configuration.COLORTEXT)).appendNewline()
-                                    .appendSpace().appendSpace().append(Component.text((entityDelivery == null?"Not set":entityDelivery.toVector() + " (" + entityDelivery.getWorld().getName()+")")).color(Configuration.COLORHIGHLIGHT))
-                                    .appendNewline()
-                    );
+                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("delivery.display",
+                            Map.entry("%i_position%", itemDelivery == null?"Not set":itemDelivery.toVector() + " (" + itemDelivery.getWorld().getName()+")"),
+                            Map.entry("%e_position%", entityDelivery == null?"Not set":entityDelivery.toVector() + " (" + entityDelivery.getWorld().getName()+")")
+                    ));
+
                 });
 
                 return true;
