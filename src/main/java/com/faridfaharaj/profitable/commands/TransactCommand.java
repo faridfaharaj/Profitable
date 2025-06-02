@@ -73,12 +73,12 @@ public class TransactCommand implements CommandExecutor {
                         }
                         case "market" -> {
 
-                            MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("exchange.warning.market-ignores-price"));
+                            MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("exchange.warning.market-ignores-price"));
                             price = sideBuy ? Double.MAX_VALUE : Double.MIN_VALUE;
                             orderType = Order.OrderType.MARKET;
                         }
                         default -> {
-                            MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("exchange.error.invalid-order-type"));
+                            MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("exchange.error.invalid-order-type"));
                             return;
                         }
                     }
@@ -101,7 +101,7 @@ public class TransactCommand implements CommandExecutor {
                 double finalPrice = price;
                 Order.OrderType finalOrderType = orderType;
 
-                MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("exchange.loading-order"));
+                MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("exchange.loading-order"));
 
                 Profitable.getfolialib().getScheduler().runAsync(async -> {
 

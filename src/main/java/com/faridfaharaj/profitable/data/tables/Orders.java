@@ -6,7 +6,6 @@ import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.util.MessagingUtil;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -393,7 +392,7 @@ public class Orders {
 
         Orders.deleteOrder(order.getUuid());
 
-        MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("orders.cancel",
+        MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("orders.cancel",
                         Map.entry("%order%", order.toStringSimplified()))
                 );
         MessagingUtil.sendPaymentNotice(player, ammountToSendBack, 0, asset);

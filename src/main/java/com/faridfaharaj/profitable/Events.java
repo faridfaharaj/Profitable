@@ -7,9 +7,6 @@ import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.util.MessagingUtil;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -113,9 +110,9 @@ public class Events implements Listener {
             runItmCooldown(Material.NAME_TAG, event.getPlayer(), () -> {
                 Entity entity = event.getRightClicked();
                 if(entity.getCustomName() != null){
-                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.cant-reclaim-entity"));
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.cant-reclaim-entity"));
                 }else if(!Configuration.ALLOWENTITIES.contains(entity.getType().name())){
-                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.cant-claim-entity"));
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.cant-claim-entity"));
 
                 } else {
 
@@ -123,7 +120,10 @@ public class Events implements Listener {
                         Profitable.getfolialib().getScheduler().runAtEntity(entity, task -> {
                             entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));
                         });
-                        MessagingUtil.sendMiniMessage(player,Profitable.getLang().get("assets.entity-claim-notice").replace("%entity%", entity.getName()).replace("%asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES)));
+                        MessagingUtil.sendComponentMessage(player,Profitable.getLang().get("assets.entity-claim-notice",
+                            Map.entry("%entity%", entity.getName()),
+                                Map.entry("%asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
+                        ));
                     };
 
 
@@ -173,12 +173,12 @@ public class Events implements Listener {
                     Block block = event.getClickedBlock();
                     if(block != null){
                         if(!(block.getState() instanceof Container)){
-                            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("delivery.error.items-must-be-container"));
+                            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.error.items-must-be-container"));
                             return;
                         }
                         Location correctedlocation = block.getLocation();
                         if(Accounts.changeItemDelivery(Accounts.getAccount(player), correctedlocation)){
-                            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("delivery.updated-item",
+                            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.updated-item",
                                     Map.entry("%position%", correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")")
                             ));
 
@@ -195,7 +195,7 @@ public class Events implements Listener {
                     if(block != null){
                         Location correctedlocation = block.getLocation().add(0.5,0,0.5).add(event.getBlockFace().getDirection());
                         if(Accounts.changeEntityDelivery(Accounts.getAccount(player), correctedlocation)){
-                            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("delivery.updated-entity",
+                            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.updated-entity",
                                     Map.entry("%position%", correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")")
                             ));
 

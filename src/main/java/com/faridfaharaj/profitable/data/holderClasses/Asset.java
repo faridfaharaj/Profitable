@@ -8,7 +8,6 @@ import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
 import com.faridfaharaj.profitable.hooks.VaultHook;
 import com.faridfaharaj.profitable.util.RandomUtil;
 import com.faridfaharaj.profitable.util.MessagingUtil;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
@@ -21,10 +20,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Asset {
 
@@ -425,7 +421,9 @@ public class Asset {
                         if(retrieveCommodityItem(player, asset.getCode(), (int) ammount)){
                             runnable.run();
                         }else {
-                            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.not-enough-asset").replace("%asset%", asset.getCode()));
+                            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                                    Map.entry("%asset%", asset.getCode())
+                            ));
                         }
 
                     });
@@ -450,7 +448,9 @@ public class Asset {
                         if(retrieveCommodityEntity(player, asset.getCode(), Accounts.getEntityClaimId(Accounts.getAccount(player)), (int) ammount)){
                             runnable.run();
                         }else{
-                            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.not-enough-asset").replace("%asset%", asset.getCode()));
+                            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                            Map.entry("%asset%", asset.getCode())
+                            ));
                         }
 
                     });
@@ -471,7 +471,9 @@ public class Asset {
                     if(retrieveBalanceExternal(account, balance, asset.getCode(), ammount, player)){
                         runnable.run();
                     }else {
-                        MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.not-enough-asset").replace("%asset%", asset.getCode()));
+                        MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                            Map.entry("%asset%", asset.getCode())
+                        ));
                     }
                 }
         }
@@ -500,7 +502,9 @@ public class Asset {
             double fee = Configuration.parseFee(Configuration.DEPOSITFEES, ammount);
 
             if(VaultHook.getEconomy().withdrawPlayer(player, ammount+fee).transactionSuccess()){
-                MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.auto-deposit-notice").replace("%asset_amount%", MessagingUtil.assetAmmount(VaultHook.getAsset(), ammount)));
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.auto-deposit-notice",
+                    Map.entry("%asset_amount%", MessagingUtil.assetAmmount(VaultHook.getAsset(), ammount))
+                ));
                 return true;
             }
 
@@ -512,7 +516,9 @@ public class Asset {
                 if(total-ammount+fee != 0){
                     AccountHoldings.setHolding(account, asset, balance+(total-ammount+fee));
                 }
-                MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.auto-deposit-notice").replace("%asset_amount%", MessagingUtil.assetAmmount(PlayerPointsHook.getAsset(), ammount)));
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.auto-deposit-notice",
+                        Map.entry("%asset_amount%", MessagingUtil.assetAmmount(PlayerPointsHook.getAsset(), ammount))
+                ));
                 return true;
             }
 

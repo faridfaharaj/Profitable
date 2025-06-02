@@ -23,9 +23,9 @@ orders:
 
 
 
-account-command:
-  account-display: "<gray>Active account: <yellow>(%account%)</yellow></gray>"
-  account-delete: "<red>DELETED account: %account%</red>"
+account:
+  display: "<gray>Active account: <yellow>(%account%)</yellow></gray>"
+  delete: "<red>DELETED account: %account%</red>"
   login: "<gray>Successfully logged into <yellow>%account%</yellow>!</gray>"
   registry: "<gray>Account <yellow>%account%</yellow> registered successfully!</gray>"
   logout: "<gray>Logged out successfully!</gray>"
@@ -44,8 +44,8 @@ exchange:
   fee-display: "<red>(incl. %amount% %asset% fee)</red>"
   charge-notice: "<gray>Charged %asset_amount% %fee%</gray>"
   payment-notice: "<gray>Received %asset_amount% %fee%</gray>"
-  selling-notice: "<gray><bullish>Bought</bullish> %base_asset_amount% for %quote_asset_amount%</gray>"
-  buying-notice: "<gray><bearish>Sold</bearish> %base_asset_amount% for %quote_asset_amount%</gray>"
+  selling-notice: "<gray><green>Bought</green> %base_asset_amount% for %quote_asset_amount%</gray>"
+  buying-notice: "<gray><red>Sold</red> %base_asset_amount% for %quote_asset_amount%</gray>"
   new-order-notice: "<gray>New %order_type% %side% %base_asset_amount% at %quote_asset_amount% each</gray>"
   loading-order: "<gray>Processing order...</gray>"
   claim-fee-notice: "Claiming fees are %fee_asset_amount% per entity"

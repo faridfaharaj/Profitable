@@ -6,7 +6,6 @@ import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.util.MessagingUtil;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -44,7 +43,7 @@ public class DeliveryCommand implements CommandExecutor {
                     Location entityDelivery = Accounts.getEntityDelivery(account);
                     Location itemDelivery = Accounts.getItemDelivery(account);
 
-                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("delivery.display",
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.display",
                             Map.entry("%i_position%", itemDelivery == null?"Not set":itemDelivery.toVector() + " (" + itemDelivery.getWorld().getName()+")"),
                             Map.entry("%e_position%", entityDelivery == null?"Not set":entityDelivery.toVector() + " (" + entityDelivery.getWorld().getName()+")")
                     ));

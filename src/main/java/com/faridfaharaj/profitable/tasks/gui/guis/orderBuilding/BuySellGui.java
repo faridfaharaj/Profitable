@@ -52,7 +52,7 @@ public final class BuySellGui extends ChestGUI {
             for(int i = 0; i < 7; i++){
                 if(i < askOrders.size()){
                     Order iteratedAsk = askOrders.get(i);
-                    prices.append("<gray> - <bearish>[ ").append(MessagingUtil.formatVolume(iteratedAsk.getUnits())).append(" ]</bearish> ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())).append("</gray>%&new_line&%");
+                    prices.append("<gray> - <red>[ ").append(MessagingUtil.formatVolume(iteratedAsk.getUnits())).append(" ]</red> ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())).append("</gray>%&new_line&%");
                 }else {
                     break;
                 }
@@ -80,7 +80,7 @@ public final class BuySellGui extends ChestGUI {
             for(int i = 0; i < 7; i++){
                 if(i < bidOrders.size()){
                     Order iteratedAsk = bidOrders.get(i);
-                    prices.append("<gray> - <bullish>[ ").append(MessagingUtil.formatVolume(iteratedAsk.getUnits())).append(" ]</bullish> ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())).append("</gray>%&new_line&%");
+                    prices.append("<gray> - <green>[ ").append(MessagingUtil.formatVolume(iteratedAsk.getUnits())).append(" ]</green> ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())).append("</gray>%&new_line&%");
                 }else {
                     break;
                 }

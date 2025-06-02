@@ -1,17 +1,13 @@
 package com.faridfaharaj.profitable.util;
 
-import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -60,9 +56,7 @@ public class MessagingUtil {
         return  component;
     }
 
-    public static void sendMiniMessage(CommandSender sender, String message){
-
-        Component component = MiniMessage.miniMessage().deserialize(message);
+    public static void sendComponentMessage(CommandSender sender, Component component){
 
         if(Profitable.getfolialib().isSpigot()){
 
@@ -87,7 +81,7 @@ public class MessagingUtil {
     public static void sendChargeNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
         String feeString;
         if(fee != 0){
-            feeString = Profitable.getLang().get("exchange.fee-display",
+            feeString = Profitable.getLang().getString("exchange.fee-display",
                     Map.entry("%amount%", decimalFormat.format(fee)),
                     Map.entry("%asset%", assetCharged.getCode())
             );
@@ -95,7 +89,10 @@ public class MessagingUtil {
             feeString = "";
         }
 
-        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("exchange.charge-notice").replace("%asset_amount%", MessagingUtil.assetAmmount(assetCharged, amount+fee)).replace("%fee%", feeString));
+        MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("exchange.charge-notice",
+                Map.entry("%asset_amount%", MessagingUtil.assetAmmount(assetCharged, amount+fee)),
+                Map.entry("%fee%", feeString)
+        ));
 
     }
 
@@ -103,7 +100,7 @@ public class MessagingUtil {
 
         String feeString;
         if(fee != 0){
-            feeString = Profitable.getLang().get("exchange.fee-display",
+            feeString = Profitable.getLang().getString("exchange.fee-display",
                     Map.entry("%amount%", decimalFormat.format(fee)),
                     Map.entry("%asset%", assetCharged.getCode())
             );
@@ -111,27 +108,34 @@ public class MessagingUtil {
             feeString = "";
         }
 
-        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("exchange.payment-notice").replace("%asset_amount%", MessagingUtil.assetAmmount(assetCharged, amount+fee)).replace("%fee%", feeString));
+        MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("exchange.payment-notice",
+                Map.entry("%asset_amount%", MessagingUtil.assetAmmount(assetCharged, amount+fee)),
+                Map.entry("%fee%", feeString)
+        ));
     }
 
     public static void sendSyntaxError(CommandSender sender, String text){
-        MessagingUtil.sendMiniMessage(sender, "<red>"+text+"</red>");
+        MessagingUtil.sendComponentMessage(sender, Component.text(text, NamedTextColor.RED));
     }
 
     public static void sendGenericInvalidAmount(CommandSender sender, String amount){
-        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("generic.error.invalid-amount").replace("%invalid_amount%", amount));
+        MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("generic.error.invalid-amount",
+                Map.entry("%invalid_amount%", amount)
+        ));
     }
 
     public static void sendGenericMissingPerm(CommandSender sender){
-        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("generic.error.missing-perm"));
+        MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("generic.error.missing-perm"));
     }
 
     public static void sendGenericCantConsole(CommandSender sender){
-        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("generic.error.cant-console"));
+        MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("generic.error.cant-console"));
     }
 
     public static void sendGenericInvalidSubCom(CommandSender sender, String subCommand){
-        MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("generic.error.invalid-subcommand").replace("%sub_command%", subCommand));
+        MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("generic.error.invalid-subcommand",
+                Map.entry("%sub_command%", subCommand)
+        ));
     }
 
     public static byte[] UUIDtoBytes(UUID uuid) throws IOException {

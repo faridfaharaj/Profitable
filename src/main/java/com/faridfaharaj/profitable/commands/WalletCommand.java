@@ -59,7 +59,9 @@ public class WalletCommand implements CommandExecutor {
                 Asset asset = Assets.getAssetData(assetid);
 
                 if(asset == null){
-                    MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("assets.error.asset-not-found").replace("%asset%", assetid));
+                    MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("assets.error.asset-not-found",
+                        Map.entry("%asset%", assetid)
+                    ));
                     return true;
                 }
 
@@ -93,7 +95,9 @@ public class WalletCommand implements CommandExecutor {
                 Asset asset = Assets.getAssetData(assetid);
 
                 if(asset == null){
-                    MessagingUtil.sendMiniMessage(sender, Profitable.getLang().get("assets.error.asset-not-found").replace("%asset%", assetid));
+                    MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("assets.error.asset-not-found",
+                            Map.entry("%asset%", assetid)
+                    ));
                     return true;
                 }
 
@@ -177,7 +181,9 @@ public class WalletCommand implements CommandExecutor {
 
             double fee = Configuration.parseFee(Configuration.DEPOSITFEES, amount);
             if(fee > amount){
-                MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.minimum-deposit").replace("%asset_amount%", MessagingUtil.assetAmmount(asset, amount)));
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.minimum-deposit",
+                    Map.entry("%asset_amount%", MessagingUtil.assetAmmount(asset, amount))
+                ));
 
                 return;
             }
@@ -199,7 +205,9 @@ public class WalletCommand implements CommandExecutor {
 
                 int integerAmount = (int) amount;
                 if(integerAmount < 1){
-                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.cant-fractional").replace("%asset%", asset.getCode()));
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.cant-fractional",
+                        Map.entry("%asset%", asset.getCode())
+                    ));
                     return;
                 }
                 if(PlayerPointsHook.getApi().take(player.getUniqueId(), integerAmount)){
@@ -211,13 +219,15 @@ public class WalletCommand implements CommandExecutor {
                 }
 
             }else {
-                MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.cant-fractional").replace("%asset%", asset.getCode()));
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.cant-fractional",
+                        Map.entry("%asset%", asset.getCode())
+                ));
                 return;
             }
 
 
 
-            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("hooks.error.insufficient-funds"));
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("hooks.error.insufficient-funds"));
 
         }
 
@@ -229,7 +239,9 @@ public class WalletCommand implements CommandExecutor {
                     Asset.sendBalance(Accounts.getAccount(player), asset.getCode(), amount);
                     MessagingUtil.sendPaymentNotice(player, amount, 0, asset);
                 }else {
-                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.not-enough-asset").replace("%asset%", asset.getCode()));
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                            Map.entry("%asset%", asset.getCode())
+                    ));
                 }
 
             });
@@ -243,7 +255,9 @@ public class WalletCommand implements CommandExecutor {
                     Asset.sendBalance(Accounts.getAccount(player), asset.getCode(), amount);
                     MessagingUtil.sendPaymentNotice(player, amount, 0, asset);
                 }else{
-                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.not-enough-asset").replace("%asset%", asset.getCode()));
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                            Map.entry("%asset%", asset.getCode())
+                    ));
                 }
 
             });
@@ -274,7 +288,9 @@ public class WalletCommand implements CommandExecutor {
                             }
                         });
                     }else {
-                        MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.not-enough-asset").replace("%asset%", asset.getCode()));
+                        MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                                Map.entry("%asset%", asset.getCode())
+                        ));
                     }
                 });
                 return;
@@ -283,7 +299,9 @@ public class WalletCommand implements CommandExecutor {
 
                 int integerAmount = (int) ammount;
                 if(integerAmount < 1){
-                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.cant-fractional").replace("%asset%", asset.getCode()));
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.cant-fractional",
+                            Map.entry("%asset%", asset.getCode())
+                    ));
                     return;
                 }
                 Profitable.getfolialib().getScheduler().runAsync(async -> {
@@ -296,12 +314,16 @@ public class WalletCommand implements CommandExecutor {
                             MessagingUtil.sendChargeNotice(player, ammount-ceilFee, ceilFee, asset);
                         });
                     }else {
-                        MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.not-enough-asset").replace("%asset%", asset.getCode()));
+                        MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                                Map.entry("%asset%", asset.getCode())
+                        ));
                     }
                 });
                 return;
             }else {
-                MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.not-depositable").replace("%asset%", asset.getCode()));
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-depositable",
+                        Map.entry("%asset%", asset.getCode())
+                ));
                 return;
             }
 
@@ -317,7 +339,9 @@ public class WalletCommand implements CommandExecutor {
                     MessagingUtil.sendPaymentNotice(player, ammount, 0, asset);
                 });
             }else {
-                MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.not-enough-asset").replace("%asset%", asset.getCode()));
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                        Map.entry("%asset%", asset.getCode())
+                ));
             }
             return;
 
@@ -334,7 +358,9 @@ public class WalletCommand implements CommandExecutor {
                 });
                 return;
             }else {
-                MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.not-enough-asset").replace("%asset%", asset.getCode()));
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                        Map.entry("%asset%", asset.getCode())
+                ));
             }
 
         }

@@ -2,6 +2,8 @@ package com.faridfaharaj.profitable;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,6 +17,10 @@ public class Lang {
     private final JavaPlugin plugin;
     private FileConfiguration lang;
     private final String[] langCodes = {"en"};
+
+    TagResolver resolver = TagResolver.resolver(
+
+    );
 
     public Lang(JavaPlugin plugin) throws IOException {
         this.plugin = plugin;
@@ -60,7 +66,18 @@ public class Lang {
         }
     }
 
-    public String get(String path, Map.Entry<String, String>... placeHolders) {
+    public Component get(String path, Map.Entry<String, String>... placeHolders) {
+
+        String text = lang.getString(path, "<red>_missing translation:[" + path + "]!_</red>");
+
+        for(Map.Entry<String, String> placeHolder : placeHolders){
+            text = text.replace(placeHolder.getKey(), placeHolder.getValue());
+        }
+
+        return MiniMessage.miniMessage().deserialize(text);
+    }
+
+    public String getString(String path, Map.Entry<String, String>... placeHolders) {
 
         String text = lang.getString(path, "<red>_missing translation:[" + path + "]!_</red>");
 
@@ -71,31 +88,31 @@ public class Lang {
         return text;
     }
 
-    public Component getComponent(String path, Map.Entry<String, String>... placeHolders) {
-
-        return MiniMessage.miniMessage().deserialize(get(path, placeHolders));
-
-    }
-
-    public List<Component> langToLore(String path, Map.Entry<String, String>... placeHolders){
+    public List<Component> langToLore(String path, Map.Entry<String, String>... placeHolders) {
         List<String> lines = lang.getStringList(path);
+        List<Component> lore = new ArrayList<>(lines.size());
 
-        List<Component> lore = new ArrayList<>();
-        for (String line : lines){
+        MiniMessage mini = MiniMessage.miniMessage();
 
-            String miniMessage = line;
-            for(Map.Entry<String, String> placeHolder : placeHolders){
-                miniMessage = miniMessage.replace(placeHolder.getKey(), placeHolder.getValue());
-            }
-            if(miniMessage.contains("%&new_line&%")){
-                String[] newLines = miniMessage.split("%&new_line&%");
-                for(String newLine : newLines){
-                    lore.add(MiniMessage.miniMessage().deserialize(newLine));
+        for (String line : lines) {
+            StringBuilder sb = new StringBuilder(line);
+            for (Map.Entry<String, String> entry : placeHolders) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                int index;
+                while ((index = sb.indexOf(key)) != -1) {
+                    sb.replace(index, index + key.length(), value);
                 }
-            }else {
-                lore.add(MiniMessage.miniMessage().deserialize(miniMessage));
             }
 
+            String processed = sb.toString();
+            if (processed.contains("%&new_line&%")) {
+                for (String part : processed.split("%&new_line&%")) {
+                    lore.add(mini.deserialize(part));
+                }
+            } else {
+                lore.add(mini.deserialize(processed));
+            }
         }
 
         return lore;

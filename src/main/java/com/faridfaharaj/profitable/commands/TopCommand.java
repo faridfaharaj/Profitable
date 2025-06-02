@@ -36,9 +36,9 @@ public class TopCommand  implements CommandExecutor {
 
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     Component assetsComponent = Candles.getHotAssets(player.getWorld().getFullTime(), 0);
-                    MessagingUtil.sendMiniMessage(player,
+                    MessagingUtil.sendComponentMessage(player,
 
-                            MiniMessage.miniMessage().serialize(Component.text("=========== [ HOT Assets ] ===========", TextColor.color(0xFF7C1E)).appendNewline().append(assetsComponent))
+                            Component.text("=========== [ HOT Assets ] ===========", TextColor.color(0xFF7C1E)).appendNewline().append(assetsComponent)
 
                     );
                 });
@@ -46,9 +46,9 @@ public class TopCommand  implements CommandExecutor {
             }else if(args[0].equals("LIQUID")){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     Component assetsComponent = Candles.getHotAssets(player.getWorld().getFullTime(), 2);
-                    MessagingUtil.sendMiniMessage(player,
+                    MessagingUtil.sendComponentMessage(player,
 
-                            MiniMessage.miniMessage().serialize(Component.text("========== [ Liquid Assets ] ==========", TextColor.color(0x2BCCFF)).appendNewline().append(assetsComponent))
+                            Component.text("========== [ Liquid Assets ] ==========", TextColor.color(0x2BCCFF)).appendNewline().append(assetsComponent)
 
                     );
                 });
@@ -56,9 +56,9 @@ public class TopCommand  implements CommandExecutor {
             }else if(args[0].equals("GROW")){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     Component assetsComponent = Candles.getHotAssets(player.getWorld().getFullTime(), 1);
-                    MessagingUtil.sendMiniMessage(player,
+                    MessagingUtil.sendComponentMessage(player,
 
-                            MiniMessage.miniMessage().serialize(Component.text("========= [ Growing Assets ] =========", TextColor.color(0xFF7A)).appendNewline().append(assetsComponent))
+                            Component.text("========= [ Growing Assets ] =========", TextColor.color(0xFF7A)).appendNewline().append(assetsComponent)
 
                     );
                 });
@@ -66,9 +66,9 @@ public class TopCommand  implements CommandExecutor {
             }else if(args[0].equals("BIG")){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     Component assetsComponent = Candles.getHotAssets(player.getWorld().getFullTime(), 3);
-                    MessagingUtil.sendMiniMessage(player,
+                    MessagingUtil.sendComponentMessage(player,
 
-                            MiniMessage.miniMessage().serialize(Component.text("========= [ Biggest Assets ] =========", TextColor.color(0xFFCA00)).appendNewline().append(assetsComponent))
+                            Component.text("========= [ Biggest Assets ] =========", TextColor.color(0xFFCA00)).appendNewline().append(assetsComponent)
 
                     );
                 });

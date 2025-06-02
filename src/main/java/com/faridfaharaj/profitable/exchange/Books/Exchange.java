@@ -26,13 +26,15 @@ public class Exchange {
         // validation -------------------------
 
         if(Objects.equals(order.getAsset(), Configuration.MAINCURRENCYASSET.getCode())){
-            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.error.identical-assets"));
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("exchange.error.identical-assets"));
             return;
         }
 
         Asset tradedAsset = Assets.getAssetData(order.getAsset());
         if(tradedAsset == null){
-            MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("assets.error.asset-not-found").replace("%asset%", order.getAsset()));
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.asset-not-found",
+                    Map.entry("%asset%", order.getAsset())
+            ));
             return;
         }
 
@@ -45,7 +47,7 @@ public class Exchange {
                     return;
                 }
                 if(Accounts.getItemDelivery(order.getOwner()) == null){
-                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("delivery.error.missing-item-delivery"));
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.error.missing-item-delivery"));
                     System.out.println(
 
                             MiniMessage.miniMessage().serialize(
@@ -66,7 +68,7 @@ public class Exchange {
                     return;
                 }
                 if(Accounts.getEntityDelivery(order.getOwner()) == null){
-                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("delivery.error.missing-entity-delivery"));
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.error.missing-entity-delivery"));
 
                     System.out.println(
 
@@ -112,9 +114,9 @@ public class Exchange {
 
             if(order.isSideBuy()?lastday.getClose() >= order.getPrice(): lastday.getClose() <= order.getPrice()){
                 if(order.isSideBuy()){
-                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.error.invalid-sell-stop-trigger"));
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("exchange.error.invalid-sell-stop-trigger"));
                 }else {
-                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.error.invalid-buy-stop-trigger"));
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("exchange.error.invalid-buy-stop-trigger"));
                 }
                 return;
             }
@@ -133,7 +135,7 @@ public class Exchange {
 
             //Market
             if(order.getType() == Order.OrderType.MARKET){
-                MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.error.no-orders-found"));
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("exchange.error.no-orders-found"));
                 return;
             }
 
@@ -150,7 +152,7 @@ public class Exchange {
 
             // Prevent self transact
             if(Objects.equals(iteratedOrder.getOwner(), order.getOwner())){
-                MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.error.cant-self-transact"));
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("exchange.error.cant-self-transact"));
                 return;
             }
 
@@ -216,7 +218,7 @@ public class Exchange {
         if(takerOrder.getType() == Order.OrderType.MARKET){
 
             if(unitsTransacted != takerOrder.getUnits()){
-                MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.warning.partial-fill-low-liquidity"));
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("exchange.warning.partial-fill-low-liquidity"));
             }
 
         }else{
@@ -233,10 +235,11 @@ public class Exchange {
 
     public static void sendTransactionNotice(Player player, boolean sideBuy, Asset tradedAsset, double units, double money, double fee){
 
-        MessagingUtil.sendMiniMessage(player,
-                (sideBuy?Profitable.getLang().get("exchange.buying-notice"):Profitable.getLang().get("exchange.selling-notice"))
-                        .replace("%base_asset_amount%", MessagingUtil.assetAmmount(tradedAsset, units))
-                        .replace("%quote_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, money))
+        MessagingUtil.sendComponentMessage(player,
+                Profitable.getLang().get(sideBuy?"exchange.buying-notice":"exchange.selling-notice",
+                        Map.entry("%base_asset_amount%", MessagingUtil.assetAmmount(tradedAsset, units)),
+                        Map.entry("%quote_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, money))
+                )
         );
 
         if(sideBuy){
@@ -263,10 +266,11 @@ public class Exchange {
 
         Player player = Profitable.getInstance().getServer().getPlayer(playerid);
         if(player != null){
-            MessagingUtil.sendMiniMessage(player,
-                    (sideBuy?Profitable.getLang().get("exchange.buying-notice"):Profitable.getLang().get("exchange.selling-notice"))
-                            .replace("%base_asset_amount%", MessagingUtil.assetAmmount(tradedAsset, units))
-                            .replace("%quote_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, money))
+            MessagingUtil.sendComponentMessage(player,
+                    Profitable.getLang().get(sideBuy?"exchange.buying-notice":"exchange.selling-notice",
+                            Map.entry("%base_asset_amount%", MessagingUtil.assetAmmount(tradedAsset, units)),
+                            Map.entry("%quote_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, money))
+                    )
             );
 
             if(sideBuy){
@@ -297,16 +301,14 @@ public class Exchange {
             // Feedback
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> player.playSound(player, Sound.ITEM_BOOK_PAGE_TURN, 1 , 1));
 
-            MessagingUtil.sendMiniMessage(player,Profitable.getLang().get("exchange.new-order-notice")
-                    .replace("%order_type%", order.getType().toString()
-                            .replace("_","-").toLowerCase()
-                    )
-                    .replace("%side%", order.isSideBuy()?
-                            Profitable.getLang().get("orders.sides.buy"):
-                            Profitable.getLang().get("orders.sides.sell")
-                    )
-                    .replace("%base_asset_amount%", MessagingUtil.assetAmmount(tradedasset, order.getUnits()))
-                    .replace("%quote_asset_amount%", MessagingUtil.assetAmmount(currency, order.getPrice()))
+            MessagingUtil.sendComponentMessage(player,Profitable.getLang().get("exchange.new-order-notice",
+                            Map.entry("%order_type%", order.getType().toString().replace("_","-").toLowerCase()),
+                            Map.entry("%side%", order.isSideBuy()?
+                                    Profitable.getLang().getString("orders.sides.buy"):
+                                    Profitable.getLang().getString("orders.sides.sell")),
+                            Map.entry("%base_asset_amount%", MessagingUtil.assetAmmount(tradedasset, order.getUnits())),
+                            Map.entry("%quote_asset_amount%", MessagingUtil.assetAmmount(currency, order.getPrice()))
+                            )
             );
 
             if(order.isSideBuy()){
@@ -318,7 +320,7 @@ public class Exchange {
 
                 if(makerFee >= cost){
 
-                    MessagingUtil.sendMiniMessage(player, Profitable.getLang().get("exchange.selling-notice",
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("exchange.selling-notice",
 
                             Map.entry("%fee_asset_amount%", MessagingUtil.assetAmmount(currency, makerFee))
 
