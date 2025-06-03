@@ -77,7 +77,7 @@ assets:
     asset-not-found: "<red>No se puede comerciar %asset% aquí</red>"
     cant-fractional: "<red>El activo %asset% no puede fraccionarse</red>"
     minimum-deposit: "<red>No se puede depositar menos de %asset_amount%</red>"
-    non-depositable: "<red>No se puede depositar ni retirar %asset%</red>"
+    not-depositable: "<red>No se puede depositar ni retirar %asset%</red>"
     not-enough-asset: "<red>No tienes suficiente %asset%</red>"
     cant-reclaim-entity: "<red>No se pueden reclamar entidades propias</red>"
     cant-claim-entity: "<red>No está permitido poseer esta entidad</red>"
@@ -165,7 +165,7 @@ gui:
           - "<yellow>Haz click derecho para posicion de entidades</yellow>"
 
   graphs:
-    title: "Mostrando gráficos de %asset%"
+    title: "Gráficos para %asset%"
     buttons:
       one-month:
         name: "1 Mes"
@@ -173,13 +173,13 @@ gui:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
           - "<yellow>Haz click derecho para ver gráfico</yellow>"
-      three-month:
+      three-months:
         name: "3 Meses"
         lore:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
           - "<yellow>Haz click derecho para ver gráfico</yellow>"
-      six-month:
+      six-months:
         name: "6 Meses"
         lore:
           - "<dark_gray>%asset%</dark_gray>"

@@ -80,7 +80,7 @@ assets:
     asset-not-found: "<red>Cannot trade %asset% here</red>"
     cant-fractional: "<red>Asset %asset% cant be fractional</red>"
     minimum-deposit: "<red>Cannot deposit less than %asset_amount%</red>"
-    non-depositable: "<red>Cannot deposit or withdraw %asset%</red>"
+    not-depositable: "<red>Cannot deposit or withdraw %asset%</red>"
     not-enough-asset: "<red>Not enough %asset%</red>"
     cant-reclaim-entity: "<red>Cannot claim owned entities</red>"
     cant-claim-entity: "<red>Owning this entity isn't allowed</red>"
@@ -175,31 +175,31 @@ gui:
         lore:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
-          - "<yellow>Right click to get graph</yellow>"
-      three-month:
-        name: "1 Month"
+          - "<yellow>Right click to view graph</yellow>"
+      three-months:
+        name: "3 Months"
         lore:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
-          - "<yellow>Right click to get graph</yellow>"
-      six-month:
-        name: "1 Month"
+          - "<yellow>Right click to view graph</yellow>"
+      six-months:
+        name: "6 Months"
         lore:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
-          - "<yellow>Right click to get graph</yellow>"
+          - "<yellow>Right click to view graph</yellow>"
       one-year:
-        name: "1 Month"
+        name: "1 Year"
         lore:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
-          - "<yellow>Right click to get graph</yellow>"
+          - "<yellow>Right click to view graph</yellow>"
       two-years:
-        name: "1 Month"
+        name: "2 Years"
         lore:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
-          - "<yellow>Right click to get graph</yellow>"
+          - "<yellow>Right click to view graph</yellow>"
   wallet:
     title: "Asset portfolio"
     buttons:

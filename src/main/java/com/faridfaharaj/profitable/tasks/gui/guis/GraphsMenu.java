@@ -51,11 +51,11 @@ public final class GraphsMenu extends ChestGUI {
 
         ItemStack mapStack = new ItemStack(Material.FILLED_MAP);
 
-        graph1MButton = new GuiElement(this, mapStack, Component.text("1 Month", Configuration.GUICOLORTITLE), buttonInstructions, vectorSlotPosition(2,1));
-        graph3MButton = new GuiElement(this, mapStack, Component.text("3 Months", Configuration.GUICOLORTITLE), buttonInstructions, vectorSlotPosition(3,1));
-        graph6MButton = new GuiElement(this, mapStack, Component.text("6 Months", Configuration.GUICOLORTITLE), buttonInstructions, vectorSlotPosition(4,1));
-        graph1YButton = new GuiElement(this, mapStack, Component.text("1 Year", Configuration.GUICOLORTITLE), buttonInstructions, vectorSlotPosition(5,1));
-        graph2YButton = new GuiElement(this, mapStack, Component.text("2 Years", Configuration.GUICOLORTITLE), buttonInstructions, vectorSlotPosition(6,1));
+        graph1MButton = new GuiElement(this, mapStack, Profitable.getLang().get("gui.graphs.buttons.one-month.name"), Profitable.getLang().langToLore("gui.graphs.buttons.one-month.lore", Map.entry("%asset%", assetID)), vectorSlotPosition(2,1));
+        graph3MButton = new GuiElement(this, mapStack, Profitable.getLang().get("gui.graphs.buttons.three-months.name"), Profitable.getLang().langToLore("gui.graphs.buttons.three-months.lore", Map.entry("%asset%", assetID)), vectorSlotPosition(3,1));
+        graph6MButton = new GuiElement(this, mapStack, Profitable.getLang().get("gui.graphs.buttons.six-months.name"), Profitable.getLang().langToLore("gui.graphs.buttons.six-months.lore", Map.entry("%asset%", assetID)), vectorSlotPosition(4,1));
+        graph1YButton = new GuiElement(this, mapStack, Profitable.getLang().get("gui.graphs.buttons.one-year.name"), Profitable.getLang().langToLore("gui.graphs.buttons.one-year.lore", Map.entry("%asset%", assetID)), vectorSlotPosition(5,1));
+        graph2YButton = new GuiElement(this, mapStack, Profitable.getLang().get("gui.graphs.buttons.two-years.name"), Profitable.getLang().langToLore("gui.graphs.buttons.two-years.lore", Map.entry("%asset%", assetID)), vectorSlotPosition(6,1));
     }
 
     @Override
