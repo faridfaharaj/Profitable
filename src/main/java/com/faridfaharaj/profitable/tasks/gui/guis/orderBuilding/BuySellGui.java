@@ -31,7 +31,7 @@ public final class BuySellGui extends ChestGUI {
     AssetCache[][] assetCache;
     AssetCache assetData;
     public BuySellGui(AssetCache[][] assetCache, AssetCache assetData, List<Order> bidOrders, List<Order> askOrders) {
-        super(3, "Pick a side.");
+        super(3, Profitable.getLang().get("gui.order-building.buy-sell.title"));
 
         this.assetCache = assetCache;
         this.assetData = assetData;
@@ -100,9 +100,9 @@ public final class BuySellGui extends ChestGUI {
             );
         }
 
-        buttons[1] = new GuiElement(this, new ItemStack(Material.RED_DYE), Component.text("Sell Order", Configuration.COLORBEARISH),
+        buttons[1] = new GuiElement(this, new ItemStack(Material.RED_DYE), Profitable.getLang().get("orders.sides.sell").color(Configuration.COLORBEARISH),
                 sellLore, vectorSlotPosition(5, 1));
-        buttons[2] = new GuiElement(this, new ItemStack(Material.LIME_DYE), Component.text("Buy Order", Configuration.COLORBULLISH),
+        buttons[2] = new GuiElement(this, new ItemStack(Material.LIME_DYE), Profitable.getLang().get("orders.sides.buy").color(Configuration.COLORBULLISH),
                 buyLore, vectorSlotPosition(3, 1));
 
     }

@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class AssetExplorer extends ChestGUI {
 
@@ -36,7 +37,7 @@ public final class AssetExplorer extends ChestGUI {
     int pages = 0;
 
     public AssetExplorer(Player player, int assetType, AssetCache[][] previousCache) {
-        super(6, "Asset explorer");
+        super(6, Profitable.getLang().get("gui.asset-explorer.title"));
 
         this.assetType = assetType;
 
@@ -45,48 +46,33 @@ public final class AssetExplorer extends ChestGUI {
         fillSlots(8, 0, 8,5, Material.BLACK_STAINED_GLASS_PANE);
         fillSlots(0, 4, 8,5, Material.BLACK_STAINED_GLASS_PANE);
 
-        categoryButton = new GuiElement(this, new ItemStack(Material.ENDER_EYE), Component.text("Category"),
-                List.of(
-                        Component.text("Assets", Configuration.GUICOLORSUBTITLE),
-                        Component.empty(),
-                        Component.text("♦ ", NamedTextColor.WHITE).append(Component.text("Forex", assetType == 1? NamedTextColor.WHITE:NamedTextColor.GRAY)),
-                        Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Item)", assetType == 2? NamedTextColor.GREEN:NamedTextColor.GRAY)),
-                        Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Entity)", assetType == 3? NamedTextColor.GREEN:NamedTextColor.GRAY)),
-                        Component.empty(),
-                        GuiElement.clickAction(null, "cycle")
+        String types = "<white>♦ </white><color:" + (assetType == 1? NamedTextColor.WHITE.asHexString():NamedTextColor.GRAY.asHexString()) + ">" + Profitable.getLang().getString("assets.categories.forex") + "</color>%&new_line&%" +
+                "<green>♦ </green><color:" + (assetType == 2? NamedTextColor.GREEN.asHexString():NamedTextColor.GRAY.asHexString()) + ">" + Profitable.getLang().getString("assets.categories.commodity-item") + "</color>%&new_line&%" +
+                "<green>♦ </green><color:" + (assetType == 3? NamedTextColor.GREEN.asHexString():NamedTextColor.GRAY.asHexString()) + ">" + Profitable.getLang().getString("assets.categories.commodity-entity") + "</color>";
+
+        categoryButton = new GuiElement(this, new ItemStack(Material.ENDER_EYE), Profitable.getLang().get("gui.asset-explorer.buttons.category-selector.name"),
+                Profitable.getLang().langToLore("gui.asset-explorer.buttons.category-selector.lore",
+
+                        Map.entry("%category_list%", types)
 
                 ), vectorSlotPosition(6, 5));
 
-        pageButton = new GuiElement(this, new ItemStack(Material.PAPER), Component.text("Page " + page + " / " + pages), List.of(
-                Component.empty(),
-                GuiElement.clickAction(ClickType.LEFT, "next page"),
-                GuiElement.clickAction(ClickType.RIGHT, "previous page")
-        ), vectorSlotPosition(7,5));
+        pageButton = new GuiElement(this, new ItemStack(Material.PAPER), Profitable.getLang().get("gui.generic.buttons.page-selector.name",
+                Map.entry("%page%",String.valueOf(page)),
+                Map.entry("%pages%",String.valueOf(pages))
+        ), Profitable.getLang().langToLore("gui.generic.buttons.page-selector.lore"), vectorSlotPosition(7,5));
 
-        walletButton = new GuiElement(this, new ItemStack(Material.CHEST), Component.text("Manage owned assets"),
-                List.of(
-                        Component.text("Asset portfolio", Configuration.GUICOLORSUBTITLE),
-                        Component.empty(),
-                        GuiElement.clickAction(null, "view portfolio")
+        walletButton = new GuiElement(this, new ItemStack(Material.CHEST), Profitable.getLang().get("gui.asset-explorer.buttons.wallet.name"),
+                Profitable.getLang().langToLore("gui.asset-explorer.buttons.wallet.lore")
+                , vectorSlotPosition(2, 5));
 
-                ), vectorSlotPosition(2, 5));
+        ordersButton = new GuiElement(this, new ItemStack(Material.BOOK), Profitable.getLang().get("gui.asset-explorer.buttons.orders.name"),
+                Profitable.getLang().langToLore("gui.asset-explorer.buttons.orders.lore")
+                , vectorSlotPosition(1, 5));
 
-        ordersButton = new GuiElement(this, new ItemStack(Material.BOOK), Component.text("Manage orders"),
-                List.of(
-                        Component.text("Orders", Configuration.GUICOLORSUBTITLE),
-                        Component.empty(),
-                        GuiElement.clickAction(null, "view active orders")
-
-                ), vectorSlotPosition(1, 5));
-
-        deliveryButton = new GuiElement(this, new ItemStack(Material.CARROT_ON_A_STICK), Component.text("Set delivery location"),
-                List.of(
-                        Component.text("Delivery", Configuration.GUICOLORSUBTITLE),
-                        Component.empty(),
-                        GuiElement.clickAction(null, "set item delivery"),
-                        GuiElement.clickAction(null, "set entity delivery")
-
-                ), vectorSlotPosition(3, 5));
+        deliveryButton = new GuiElement(this, new ItemStack(Material.CARROT_ON_A_STICK), Profitable.getLang().get("gui.asset-explorer.buttons.delivery.name"),
+                Profitable.getLang().langToLore("gui.asset-explorer.buttons.delivery.lore")
+                , vectorSlotPosition(3, 5));
 
         long time = player.getWorld().getFullTime();
         updateAssets(assetType, previousCache, time);
@@ -111,7 +97,10 @@ public final class AssetExplorer extends ChestGUI {
             updatePage();
 
             if(pages > 0){
-                pageButton.setDisplayName(Component.text("Page " + page + " / " + pages));
+                pageButton.setDisplayName(Profitable.getLang().get("gui.generic.buttons.page-selector.name",
+                        Map.entry("%page%",String.valueOf(page)),
+                        Map.entry("%pages%",String.valueOf(pages))
+                ));
                 pageButton.show(this);
             }else {
                 fillSlot(pageButton.getSlot(), new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
@@ -175,15 +164,12 @@ public final class AssetExplorer extends ChestGUI {
             if(assetType >= 4){
                 assetType = 1;
             }
-            categoryButton.setLore(List.of(
-                    Component.text("Assets", Configuration.GUICOLORSUBTITLE),
-                    Component.empty(),
-                    Component.text("♦ ", NamedTextColor.WHITE).append(Component.text("Forex", assetType == 1? NamedTextColor.WHITE: Configuration.GUICOLORTEXT)),
-                    Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Item)", assetType == 2? NamedTextColor.GREEN:Configuration.GUICOLORTEXT)),
-                    Component.text("♦ ", NamedTextColor.GREEN).append(Component.text("Commodity (Entity)", assetType == 3? NamedTextColor.GREEN:Configuration.GUICOLORTEXT)),
-                    Component.empty(),
-                    GuiElement.clickAction(null, "cycle")
 
+            String types = "<white>♦ </white><color:" + (assetType == 1? NamedTextColor.WHITE.asHexString():NamedTextColor.GRAY.asHexString()) + ">" + Profitable.getLang().getString("assets.categories.forex") + "</color>%&new_line&%" +
+                    "<green>♦ </green><color:" + (assetType == 2? NamedTextColor.GREEN.asHexString():NamedTextColor.GRAY.asHexString()) + ">" + Profitable.getLang().getString("assets.categories.commodity-item") + "</color>%&new_line&%" +
+                    "<green>♦ </green><color:" + (assetType == 3? NamedTextColor.GREEN.asHexString():NamedTextColor.GRAY.asHexString()) + ">" + Profitable.getLang().getString("assets.categories.commodity-entity") + "</color>";
+            categoryButton.setLore(Profitable.getLang().langToLore("gui.asset-explorer.buttons.category-selector.lore",
+                            Map.entry("%category_list%", types)
             ));
             categoryButton.show(this);
             updateAssets(assetType, assetCache, player.getWorld().getFullTime());
@@ -198,7 +184,10 @@ public final class AssetExplorer extends ChestGUI {
                 }
                 page = Math.clamp(page, 0, pages);
                 updatePage();
-                pageButton.setDisplayName(Component.text("Page " + page + " / " + pages));
+                pageButton.setDisplayName(Profitable.getLang().get("gui.generic.buttons.page-selector.name",
+                        Map.entry("%page%",String.valueOf(page)),
+                        Map.entry("%pages%",String.valueOf(pages))
+                ));
                 pageButton.show(this);
             }
         }

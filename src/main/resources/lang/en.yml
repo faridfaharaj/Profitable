@@ -12,9 +12,9 @@ temp-items:
 orders:
   cancel: "<gray>Cancelled <yellow>%order%</yellow></gray>"
   order-types:
-    limit-order: "limit order"
-    market-order: "market order"
-    stop-limit-order: "stop-limit"
+    limit-order: "limit"
+    market-order: "market"
+    stop-limit-order: "stop"
   sides:
     buy: "buy order"
     sell: "sell order"
@@ -66,6 +66,16 @@ assets:
   auto-deposit-notice: "Automatically deposited %asset_amount% <red>(+ fees)</red>"
   entity-claim-notice: "Claimed %entity% using %asset_amount%"
   loading-graph: "Loading graph..."
+  categories:
+    forex: "Forex"
+    commodity: "Commodity"
+    commodity-item: "Commodity (item)"
+    commodity-entity: "Commodity (entity)"
+  asset-types:
+    currency: "Currency"
+    commodity: "Commodity"
+    commodity-item: "Commodity (item)"
+    commodity-entity: "Commodity (entity)"
   error:
     asset-not-found: "<red>Cannot trade %asset% here</red>"
     cant-fractional: "<red>Asset %asset% cant be fractional</red>"
@@ -97,11 +107,102 @@ gui:
         lore:
           - ""
           - "<yellow>Click to go to last menu</yellow>"
+      page-selector:
+        name: "Page %page%/%pages%"
+        lore:
+          - ""
+          - "<yellow>Left click for next page</yellow>"
+          - "<yellow>Right click for past page</yellow>"
+
+  number-selector:
+    buttons:
+      add:
+        name: "<yellow>Add %number%</yellow>"
+      subtract:
+        name: "<yellow>Subtract %number%</yellow>"
+      times-ten:
+        name: "<yellow>Click to multiply by 10</yellow>"
+      divide-ten:
+        name: "<yellow>Click to divide by 10</yellow>"
+
+  asset-explorer:
+    title: "Asset explorer"
+    buttons:
+      asset:
+        name: "<white>%asset%  $%price%  %price_change% %percentage_change%</white>"
+        lore:
+          - "<dark_gray>%asset_category%</dark_gray>"
+          - ""
+          - "<gray>%asset_name%</gray>"
+          - "<dark_gray> - </dark_gray><gray>Volume: </gray><white>%volume%</white>"
+          - "<dark_gray> - </dark_gray><gray>Open: </gray><white>$%open_price%</white>"
+          - "<dark_gray> - </dark_gray><gray>Day's range: </gray><white>$%range_low% to $%range_high%</white>"
+          - ""
+          - "<yellow>Left click to trade</yellow>"
+          - "<yellow>Right click to view graphs</yellow>"
+      category-selector:
+        name: "Categories"
+        lore:
+          - "<dark_gray>Assets</dark_gray>"
+          - ""
+          - "%category_list%"
+          - ""
+          - "<yellow>Click to cycle</yellow>"
+      orders:
+        name: "Manage orders"
+        lore:
+          - "<dark_gray>Orders</dark_gray>"
+          - ""
+          - "<yellow>Click to go to last menu</yellow>"
+      wallet:
+        name: "Manage owned assets"
+        lore:
+          - "<dark_gray>Portfolio</dark_gray>"
+          - ""
+          - "<yellow>Click to go to last menu</yellow>"
+      delivery:
+        name: "Set delivery location"
+        lore:
+          - "<dark_gray>Delivery</dark_gray>"
+          - ""
+          - "<yellow>Click to go to last menu</yellow>"
+  graphs:
+    title: "Showing graphs for %asset%"
+    buttons:
+      one-month:
+        name: "1 Month"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Right click to get graph</yellow>"
+      three-month:
+        name: "1 Month"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Right click to get graph</yellow>"
+      six-month:
+        name: "1 Month"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Right click to get graph</yellow>"
+      one-year:
+        name: "1 Month"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Right click to get graph</yellow>"
+      two-years:
+        name: "1 Month"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Right click to get graph</yellow>"
   wallet:
-    title: "Portfolio"
+    title: "Asset portfolio"
     buttons:
       asset-holding:
-        name: "%asset%"
         lore:
           - "<dark_gray>%asset_type%</dark_gray>"
           - ""
@@ -113,7 +214,7 @@ gui:
           - "<yellow>Left click to withdraw</yellow>"
           - "<yellow>Right click to deposit</yellow>"
   orders:
-    title: "Active orders"
+    title: "Your active orders"
     buttons:
       order:
         lore:
@@ -127,6 +228,23 @@ gui:
           - "<gray>Total value: %value_asset_amount%</gray>"
           - ""
           - "<yellow>Left click to cancel</yellow>"
+
+  deposit-withdrawal:
+    title-deposit: "Select amount to deposit."
+    title-withdrawal: "Select amount to withdraw."
+    buttons:
+      submit-deposit:
+        name: "Amount: <yellow>%amount% %asset%</yellow>"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Left click to proceed</yellow>"
+      submit-withdrawal:
+        name: "<yellow>Amount: %amount% %asset%</yellow>"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Left click to proceed</yellow>"
 
   order-building:
     buy-sell:
@@ -167,11 +285,53 @@ gui:
             - ""
             - "<yellow>Left click to pick sell</yellow>"
 
+    type-select:
+      title: "Pick an order type."
+      buttons:
+        market:
+          name: "Market Order"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>transact <yellow>immediately</yellow></gray>"
+            - "<gray>at the best</gray>"
+            - "<gray>price available</gray>"
+            - ""
+            - "<yellow>Click to select Market</yellow>"
+          lore-no-orders:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>transact <yellow>immediately</yellow></gray>"
+            - "<gray>at the best</gray>"
+            - "<gray>price available</gray>"
+            - ""
+            - "<red>No orders available!</red>"
+        limit:
+          name: "Limit Order"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Choose a <yellow>price</yellow></gray>"
+            - "<gray>and transact once</gray>"
+            - "<gray>a match is found</gray>"
+            - ""
+            - "<yellow>Click to select Limit</yellow>"
+        stop-limit:
+          name: "Stop-Limit Order"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>place <yellow>Limit Order</yellow></gray>"
+            - "<gray>once price hits</gray>"
+            - "<gray>your trigger</gray>"
+            - ""
+            - "<yellow>Click to select Stop-limit</yellow>"
+
     price-select:
       title: "Select a price."
       buttons:
         submit:
-          name: "<yellow>Your price: %asset_amount%</yellow>"
+          name: "Your price: <yellow>%amount% %asset%</yellow>"
           lore:
             - "<dark_gray>%asset%</dark_gray>"
             - ""
@@ -182,7 +342,7 @@ gui:
       title: "Select units."
       buttons:
         submit:
-          name: "<yellow>Transacting amount: %asset_amount%</yellow>"
+          name: "Transacting amount: <yellow>%amount% %asset%</yellow>"
           lore:
             - "<dark_gray>%asset%</dark_gray>"
             - ""

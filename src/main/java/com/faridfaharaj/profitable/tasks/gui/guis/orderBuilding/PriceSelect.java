@@ -28,7 +28,7 @@ public final class PriceSelect  extends QuantitySelectGui {
     AssetCache[][] assetCache;
     AssetCache assetData;
     public PriceSelect(AssetCache[][] assetCache, AssetCache assetData, Order order, List<Order> bidOrders, List<Order> askOrders) {
-        super("Select price per unit.", true, false,
+        super(Profitable.getLang().get("gui.order-building.price-select.title"), true, false,
                 Math.max(order.isSideBuy()? (bidOrders.isEmpty()? assetData.getlastCandle().getClose() : bidOrders.getFirst().getPrice()) :(askOrders.isEmpty()? assetData.getlastCandle().getClose() : askOrders.getFirst().getPrice()), 0.001)
         );
         this.assetCache = assetCache;
@@ -38,7 +38,7 @@ public final class PriceSelect  extends QuantitySelectGui {
         this.bidOrders = bidOrders;
         this.askOrders = askOrders;
 
-        List<Component> lore = new ArrayList<>();
+        List<Component> lore;
         lore = Profitable.getLang().langToLore("gui.order-building.price-select.buttons.submit.lore",
                 Map.entry("%asset%", assetData.getAsset().getCode()),
                 Map.entry("%price_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, assetData.getlastCandle().getClose()))
@@ -49,7 +49,7 @@ public final class PriceSelect  extends QuantitySelectGui {
 
     @Override
     protected void onAmountUpdate(double newPrice) {
-        getSubmitButton().setDisplayName(Component.text("Your price: ", Configuration.GUICOLORTITLE).append(Component.text(newPrice + " " + Configuration.MAINCURRENCYASSET.getCode(),Configuration.GUICOLORTITLEHIGHLIGHT)));
+        getSubmitButton().setDisplayName(Profitable.getLang().get("gui.order-building.price-select.buttons.submit.name", Map.entry("%amount%", String.valueOf(this.amount)), Map.entry("%asset%", Configuration.MAINCURRENCYASSET.getCode())));
         getSubmitButton().show(this);
     }
 
@@ -60,6 +60,7 @@ public final class PriceSelect  extends QuantitySelectGui {
 
         Component name = Component.text("Your price: ", Configuration.GUICOLORTITLE).append(Component.text(this.amount + " " + Configuration.MAINCURRENCYASSET.getCode(),Configuration.GUICOLORTITLEHIGHLIGHT));
 
+        name = Profitable.getLang().get("gui.order-building.price-select.buttons.submit.name", Map.entry("%amount%", String.valueOf(this.amount)), Map.entry("%asset%", Configuration.MAINCURRENCYASSET.getCode()));
 
         return new GuiElement(this, display, name, null, slot);
     }

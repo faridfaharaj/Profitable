@@ -1,5 +1,6 @@
 package com.faridfaharaj.profitable.tasks.gui.guis;
 
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.commands.WalletCommand;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.tasks.gui.QuantitySelectGui;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
+import java.util.Map;
 
 public final class DepositWithdrawalGui extends QuantitySelectGui {
 
@@ -20,20 +22,18 @@ public final class DepositWithdrawalGui extends QuantitySelectGui {
 
     AssetCache[][] assetCache;
     public DepositWithdrawalGui(Asset asset, boolean depositing, AssetCache[][] assetCache) {
-        super("Select amount to " + (depositing?"deposit.":"withdraw."), asset.getAssetType() != 2 && asset.getAssetType() != 3, asset.getAssetType() == 2 || asset.getAssetType() == 3, 1);
+        super(Profitable.getLang().get(depositing?"gui.deposit-withdrawal.title-deposit":"gui.deposit-withdrawal.title-withdrawal"), asset.getAssetType() != 2 && asset.getAssetType() != 3, asset.getAssetType() == 2 || asset.getAssetType() == 3, 1);
         this.assetCache = assetCache;
         this.depositing = depositing;
         this.asset = asset;
+        onAmountUpdate(amount);
     }
 
     @Override
     protected void onAmountUpdate(double newAmount) {
 
-        getSubmitButton().setDisplayName(Component.text("Amount: ").append(Component.text(newAmount, NamedTextColor.YELLOW)));
-        List<Component> lore = List.of(
-                Component.empty(),
-                GuiElement.clickAction(null, (depositing?"Deposit":"Withdraw") + " this amount")
-        );
+        getSubmitButton().setDisplayName(Profitable.getLang().get(depositing?"gui.deposit-withdrawal.buttons.submit-deposit.name":"gui.deposit-withdrawal.buttons.submit-withdrawal.name", Map.entry("%amount%", String.valueOf(newAmount)), Map.entry("%asset%", asset.getCode())));
+        List<Component> lore = Profitable.getLang().langToLore(depositing?"gui.deposit-withdrawal.buttons.submit-deposit.lore":"gui.deposit-withdrawal.buttons.submit-withdrawal.lore", Map.entry("%asset%", asset.getCode()));
         getSubmitButton().setLore(lore);
         getSubmitButton().show(this);
 
@@ -44,11 +44,8 @@ public final class DepositWithdrawalGui extends QuantitySelectGui {
 
         ItemStack display = new ItemStack(Material.PAPER);
 
-        Component name = Component.text("Amount: ").append(Component.text(1.0, NamedTextColor.YELLOW));
-        List<Component> lore = List.of(
-                Component.empty(),
-                GuiElement.clickAction(null, (depositing?"Deposit":"Withdraw") + " this amount")
-        );
+        Component name = Profitable.getLang().get(depositing?"gui.deposit-withdrawal.buttons.submit-deposit.name":"gui.deposit-withdrawal.buttons.submit-withdrawal.name", Map.entry("%amount%", String.valueOf(amount)));
+        List<Component> lore = Profitable.getLang().langToLore(depositing?"gui.deposit-withdrawal.buttons.submit-deposit.lore":"gui.deposit-withdrawal.buttons.submit-withdrawal.lore");
 
         return new GuiElement(this, display, name, lore, slot);
     }

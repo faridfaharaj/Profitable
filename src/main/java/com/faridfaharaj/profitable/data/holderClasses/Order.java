@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.data.holderClasses;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
@@ -58,6 +59,18 @@ public class Order{
             }
             throw new IllegalArgumentException("Invalid OrderType code: " + value);
         }
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case LIMIT: return Profitable.getLang().getString("orders.order-types.limit-order");
+                case MARKET: return Profitable.getLang().getString("orders.order-types.market-order");
+                case STOP_LIMIT: return Profitable.getLang().getString("orders.order-types.stop-limit-order");
+                case STOP_MARKET: return "Stop Market Order";
+                default: return name(); // fallback to enum name
+            }
+        }
+
 
     }
 

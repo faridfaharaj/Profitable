@@ -1,0 +1,262 @@
+generic:
+  error:
+    cant-console: "<red>No puedes usar este comando desde la consola</red>"
+    missing-perm: "<red>No tienes permiso para hacer eso</red>"
+    invalid-subcommand: "<red>Subcomando inválido: %sub_command%</red>"
+    invalid-amount: "<red>Cantidad inválida %invalid_amount%</red>"
+
+temp-items:
+  error:
+    main-hand-occupied: "<red>La mano principal debe estar libre</red>"
+
+orders:
+  cancel: "<gray>Orden cancelada <yellow>%order%</yellow></gray>"
+  order-types:
+    limit-order: "orden límite"
+    market-order: "orden de mercado"
+    stop-limit-order: "orden stop-limit"
+  sides:
+    buy: "orden de compra"
+    sell: "orden de venta"
+  warning:
+    market-ignores-price: "<yellow>Ignorando el precio para orden de mercado</yellow>"
+
+account:
+  display: "<gray>Cuenta activa: <yellow>(%account%)</yellow></gray>"
+  delete: "<red>CUENTA ELIMINADA: %account%</red>"
+  login: "<gray>Sesión iniciada correctamente en <yellow>%account%</yellow>!</gray>"
+  registry: "<gray>Cuenta <yellow>%account%</yellow> registrada con éxito!</gray>"
+  logout: "<gray>Sesión cerrada con éxito!</gray>"
+  password-update: "<gray>Contraseña actualizada con éxito!</gray>"
+  error:
+    account-already-exists: "<red>Ya existe una cuenta con ese nombre</red>"
+    password-too-long: "<red>La contraseña puede tener como máximo 32 caracteres</red>"
+    password-mismatch: "<red>Las contraseñas no coinciden</red>"
+    cant-delete-default: "<red>No se puede eliminar la cuenta predeterminada</red>"
+    wrong-password: "<red>Contraseña o cuenta incorrecta</red>"
+    cant-delete-active-account: "<red>Alguien más está usando esta cuenta, no se puede eliminar</red>"
+    active-account-mismatch: "<red>El nombre de la cuenta no coincide con la cuenta activa</red>"
+
+exchange:
+  fee-display: "<red>(incluye %amount% %asset% de comisión)</red>"
+  charge-notice: "<gray>Cobrado %asset_amount% %fee%</gray>"
+  payment-notice: "<gray>Recibido %asset_amount% %fee%</gray>"
+  selling-notice: "<gray><green>Comprado</green> %base_asset_amount% por %quote_asset_amount%</gray>"
+  buying-notice: "<gray><red>Vendido</red> %base_asset_amount% por %quote_asset_amount%</gray>"
+  new-order-notice: "<gray>Nueva %order_type% %side% de %base_asset_amount% a %quote_asset_amount% cada una</gray>"
+  loading-order: "<gray>Procesando orden...</gray>"
+  claim-fee-notice: "Comisión por reclamar es de %fee_asset_amount% por entidad"
+  warning:
+    partial-fill: "<yellow>Orden parcialmente completada</yellow>"
+    partial-fill-low-liquidity: "<yellow>Parcialmente completada porque no hay más órdenes disponibles</yellow>"
+    fee-higher-than-profit: "<yellow>¡Esta orden vale menos que la comisión (%fee_asset_amount%), no habrá ganancia!</yellow>"
+  error:
+    invalid-order-type: "<red>Tipo de orden inválido</red>"
+    identical-assets: "<red>Debes intercambiar entre dos activos diferentes</red>"
+    invalid-sell-stop-trigger: "<red>El precio de activación de stop debe ser menor que el del mercado al vender</red>"
+    invalid-buy-stop-trigger: "<red>El precio de activación de stop debe ser mayor que el del mercado al comprar</red>"
+    cant-self-transact: "<red>¡No puedes hacer transacciones contigo mismo! Cancela la orden actual primero</red>"
+    no-orders-found: "<red>No hay órdenes disponibles, ¡usa una orden límite!</red>"
+
+assets:
+  amount-display: "%amount% %asset%"
+  auto-deposit-notice: "Depositado automáticamente %asset_amount% <red>(+ comisiones)</red>"
+  entity-claim-notice: "Reclamado %entity% usando %asset_amount%"
+  loading-graph: "Cargando gráfico..."
+  categories:
+    forex: "Divisas"
+    commodity: "Mercancía"
+    commodity-item: "Mercancía (ítem)"
+    commodity-entity: "Mercancía (entidad)"
+  asset-types:
+    currency: "Moneda"
+    commodity: "Mercancía"
+    commodity-item: "Mercancía (ítem)"
+    commodity-entity: "Mercancía (entidad)"
+  error:
+    asset-not-found: "<red>No se puede comerciar %asset% aquí</red>"
+    cant-fractional: "<red>El activo %asset% no puede fraccionarse</red>"
+    minimum-deposit: "<red>No se puede depositar menos de %asset_amount%</red>"
+    non-depositable: "<red>No se puede depositar ni retirar %asset%</red>"
+    not-enough-asset: "<red>No tienes suficiente %asset%</red>"
+    cant-reclaim-entity: "<red>No se pueden reclamar entidades propias</red>"
+    cant-claim-entity: "<red>No está permitido poseer esta entidad</red>"
+
+delivery:
+  display: "<br><gray>Entrega de ítems: <yellow>%i_position%</yellow></gray><br><gray>Entrega de entidades: <yellow>%e_position%</yellow></gray><br>"
+  updated-item: "<gray>Entrega de ítems actualizada a: <yellow>%position%</yellow></gray>"
+  updated-entity: "<gray>Entrega de entidades actualizada a: <yellow>%position%</yellow></gray>"
+  error:
+    items-must-be-container: "<red>La entrega de ítems debe ser en un contenedor</red>"
+    missing-item-delivery: "<red>Falta especificar la entrega de ítems</red>"
+    missing-entity-delivery: "<red>Falta especificar la entrega de entidades</red>"
+
+hooks:
+  error:
+    insufficient-funds: "Fondos insuficientes"
+
+gui:
+  generic:
+    buttons:
+      return:
+        name: "<red>volver</red>"
+        lore:
+          - ""
+          - "<yellow>Haz clic para volver al menú anterior</yellow>"
+      page-selector:
+        name: "Página %page%/%pages%"
+        lore:
+          - ""
+          - "<yellow>Clic izquierdo: siguiente página</yellow>"
+          - "<yellow>Clic derecho: página anterior</yellow>"
+
+  number-selector:
+    buttons:
+      add:
+        name: "<yellow>Sumar %number%</yellow>"
+      subtract:
+        name: "<yellow>Restar %number%</yellow>"
+      times-ten:
+        name: "<yellow>Clic para multiplicar por 10</yellow>"
+      divide-ten:
+        name: "<yellow>Clic para dividir por 10</yellow>"
+
+  asset-explorer:
+    title: "Explorador de activos"
+    buttons:
+      asset:
+        name: "<white>%asset%  $%price%  %price_change% %percentage_change%</white>"
+        lore:
+          - "<dark_gray>%asset_category%</dark_gray>"
+          - ""
+          - "<gray>%asset_name%</gray>"
+          - "<dark_gray> - </dark_gray><gray>Volumen: </gray><white>%volume%</white>"
+          - "<dark_gray> - </dark_gray><gray>Apertura: </gray><white>$%open_price%</white>"
+          - "<dark_gray> - </dark_gray><gray>Rango del día: </gray><white>$%range_low% a $%range_high%</white>"
+          - ""
+          - "<yellow>Clic izquierdo para comerciar</yellow>"
+          - "<yellow>Clic derecho para ver gráficos</yellow>"
+      category-selector:
+        name: "Categorías"
+        lore:
+          - "<dark_gray>Activos</dark_gray>"
+          - ""
+          - "%category_list%"
+          - ""
+          - "<yellow>Haz clic para cambiar</yellow>"
+      orders:
+        name: "Gestionar órdenes"
+        lore:
+          - "<dark_gray>Órdenes</dark_gray>"
+          - ""
+          - "<yellow>Clic para ir al menú anterior</yellow>"
+      wallet:
+        name: "Gestionar activos"
+        lore:
+          - "<dark_gray>Cartera</dark_gray>"
+          - ""
+          - "<yellow>Clic para ir al menú anterior</yellow>"
+      delivery:
+        name: "Establecer entrega"
+        lore:
+          - "<dark_gray>Entrega</dark_gray>"
+          - ""
+          - "<yellow>Clic para ir al menú anterior</yellow>"
+
+  graphs:
+    title: "Mostrando gráficos de %asset%"
+    buttons:
+      one-month:
+        name: "1 Mes"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Clic derecho para ver gráfico</yellow>"
+      three-month:
+        name: "3 Meses"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Clic derecho para ver gráfico</yellow>"
+      six-month:
+        name: "6 Meses"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Clic derecho para ver gráfico</yellow>"
+      one-year:
+        name: "1 Año"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Clic derecho para ver gráfico</yellow>"
+      two-years:
+        name: "2 Años"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Clic derecho para ver gráfico</yellow>"
+
+  wallet:
+    title: "Cartera de activos"
+    buttons:
+      asset-holding:
+        lore:
+          - "<dark_gray>%asset_type%</dark_gray>"
+          - ""
+          - "<gray>En posesión: %owned_asset_amount%</gray>"
+          - ""
+          - "<gray>Precio de mercado: %price_asset_amount%</gray>"
+          - "<gray>Valor total: %value_asset_amount%</gray>"
+          - ""
+          - "<yellow>Clic izquierdo para retirar</yellow>"
+          - "<yellow>Clic derecho para depositar</yellow>"
+
+  orders:
+    title: "Tus órdenes activas"
+    buttons:
+      order:
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<gray>Tipo: %order_type%</gray>"
+          - ""
+          - "<gray>Unidades: <white>%base_asset_amount%</white></gray>"
+          - "<gray>Precio: %quote_asset_amount%</gray>"
+          - ""
+          - "<gray>Valor total: %value_asset_amount%</gray>"
+          - ""
+          - "<yellow>Clic izquierdo para cancelar</yellow>"
+
+  deposit-withdrawal:
+    title-deposit: "Selecciona la cantidad a depositar."
+    title-withdrawal: "Selecciona la cantidad a retirar."
+    buttons:
+      submit-deposit:
+        name: "Cantidad: <yellow>%amount% %asset%</yellow>"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Clic izquierdo para continuar</yellow>"
+      submit-withdrawal:
+        name: "<yellow>Cantidad: %amount% %asset%</yellow>"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Clic izquierdo para continuar</yellow>"
+
+  order-building:
+    buy-sell:
+      title: "Elige un lado."
+      buttons:
+        sell:
+          name: "Orden de %side%"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Oferta: %ask_asset_amount%</gray>"
+            - ""
+            - "<gray>Precios más bajos:</gray>"
+            - "%price_list%"
+            - ""
+            - "<yellow>Clic izquierdo para elegir venta</yellow>"

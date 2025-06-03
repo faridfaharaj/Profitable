@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class GraphsMenu extends ChestGUI {
 
@@ -32,7 +33,9 @@ public final class GraphsMenu extends ChestGUI {
     AssetCache[][] cache;
 
     public GraphsMenu(String assetID, AssetCache[][] cache) {
-        super(3, "Graphs for " + assetID);
+        super(3, Profitable.getLang().get("gui.graphs.title",
+                Map.entry("%asset%", assetID)
+        ));
 
         this.assetid = assetID;
         this.cache = cache;

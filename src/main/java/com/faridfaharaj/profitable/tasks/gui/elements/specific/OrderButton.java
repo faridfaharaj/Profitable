@@ -20,7 +20,7 @@ public final class OrderButton extends GuiElement{
     Order order;
 
     public OrderButton(ChestGUI gui, Order order, int slot, boolean actionCancel) {
-        super(gui, order.isSideBuy()?new ItemStack(Material.PAPER):new ItemStack(Material.MAP), order.isSideBuy()?Component.text("Buy order", Configuration.COLORBULLISH):Component.text("Sell order", Configuration.COLORBEARISH),
+        super(gui, order.isSideBuy()?new ItemStack(Material.PAPER):new ItemStack(Material.MAP), order.isSideBuy()?Profitable.getLang().get("orders.sides.buy").color(Configuration.COLORBULLISH):Profitable.getLang().get("orders.sides.sell").color(Configuration.COLORBEARISH),
                 Profitable.getLang().langToLore(actionCancel?"gui.orders.buttons.order.lore":"gui.order-building.confirmation.buttons.submit.lore",
                         Map.entry("%asset%", order.getAsset()),
                         Map.entry("%order_type%", order.getType().toString()),

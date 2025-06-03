@@ -16,7 +16,7 @@ public class Lang {
 
     private final JavaPlugin plugin;
     private FileConfiguration lang;
-    private final String[] langCodes = {"en"};
+    private final String[] langCodes = {"en","es"};
 
     TagResolver resolver = TagResolver.resolver(
 
@@ -25,7 +25,7 @@ public class Lang {
     public Lang(JavaPlugin plugin) throws IOException {
         this.plugin = plugin;
         saveDefaultLangFiles();
-        loadLang(plugin.getConfig().getString("lang", langCodes[0]));
+        loadLang(plugin.getConfig().getString("language", langCodes[0]));
     }
 
     public void saveDefaultLangFiles() {

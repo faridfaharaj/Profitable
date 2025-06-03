@@ -28,7 +28,7 @@ public final  class ConfirmOrder extends ChestGUI {
     AssetCache[][] assetCache;
     AssetCache assetData;
     public ConfirmOrder(AssetCache[][] assetCache, AssetCache assetData, Order order, List<Order> bidOrders, List<Order> askOrders) {
-        super(3, "Confirm?");
+        super(3, Profitable.getLang().get("gui.order-building.confirmation.title"));
         this.assetCache = assetCache;
         this.assetData = assetData;
 
