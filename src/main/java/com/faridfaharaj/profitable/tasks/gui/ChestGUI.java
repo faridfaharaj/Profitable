@@ -1,6 +1,9 @@
 package com.faridfaharaj.profitable.tasks.gui;
 
 import com.faridfaharaj.profitable.Profitable;
+import com.tcoded.folialib.FoliaLib;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,8 +18,13 @@ public abstract class ChestGUI implements InventoryHolder {
 
     private final Inventory inventory;
 
-    public ChestGUI(int height, String title){
-        inventory = Bukkit.createInventory(this, 9*height, title);
+    public ChestGUI(int height, Component title){
+
+        if(Profitable.getfolialib().isSpigot()){
+            inventory = Bukkit.createInventory(this, 9*height, LegacyComponentSerializer.legacySection().serialize(title));
+        }else {
+            inventory = Bukkit.createInventory(this, 9*height, title);
+        }
     }
 
     public void openGui(Player player){

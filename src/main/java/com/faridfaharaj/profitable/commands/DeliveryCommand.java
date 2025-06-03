@@ -6,7 +6,6 @@ import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.util.MessagingUtil;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class DeliveryCommand implements CommandExecutor {
@@ -24,10 +24,11 @@ public class DeliveryCommand implements CommandExecutor {
     @Override
     public boolean onCommand( CommandSender sender,  Command command,  String s,  String[] args) {
 
-        if(Configuration.MULTIWORLD){
-            DataBase.universalUpdateWorld(sender);
-        }
         if(sender instanceof Player player){
+
+            if(Configuration.MULTIWORLD){
+                DataBase.universalUpdateWorld(sender);
+            }
 
             String account = Accounts.getAccount(player);
 
@@ -42,14 +43,11 @@ public class DeliveryCommand implements CommandExecutor {
                     Location entityDelivery = Accounts.getEntityDelivery(account);
                     Location itemDelivery = Accounts.getItemDelivery(account);
 
-                    MessagingUtil.sendCustomMessage(sender,
-                            Component.newline()
-                                    .append(Component.text("Item Delivery Location:",Configuration.COLORTEXT)).appendNewline()
-                                    .appendSpace().appendSpace().append(Component.text((itemDelivery == null?"Not set":itemDelivery.toVector() + " (" + itemDelivery.getWorld().getName()+")")).color(Configuration.COLORHIGHLIGHT)).appendNewline()
-                                    .append(Component.text("Entity Delivery Location:",Configuration.COLORTEXT)).appendNewline()
-                                    .appendSpace().appendSpace().append(Component.text((entityDelivery == null?"Not set":entityDelivery.toVector() + " (" + entityDelivery.getWorld().getName()+")")).color(Configuration.COLORHIGHLIGHT))
-                                    .appendNewline()
-                    );
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.display",
+                            Map.entry("%i_position%", itemDelivery == null?"Not set":itemDelivery.toVector() + " (" + itemDelivery.getWorld().getName()+")"),
+                            Map.entry("%e_position%", entityDelivery == null?"Not set":entityDelivery.toVector() + " (" + entityDelivery.getWorld().getName()+")")
+                    ));
+
                 });
 
                 return true;
@@ -63,7 +61,7 @@ public class DeliveryCommand implements CommandExecutor {
                 }
 
                 if(args.length < 2){
-                    MessagingUtil.sendError(player, "/account delivery set item OR /account delivery set entity");
+                    MessagingUtil.sendSyntaxError(player, "/account delivery set <entity/item>");
                     return true;
                 }
 
@@ -78,7 +76,7 @@ public class DeliveryCommand implements CommandExecutor {
 
                     return true;
                 }else{
-                    MessagingUtil.sendError(player, "Invalid delivery");
+                    MessagingUtil.sendGenericInvalidSubCom(sender, args[1]);
 
                 }
 
@@ -86,12 +84,14 @@ public class DeliveryCommand implements CommandExecutor {
 
 
             }else{
-                MessagingUtil.sendError(player, "/account delivery set item OR /account delivery set entity");
+                MessagingUtil.sendSyntaxError(player, "/account delivery set <entity/item>");
             }
 
+        }else {
+            MessagingUtil.sendGenericCantConsole(sender);
         }
 
-        return false;
+        return true;
     }
 
     public static class CommandTabCompleter implements TabCompleter {

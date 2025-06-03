@@ -56,12 +56,18 @@ public class TemporalItems {
     public static void sendClaimingTag(Player player){
 
         if(player.getInventory().getItemInMainHand().getType() != Material.AIR){
-            MessagingUtil.sendError(player, "you must have your main hand free");
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("temp-items.error.main-hand-occupied"));
             return;
         }
 
         if(Configuration.ENTITYCLAIMINGFEES != 0){
-            MessagingUtil.sendWarning(player,"Claiming fees are " + Configuration.ENTITYCLAIMINGFEES + " " + Configuration.MAINCURRENCYASSET.getCode() + " per entity");
+
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("exchange.claim-fee-notice",
+
+                    Map.entry("%fee_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
+
+            ));
+
         }
 
         TemporalItems.addTemp(player, TemporalItem.CLAIMINGTAG);
@@ -73,7 +79,7 @@ public class TemporalItems {
     public static void sendDeliveryStick(Player player, boolean items){
 
         if(player.getInventory().getItemInMainHand().getType() != Material.AIR){
-            MessagingUtil.sendError(player, "you must have your main hand free");
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("temp-items.error.main-hand-occupied"));
             return;
         }
 
@@ -86,14 +92,16 @@ public class TemporalItems {
     public static void sendGraphMap(Player player, String assetid, long time, String interval){
 
         if(player.getInventory().getItemInMainHand().getType() != Material.AIR){
-            MessagingUtil.sendError(player, "you must have your main hand free");
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("temp-items.error.main-hand-occupied"));
             return;
         }
 
         Asset asset = Assets.getAssetData(assetid);
 
         if(asset == null){
-            MessagingUtil.sendError(player, "This asset isn't traded here");
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.asset-not-found",
+                Map.entry("%asset%", assetid)
+            ));
             return;
         }
 

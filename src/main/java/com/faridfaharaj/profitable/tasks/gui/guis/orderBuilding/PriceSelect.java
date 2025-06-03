@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.tasks.gui.guis.orderBuilding;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
@@ -16,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class PriceSelect  extends QuantitySelectGui {
 
@@ -26,7 +28,7 @@ public final class PriceSelect  extends QuantitySelectGui {
     AssetCache[][] assetCache;
     AssetCache assetData;
     public PriceSelect(AssetCache[][] assetCache, AssetCache assetData, Order order, List<Order> bidOrders, List<Order> askOrders) {
-        super("Select price per unit.", true, false,
+        super(Profitable.getLang().get("gui.order-building.price-select.title"), true, false,
                 Math.max(order.isSideBuy()? (bidOrders.isEmpty()? assetData.getlastCandle().getClose() : bidOrders.getFirst().getPrice()) :(askOrders.isEmpty()? assetData.getlastCandle().getClose() : askOrders.getFirst().getPrice()), 0.001)
         );
         this.assetCache = assetCache;
@@ -36,25 +38,18 @@ public final class PriceSelect  extends QuantitySelectGui {
         this.bidOrders = bidOrders;
         this.askOrders = askOrders;
 
-        List<Component> lore = new ArrayList<>();
-        lore.add(Component.text(assetData.getAsset().getCode(), Configuration.GUICOLORSUBTITLE));
-        lore.add(Component.empty());
-        lore.add(Component.text("Current asset price: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, assetData.getlastCandle().getClose())));
-        if(!bidOrders.isEmpty()){
-            lore.add(Component.text("Bid: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, bidOrders.getFirst().getPrice())));
-        }
-        if(!askOrders.isEmpty()){
-            lore.add(Component.text("Ask: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, askOrders.getFirst().getPrice())));
-        }
-        lore.add(Component.empty());
-        lore.add(GuiElement.clickAction(null, "Proceed with this price"));
+        List<Component> lore;
+        lore = Profitable.getLang().langToLore("gui.order-building.price-select.buttons.submit.lore",
+                Map.entry("%asset%", assetData.getAsset().getCode()),
+                Map.entry("%price_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, assetData.getlastCandle().getClose()))
+        );
         getSubmitButton().setLore(lore);
         getSubmitButton().show(this);
     }
 
     @Override
     protected void onAmountUpdate(double newPrice) {
-        getSubmitButton().setDisplayName(Component.text("Your price: ", Configuration.GUICOLORTITLE).append(Component.text(newPrice + " " + Configuration.MAINCURRENCYASSET.getCode(),Configuration.GUICOLORTITLEHIGHLIGHT)));
+        getSubmitButton().setDisplayName(Profitable.getLang().get("gui.order-building.price-select.buttons.submit.name", Map.entry("%amount%", String.valueOf(this.amount)), Map.entry("%asset%", Configuration.MAINCURRENCYASSET.getCode())));
         getSubmitButton().show(this);
     }
 
@@ -65,6 +60,7 @@ public final class PriceSelect  extends QuantitySelectGui {
 
         Component name = Component.text("Your price: ", Configuration.GUICOLORTITLE).append(Component.text(this.amount + " " + Configuration.MAINCURRENCYASSET.getCode(),Configuration.GUICOLORTITLEHIGHLIGHT));
 
+        name = Profitable.getLang().get("gui.order-building.price-select.buttons.submit.name", Map.entry("%amount%", String.valueOf(this.amount)), Map.entry("%asset%", Configuration.MAINCURRENCYASSET.getCode()));
 
         return new GuiElement(this, display, name, null, slot);
     }

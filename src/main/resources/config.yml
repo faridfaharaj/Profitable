@@ -1,7 +1,10 @@
-# allows Vault currency be added as an asset, withdrawn or deposited to your account
+# Lang file to be used by the plugin
+language: en
+
+# Allows Vault currency be added as an asset, withdrawn or deposited to your account
 vault-support: true
 
-# allows PlayerPoints currency be added as an asset, withdrawn or deposited to your account
+# Allows PlayerPoints currency be added as an asset, withdrawn or deposited to your account
 player-points-support: true
 
 colors: # Allows customization of command outputs and graphs

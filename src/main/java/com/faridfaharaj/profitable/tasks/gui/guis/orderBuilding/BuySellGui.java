@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.tasks.gui.guis.orderBuilding;
 
 import com.faridfaharaj.profitable.Configuration;
+import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
@@ -18,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class BuySellGui extends ChestGUI {
 
@@ -29,7 +31,7 @@ public final class BuySellGui extends ChestGUI {
     AssetCache[][] assetCache;
     AssetCache assetData;
     public BuySellGui(AssetCache[][] assetCache, AssetCache assetData, List<Order> bidOrders, List<Order> askOrders) {
-        super(3, "Pick a side.");
+        super(3, Profitable.getLang().get("gui.order-building.buy-sell.title"));
 
         this.assetCache = assetCache;
         this.assetData = assetData;
@@ -42,57 +44,65 @@ public final class BuySellGui extends ChestGUI {
 
 
 
-        List<Component> sellLore = new ArrayList<>();
-        sellLore.add(Component.text(this.assetData.getAsset().getCode(), Configuration.GUICOLORSUBTITLE));
-        sellLore.add(Component.empty());
+        List<Component> sellLore;
         if(!askOrders.isEmpty()){
-            sellLore.add(Component.text("Ask: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, askOrders.getFirst().getPrice())));
-            sellLore.add(Component.empty());
-            sellLore.add(Component.text("Lowest prices: ", Configuration.GUICOLORTEXT));
+
+            StringBuilder prices = new StringBuilder();
+
             for(int i = 0; i < 7; i++){
                 if(i < askOrders.size()){
                     Order iteratedAsk = askOrders.get(i);
-                    sellLore.add(Component.text(" - ", Configuration.GUICOLORTEXT).append(Component.text("[ "+MessagingUtil.formatVolume(iteratedAsk.getUnits())+" ] ",Configuration.COLORBEARISH)).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())));
+                    prices.append("<gray> - <red>[ ").append(MessagingUtil.formatVolume(iteratedAsk.getUnits())).append(" ]</red> ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())).append("</gray>%&new_line&%");
                 }else {
                     break;
                 }
                 if(i == 6){
-                    sellLore.add(Component.text(" - ...", Configuration.GUICOLORTEXT));
+                    prices.append("<gray> - ...</gray>");
                 }
             }
-        }else {
-            sellLore.add(Component.text("No one is selling this asset yet!", Configuration.GUICOLORTEXT));
-        }
-        sellLore.add(Component.empty());
-        sellLore.add(GuiElement.clickAction(null, "select sell"));
 
-        List<Component> buyLore = new ArrayList<>();
-        buyLore.add(Component.text(this.assetData.getAsset().getCode(),Configuration.GUICOLORSUBTITLE));
-        buyLore.add(Component.empty());
+            sellLore = Profitable.getLang().langToLore("gui.order-building.buy-sell.buttons.sell.lore",
+                    Map.entry("%asset%", this.assetData.getAsset().getCode()),
+                    Map.entry("%ask_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, askOrders.getFirst().getPrice())),
+                    Map.entry("%price_list%", prices.toString())
+            );
+        }else {
+            sellLore = Profitable.getLang().langToLore("gui.order-building.buy-sell.buttons.sell.no-orders-lore",
+                    Map.entry("%asset%", this.assetData.getAsset().getCode())
+            );
+        }
+
+        List<Component> buyLore;
         if(!bidOrders.isEmpty()){
-            buyLore.add(Component.text("Bid: ", Configuration.GUICOLORTEXT).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET,bidOrders.getFirst().getPrice())));
-            buyLore.add(Component.empty());
-            buyLore.add(Component.text("Highest prices: ", Configuration.GUICOLORTEXT));
+
+            StringBuilder prices = new StringBuilder();
+
             for(int i = 0; i < 7; i++){
                 if(i < bidOrders.size()){
                     Order iteratedAsk = bidOrders.get(i);
-                    buyLore.add(Component.text(" - ", Configuration.GUICOLORTEXT).append(Component.text("[ "+MessagingUtil.formatVolume(iteratedAsk.getUnits())+" ] ",Configuration.COLORBULLISH)).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())));
+                    prices.append("<gray> - <green>[ ").append(MessagingUtil.formatVolume(iteratedAsk.getUnits())).append(" ]</green> ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, iteratedAsk.getPrice())).append("</gray>%&new_line&%");
                 }else {
                     break;
                 }
                 if(i == 6){
-                    sellLore.add(Component.text(" - ...", Configuration.GUICOLORTEXT));
+                    prices.append("<gray> - ...</gray>");
                 }
             }
-        }else {
-            buyLore.add(Component.text("No one is buying this asset yet!", Configuration.GUICOLORTEXT));
-        }
-        buyLore.add(Component.empty());
-        buyLore.add(GuiElement.clickAction(null, "select buy"));
 
-        buttons[1] = new GuiElement(this, new ItemStack(Material.RED_DYE), Component.text("Sell Order", Configuration.COLORBEARISH),
+            buyLore = Profitable.getLang().langToLore("gui.order-building.buy-sell.buttons.buy.lore",
+                    Map.entry("%asset%", this.assetData.getAsset().getCode()),
+                    Map.entry("%bid_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, bidOrders.getFirst().getPrice())),
+                    Map.entry("%price_list%", prices.toString())
+            );
+        }else {
+            buyLore = Profitable.getLang().langToLore("gui.order-building.buy-sell.buttons.buy.no-orders-lore",
+                    Map.entry("%asset%", this.assetData.getAsset().getCode())
+            );
+        }
+
+        buttons[1] = new GuiElement(this, new ItemStack(Material.RED_DYE), Profitable.getLang().get("orders.sides.sell").color(Configuration.COLORBEARISH),
                 sellLore, vectorSlotPosition(5, 1));
-        buttons[2] = new GuiElement(this, new ItemStack(Material.LIME_DYE), Component.text("Buy Order", Configuration.COLORBULLISH),
+        buttons[2] = new GuiElement(this, new ItemStack(Material.LIME_DYE), Profitable.getLang().get("orders.sides.buy").color(Configuration.COLORBULLISH),
                 buyLore, vectorSlotPosition(3, 1));
 
     }

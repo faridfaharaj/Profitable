@@ -1,15 +1,13 @@
 package com.faridfaharaj.profitable.util;
 
-import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -17,6 +15,7 @@ import org.bukkit.entity.Player;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
+import java.util.Map;
 import java.util.UUID;
 
 public class MessagingUtil {
@@ -31,8 +30,8 @@ public class MessagingUtil {
 
     }
 
-    public static Component assetAmmount(Asset asset, double amount){
-        return Component.text(decimalFormat.format(amount) + " " + asset.getCode(), asset.getColor()).hoverEvent(assetSummary(asset));
+    public static String assetAmmount(Asset asset, double amount){
+        return "<color:" + asset.getColor().asHexString() + ">" + decimalFormat.format(amount) + " " + asset.getCode() + "</color>";
     }
 
     public static Component assetSummary(Asset asset){
@@ -57,48 +56,8 @@ public class MessagingUtil {
         return  component;
     }
 
-    public static Component profitablePrefix(){
-        return Component.text("", Configuration.COLORTEXT);
-    }
+    public static void sendComponentMessage(CommandSender sender, Component component){
 
-    public static Component profitableTopSeparator(String text, String sides){
-        return Component.text("").append(Component.text(sides + " [",Configuration.COLORPROFITABLE))
-                .append(Component.text(text,Configuration.COLORPROFITABLE).decorate(TextDecoration.BOLD))
-                .append(Component.text("] " + sides,Configuration.COLORPROFITABLE));
-    }
-
-    public static Component profitableBottomSeparator(){
-        return Component.text("--------------------------------------------",Configuration.COLORPROFITABLE);
-    }
-
-    public static Component profitablePaginator(int current, int total, String command){
-
-        String cmndpast = command + " " + (current-1);
-        String cmndnext = command + " " + (current+1);
-
-        Component component;
-
-        if(0 < current){
-            component = Component.text("             ", Configuration.COLORPROFITABLE)
-                    .append(MessagingUtil.buttonComponent(" [Past] ", cmndpast));
-        }else {
-            component = Component.text("                   ", Configuration.COLORPROFITABLE);
-        }
-
-        component = component.append(Component.text("<" + current + "/" + total  + ">"));
-
-        if(total > current){
-
-            component = component.append(MessagingUtil.buttonComponent(" [Next] ", cmndnext));
-
-        }
-
-        return component;
-
-
-    }
-
-    public static void sendCustomMessage(CommandSender sender, Component component){
         if(Profitable.getfolialib().isSpigot()){
 
             String jsonMessage = GsonComponentSerializer.gson().serialize(component);
@@ -119,63 +78,64 @@ public class MessagingUtil {
         }
     }
 
-    public static void sendEmptyNotice(CommandSender sender, String text){
-
-        sendCustomMessage(sender, profitablePrefix().append(Component.text(text).color(Configuration.COLOREMPTY)));
-
-    }
-
-    public static void sendInfoNotice(CommandSender sender, String text){
-
-        sendCustomMessage(sender, profitablePrefix().append(Component.text(text).color(Configuration.COLORHIGHLIGHT)));
-
-    }
-
-    public static void sendSuccsess(CommandSender sender, String text){
-
-        sendCustomMessage(sender, profitablePrefix().append(Component.text(text, Configuration.COLORTEXT)));
-    }
-
-    public static void sendPlain(CommandSender sender, String text){
-
-        sendCustomMessage(sender, profitablePrefix().append(Component.text(text, Configuration.COLORTEXT)));
-    }
-
     public static void sendChargeNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
+        String feeString;
         if(fee != 0){
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(assetAmmount(assetCharged, amount+fee)).append(Component.text(" (incl. " + decimalFormat.format(fee) + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
+            feeString = Profitable.getLang().getString("exchange.fee-display",
+                    Map.entry("%amount%", decimalFormat.format(fee)),
+                    Map.entry("%asset%", assetCharged.getCode())
+            );
         }else {
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Charged ")).append(assetAmmount(assetCharged, amount+fee)));
+            feeString = "";
         }
+
+        MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("exchange.charge-notice",
+                Map.entry("%asset_amount%", MessagingUtil.assetAmmount(assetCharged, amount+fee)),
+                Map.entry("%fee%", feeString)
+        ));
+
     }
 
     public static void sendPaymentNotice(CommandSender sender, double amount, double fee, Asset assetCharged){
+
+        String feeString;
         if(fee != 0){
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(assetAmmount(assetCharged, amount-fee)).append(Component.text(" (incl. " + decimalFormat.format(fee) + " " + assetCharged.getCode() + " fee)", NamedTextColor.RED)));
+            feeString = Profitable.getLang().getString("exchange.fee-display",
+                    Map.entry("%amount%", decimalFormat.format(fee)),
+                    Map.entry("%asset%", assetCharged.getCode())
+            );
         }else {
-            sendCustomMessage(sender, profitablePrefix().append(Component.text("Received ")).append(assetAmmount(assetCharged, amount-fee)));
+            feeString = "";
         }
+
+        MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("exchange.payment-notice",
+                Map.entry("%asset_amount%", MessagingUtil.assetAmmount(assetCharged, amount+fee)),
+                Map.entry("%fee%", feeString)
+        ));
     }
 
-    public static void sendWarning(CommandSender sender, String text){
-
-        sendCustomMessage(sender, profitablePrefix().append(Component.text(text).color(Configuration.COLORWARN)));
+    public static void sendSyntaxError(CommandSender sender, String text){
+        MessagingUtil.sendComponentMessage(sender, Component.text(text, NamedTextColor.RED));
     }
 
-    public static void sendError(CommandSender sender, String text){
-        sendCustomMessage(sender, Component.text(text).color(Configuration.COLORERROR));
+    public static void sendGenericInvalidAmount(CommandSender sender, String amount){
+        MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("generic.error.invalid-amount",
+                Map.entry("%invalid_amount%", amount)
+        ));
     }
 
     public static void sendGenericMissingPerm(CommandSender sender){
-        sendError(sender, "You don't have permission to do that");
+        MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("generic.error.missing-perm"));
     }
 
     public static void sendGenericCantConsole(CommandSender sender){
-        sendError(sender, "Cant use this command from the console");
+        MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("generic.error.cant-console"));
     }
 
-    public static void genericInvalidSubcom(CommandSender sender, String subcom){
-        sendError(sender, "Invalid Subcommand " + subcom);
+    public static void sendGenericInvalidSubCom(CommandSender sender, String subCommand){
+        MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("generic.error.invalid-subcommand",
+                Map.entry("%sub_command%", subCommand)
+        ));
     }
 
     public static byte[] UUIDtoBytes(UUID uuid) throws IOException {

@@ -1,5 +1,7 @@
 package com.faridfaharaj.profitable.util;
 
+import com.faridfaharaj.profitable.Profitable;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -44,7 +46,7 @@ public class NamingUtil {
 
 
 
-    private static final String[] assetTypeNaming = {"" , "Forex", "Commodity", "Commodity", "Commodity", "Commodity", "Stock"};
+    private static final String[] assetTypeNaming = {"" , "assets.categories.forex", "assets.categories.commodity", "assets.categories.commodity", "Commodity", "Commodity", "Stock"};
 
     public static String nameCommodity(String code) {
         String name = commodityNaming.get(code);
@@ -60,6 +62,6 @@ public class NamingUtil {
         if (assetType < 1 || assetType >= assetTypeNaming.length) {
             return "Unknown";
         }
-        return assetTypeNaming[assetType];
+        return Profitable.getLang().getString(assetTypeNaming[assetType]);
     }
 }
