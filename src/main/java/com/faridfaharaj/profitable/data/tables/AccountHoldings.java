@@ -76,61 +76,6 @@ public class AccountHoldings {
         return 0;
     }
 
-    public static Component AssetBalancesToString(String account) {
-        String sql = "SELECT aa.asset_id, a.asset_type, aa.quantity, a.meta, " +
-                "IFNULL(c.close, 0) AS price, " +
-                "(aa.quantity * IFNULL(c.close, 0)) AS value " +
-                "FROM account_assets aa " +
-                "JOIN assets a ON aa.world = a.world AND aa.asset_id = a.asset_id " +
-                "LEFT JOIN candles_day c ON aa.world = c.world AND aa.asset_id = c.asset_id " +
-                "AND c.time = (SELECT MAX(time) FROM candles_day WHERE world = aa.world AND asset_id = aa.asset_id) " +
-                "WHERE aa.world = ? AND aa.account_name = ? " +
-                "ORDER BY a.asset_type";
-
-        Component component = Component.text("Currency", Configuration.COLORTEXT);
-        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
-            stmt.setString(2, account);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-
-                double totalValue = 0;
-                int type = 1;
-                while (rs.next()) {
-                    String assetCode = rs.getString("asset_id");
-                    byte[] meta = rs.getBytes("meta");
-                    int iteratedType = rs.getInt("asset_type");
-                    if(type != iteratedType){
-                        type = iteratedType;
-                        component = component.appendNewline().append(Component.text(NamingUtil.nameType(iteratedType), Configuration.COLORTEXT));
-                    }
-
-                    Asset asset = Asset.assetFromMeta(assetCode, iteratedType, meta);
-
-                    double quantity = rs.getDouble("quantity");
-                    component = component.appendNewline().append(Component.text(" - ")).append(MessagingUtil.assetAmmount(asset, quantity));
-
-                    if(!Objects.equals(assetCode, Configuration.MAINCURRENCYASSET.getCode())){
-                        totalValue += rs.getDouble("value");
-                    }else {
-                        totalValue += quantity;
-                    }
-                }
-
-                if(totalValue == 0){
-                    component = Component.text("Empty").color(Configuration.COLOREMPTY);
-                }
-                component = component.appendNewline().append(Component.text("Portfolio Value: ", Configuration.COLORTEXT)).append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, totalValue));
-
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return component;
-    }
-
     public static List<AssetCache> AssetBalancesToAssetData(String account) {
         String sql = "SELECT aa.asset_id, a.asset_type, aa.quantity, a.meta, " +
                 "IFNULL(c.close, 0) AS price, " +

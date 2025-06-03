@@ -8,7 +8,6 @@ import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
-import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.tasks.gui.guis.HoldingsMenu;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.hooks.VaultHook;
@@ -26,22 +25,19 @@ import static com.faridfaharaj.profitable.data.holderClasses.Asset.retrieveCommo
 
 public class WalletCommand implements CommandExecutor {
 
-    AssetCache[][] assetCache;
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
 
-        if(!sender.hasPermission("profitable.account.info.wallet")){
-            MessagingUtil.sendGenericMissingPerm(sender);
-            return true;
-        }
-
-        if(Configuration.MULTIWORLD){
-            DataBase.universalUpdateWorld(sender);
-        }
-
         if(sender instanceof Player player){
 
+            if(!sender.hasPermission("profitable.account.info.wallet")){
+                MessagingUtil.sendGenericMissingPerm(sender);
+                return true;
+            }
 
+            if(Configuration.MULTIWORLD){
+                DataBase.universalUpdateWorld(sender);
+            }
 
             if(args.length == 0){
 
@@ -63,23 +59,33 @@ public class WalletCommand implements CommandExecutor {
                 Asset asset = Assets.getAssetData(assetid);
 
                 if(asset == null){
-                    MessagingUtil.sendError(sender, "Invalid asset");
+                    MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("assets.error.asset-not-found",
+                        Map.entry("%asset%", assetid)
+                    ));
                     return true;
                 }
 
                 double ammount;
-                try{
-                    ammount = Double.parseDouble(args[2]);
-                    if(asset.getAssetType() == 2 || asset.getAssetType() == 3){
-                        ammount = (int) ammount;
-                    }
-                    if(ammount <= 0){
-                        MessagingUtil.sendError(sender, "Invalid amount");
+                if(args.length != 2){
+                    try{
+                        ammount = Double.parseDouble(args[2]);
+                        if(asset.getAssetType() == 2 || asset.getAssetType() == 3){
+                            ammount = (int) ammount;
+                        }
+                        if(ammount <= 0){
+                            MessagingUtil.sendGenericInvalidAmount(sender, args[2]);
+                            return true;
+                        }
+                    }catch (Exception e){
+                        MessagingUtil.sendGenericInvalidAmount(sender, args[2]);
                         return true;
                     }
-                }catch (Exception e){
-                    MessagingUtil.sendError(sender, "Invalid amount");
-                    return true;
+                }else {
+                    if(args[1].equals("hand")){
+                        ammount = player.getInventory().getItemInMainHand().getAmount();
+                    }else {
+                        ammount = 1;
+                    }
                 }
 
                 depositAsset(asset, ammount, player);
@@ -97,23 +103,29 @@ public class WalletCommand implements CommandExecutor {
                 Asset asset = Assets.getAssetData(assetid);
 
                 if(asset == null){
-                    MessagingUtil.sendError(sender, "Invalid asset");
+                    MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("assets.error.asset-not-found",
+                            Map.entry("%asset%", assetid)
+                    ));
                     return true;
                 }
 
                 double ammount;
-                try{
-                    ammount = Double.parseDouble(args[2]);
-                    if(asset.getAssetType() == 2 || asset.getAssetType() == 3){
-                        ammount = (int) ammount;
-                    }
-                    if(ammount <= 0){
-                        MessagingUtil.sendError(sender, "Invalid amount");
+                if(args.length != 2){
+                    try{
+                        ammount = Double.parseDouble(args[2]);
+                        if(asset.getAssetType() == 2 || asset.getAssetType() == 3){
+                            ammount = (int) ammount;
+                        }
+                        if(ammount <= 0){
+                            MessagingUtil.sendGenericInvalidAmount(sender, args[2]);
+                            return true;
+                        }
+                    }catch (Exception e){
+                        MessagingUtil.sendGenericInvalidAmount(sender, args[2]);
                         return true;
                     }
-                }catch (Exception e){
-                    MessagingUtil.sendError(sender, "Invalid amount");
-                    return true;
+                }else {
+                    ammount = 1;
                 }
 
                 withdrawAsset(asset, ammount, player);
@@ -128,7 +140,7 @@ public class WalletCommand implements CommandExecutor {
 
 
 
-        return false;
+        return true;
     }
 
     public static class CommandTabCompleter implements TabCompleter {
@@ -175,22 +187,25 @@ public class WalletCommand implements CommandExecutor {
 
     }
 
-    public static void depositAsset(Asset asset, double ammount, Player player){
+    public static void depositAsset(Asset asset, double amount, Player player){
 
         if(asset.getAssetType() == 1){
 
-            double fee = Configuration.parseFee(Configuration.DEPOSITFEES, ammount);
-            if(fee > ammount){
-                MessagingUtil.sendError(player, "Amount cannot be lower than " + fee);
+            double fee = Configuration.parseFee(Configuration.DEPOSITFEES, amount);
+            if(fee > amount){
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.minimum-deposit",
+                    Map.entry("%asset_amount%", MessagingUtil.assetAmmount(asset, amount))
+                ));
+
                 return;
             }
 
             if(VaultHook.isConnected() && Objects.equals(VaultHook.getAsset().getCode(), asset.getCode())){
 
-                if(VaultHook.getEconomy().withdrawPlayer(player, ammount).transactionSuccess()){
+                if(VaultHook.getEconomy().withdrawPlayer(player, amount).transactionSuccess()){
                     Profitable.getfolialib().getScheduler().runAsync(task -> {
-                        Asset.distributeAsset(Accounts.getAccount(player), asset, ammount-fee);
-                        MessagingUtil.sendPaymentNotice(player, ammount, fee, asset);
+                        Asset.distributeAsset(Accounts.getAccount(player), asset, amount -fee);
+                        MessagingUtil.sendPaymentNotice(player, amount, fee, asset);
                     });
 
                     return;
@@ -200,26 +215,31 @@ public class WalletCommand implements CommandExecutor {
 
             if (PlayerPointsHook.isConnected() && Objects.equals(PlayerPointsHook.getAsset().getCode(), asset.getCode())){
 
-                int integerAmount = (int) ammount;
+                int integerAmount = (int) amount;
                 if(integerAmount < 1){
-                    MessagingUtil.sendError(player, "Cannot Withdraw fractional Player Points");
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.cant-fractional",
+                        Map.entry("%asset%", asset.getCode())
+                    ));
                     return;
                 }
                 if(PlayerPointsHook.getApi().take(player.getUniqueId(), integerAmount)){
                     Profitable.getfolialib().getScheduler().runAsync(task -> {
                         Asset.distributeAsset(Accounts.getAccount(player), asset, integerAmount- Math.ceil(fee));
-                        MessagingUtil.sendPaymentNotice(player, ammount, Math.ceil(fee), asset);
+                        MessagingUtil.sendPaymentNotice(player, amount, Math.ceil(fee), asset);
                     });
                     return;
                 }
 
             }else {
-                MessagingUtil.sendError(player, "This asset cannot be deposited");
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.cant-fractional",
+                        Map.entry("%asset%", asset.getCode())
+                ));
                 return;
             }
 
 
-            MessagingUtil.sendError(player, "Insufficient funds to deposit this amount");
+
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("hooks.error.insufficient-funds"));
 
         }
 
@@ -227,11 +247,13 @@ public class WalletCommand implements CommandExecutor {
 
 
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
-                if(retrieveCommodityItem(player, asset.getCode(), (int) ammount)){
-                    Asset.sendBalance(Accounts.getAccount(player), asset.getCode(), ammount);
-                    MessagingUtil.sendPaymentNotice(player, ammount, 0, asset);
+                if(retrieveCommodityItem(player, asset.getCode(), (int) amount)){
+                    Asset.sendBalance(Accounts.getAccount(player), asset.getCode(), amount);
+                    MessagingUtil.sendPaymentNotice(player, amount, 0, asset);
                 }else {
-                    MessagingUtil.sendError(player, "Not enough " + asset.getCode().toLowerCase().replace("_", " "));
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                            Map.entry("%asset%", asset.getCode())
+                    ));
                 }
 
             });
@@ -241,11 +263,13 @@ public class WalletCommand implements CommandExecutor {
         if(asset.getAssetType() == 3){
 
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
-                if(retrieveCommodityEntity(player, asset.getCode(), Accounts.getEntityClaimId(Accounts.getAccount(player)), (int) ammount)){
-                    Asset.sendBalance(Accounts.getAccount(player), asset.getCode(), ammount);
-                    MessagingUtil.sendPaymentNotice(player, ammount, 0, asset);
+                if(retrieveCommodityEntity(player, asset.getCode(), Accounts.getEntityClaimId(Accounts.getAccount(player)), (int) amount)){
+                    Asset.sendBalance(Accounts.getAccount(player), asset.getCode(), amount);
+                    MessagingUtil.sendPaymentNotice(player, amount, 0, asset);
                 }else{
-                    MessagingUtil.sendError(player,"Not enough claimed " + asset.getCode().toLowerCase().replace("_", " ") + "s around");
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                            Map.entry("%asset%", asset.getCode())
+                    ));
                 }
 
             });
@@ -259,10 +283,6 @@ public class WalletCommand implements CommandExecutor {
         if(asset.getAssetType() == 1){
 
             double fee = Configuration.parseFee(Configuration.WITHDRAWALFEES, ammount);
-            if(fee > ammount){
-                MessagingUtil.sendError(player, "Amount cannot be lower than its fee ($" + fee + ")");
-                return;
-            }
 
             if(VaultHook.isConnected() && asset.getCode().equals(VaultHook.getAsset().getCode())){
 
@@ -273,14 +293,16 @@ public class WalletCommand implements CommandExecutor {
                         Profitable.getfolialib().getScheduler().runNextTick(global -> {
                             EconomyResponse es = VaultHook.getEconomy().depositPlayer(player, ammount);
                             if(es.transactionSuccess()){
-                                MessagingUtil.sendChargeNotice(player, ammount-fee, fee, asset);
+                                MessagingUtil.sendChargeNotice(player, ammount+fee, fee, asset);
                             }else{
-                                MessagingUtil.sendError(player, es.errorMessage);
+                                MessagingUtil.sendSyntaxError(player, es.errorMessage);
                                 Asset.distributeAsset(Accounts.getAccount(player), asset, ammount);
                             }
                         });
                     }else {
-                        MessagingUtil.sendError(player, "Not enough " + asset.getCode());
+                        MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                                Map.entry("%asset%", asset.getCode())
+                        ));
                     }
                 });
                 return;
@@ -289,7 +311,9 @@ public class WalletCommand implements CommandExecutor {
 
                 int integerAmount = (int) ammount;
                 if(integerAmount < 1){
-                    MessagingUtil.sendError(player, "Cannot Withdraw fractional Player Points, not enough " + asset.getCode());
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.cant-fractional",
+                            Map.entry("%asset%", asset.getCode())
+                    ));
                     return;
                 }
                 Profitable.getfolialib().getScheduler().runAsync(async -> {
@@ -302,12 +326,16 @@ public class WalletCommand implements CommandExecutor {
                             MessagingUtil.sendChargeNotice(player, ammount-ceilFee, ceilFee, asset);
                         });
                     }else {
-                        MessagingUtil.sendError(player, "Not enough " + asset.getCode());
+                        MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                                Map.entry("%asset%", asset.getCode())
+                        ));
                     }
                 });
                 return;
             }else {
-                MessagingUtil.sendError(player, "This asset cannot be withdrawn");
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-depositable",
+                        Map.entry("%asset%", asset.getCode())
+                ));
                 return;
             }
 
@@ -323,7 +351,9 @@ public class WalletCommand implements CommandExecutor {
                     MessagingUtil.sendPaymentNotice(player, ammount, 0, asset);
                 });
             }else {
-                MessagingUtil.sendError(player, "Not enough " + asset.getCode() + " on your account");
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                        Map.entry("%asset%", asset.getCode())
+                ));
             }
             return;
 
@@ -340,7 +370,9 @@ public class WalletCommand implements CommandExecutor {
                 });
                 return;
             }else {
-                MessagingUtil.sendError(player, "Not enough " + asset.getCode() + " on your account");
+                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                        Map.entry("%asset%", asset.getCode())
+                ));
             }
 
         }

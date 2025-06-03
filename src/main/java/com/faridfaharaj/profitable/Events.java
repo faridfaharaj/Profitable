@@ -7,8 +7,6 @@ import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.util.MessagingUtil;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -28,6 +26,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 
 public class Events implements Listener {
@@ -111,10 +110,9 @@ public class Events implements Listener {
             runItmCooldown(Material.NAME_TAG, event.getPlayer(), () -> {
                 Entity entity = event.getRightClicked();
                 if(entity.getCustomName() != null){
-                    MessagingUtil.sendError(player, "Cannot claim named entities");
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.cant-reclaim-entity"));
                 }else if(!Configuration.ALLOWENTITIES.contains(entity.getType().name())){
-
-                    MessagingUtil.sendError(player, "Owning this entity isn't allowed");
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.cant-claim-entity"));
 
                 } else {
 
@@ -122,19 +120,17 @@ public class Events implements Listener {
                         Profitable.getfolialib().getScheduler().runAtEntity(entity, task -> {
                             entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));
                         });
-                        MessagingUtil.sendCustomMessage(player, MessagingUtil.profitablePrefix().append(Component.text("Claimed "+entity.getName()))
-                                .append(Configuration.ENTITYCLAIMINGFEES == 0?
-                                        Component.text(" FOR FREE", NamedTextColor.GREEN):
-                                        Component.text(" using ").append(MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
-                                )
-                        );
+                        MessagingUtil.sendComponentMessage(player,Profitable.getLang().get("assets.entity-claim-notice",
+                            Map.entry("%entity%", entity.getName()),
+                                Map.entry("%asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES))
+                        ));
                     };
 
 
                     if(Configuration.ENTITYCLAIMINGFEES <= 0){
                         claim.run();
                     }else {
-                        Asset.chargeAndRun(player, "Could't claim "+ entity.getName() , Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES, claim);
+                        Asset.chargeAndRun(player, Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES, claim);
                     }
 
                 }
@@ -177,16 +173,16 @@ public class Events implements Listener {
                     Block block = event.getClickedBlock();
                     if(block != null){
                         if(!(block.getState() instanceof Container)){
-                            MessagingUtil.sendError(player, "Item delivery location must be a container");
+                            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.error.items-must-be-container"));
                             return;
                         }
                         Location correctedlocation = block.getLocation();
                         if(Accounts.changeItemDelivery(Accounts.getAccount(player), correctedlocation)){
-                            MessagingUtil.sendCustomMessage(player, Component.text("Updated item delivery to: ", Configuration.COLORTEXT).append(Component.text(correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")", Configuration.COLORHIGHLIGHT)));
+                            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.updated-item",
+                                    Map.entry("%position%", correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")")
+                            ));
 
                             TemporalItems.removeTempItem(player);
-                        }else {
-                            MessagingUtil.sendError(player, "Could not update Item delivery");
                         }
                     }
                 });
@@ -199,10 +195,11 @@ public class Events implements Listener {
                     if(block != null){
                         Location correctedlocation = block.getLocation().add(0.5,0,0.5).add(event.getBlockFace().getDirection());
                         if(Accounts.changeEntityDelivery(Accounts.getAccount(player), correctedlocation)){
-                            MessagingUtil.sendCustomMessage(player, Component.text("Updated entity delivery to: ", Configuration.COLORTEXT).append(Component.text(correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")", Configuration.COLORHIGHLIGHT)));
+                            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.updated-entity",
+                                    Map.entry("%position%", correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")")
+                            ));
+
                             TemporalItems.removeTempItem(player);
-                        }else {
-                            MessagingUtil.sendError(player, "Could not update Entity delivery");
                         }
                     }
 

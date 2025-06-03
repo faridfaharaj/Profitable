@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -46,10 +47,16 @@ public final class Profitable extends JavaPlugin {
     private static Profitable instance;
     private static BukkitAudiences audiences;
     private static FoliaLib foliaLib;
+    private static Lang lang;
 
     public static Profitable getInstance() {
         return instance;
     }
+
+    public static Lang getLang(){
+        return lang;
+    }
+
     public static BukkitAudiences getBukkitAudiences() {
         return audiences;
     }
@@ -64,6 +71,13 @@ public final class Profitable extends JavaPlugin {
         instance = this;
         audiences = BukkitAudiences.create(this);
         foliaLib = new FoliaLib(this);
+        try {
+            lang = new Lang(this);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         foliaLib.getScheduler().runAsync(task -> {
             checkForUpdate(this);

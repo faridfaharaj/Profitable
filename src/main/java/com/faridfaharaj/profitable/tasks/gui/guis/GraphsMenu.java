@@ -9,7 +9,6 @@ import com.faridfaharaj.profitable.tasks.gui.elements.ReturnButton;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -17,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class GraphsMenu extends ChestGUI {
 
@@ -33,7 +33,9 @@ public final class GraphsMenu extends ChestGUI {
     AssetCache[][] cache;
 
     public GraphsMenu(String assetID, AssetCache[][] cache) {
-        super(3, "Graphs for " + assetID);
+        super(3, Profitable.getLang().get("gui.graphs.title",
+                Map.entry("%asset%", assetID)
+        ));
 
         this.assetid = assetID;
         this.cache = cache;
@@ -64,31 +66,31 @@ public final class GraphsMenu extends ChestGUI {
             new AssetExplorer(player, 2, cache).openGui(player);
         }else if(slot == graph1MButton.getSlot()){
             player.closeInventory();
-            MessagingUtil.sendSuccsess(player, "Preparing Graph...");
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.loading-graph"));
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 720000, "1M");
             });
         } else if (slot == graph3MButton.getSlot()) {
             player.closeInventory();
-            MessagingUtil.sendSuccsess(player, "Preparing Graph...");
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.loading-graph"));
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 2160000, "3M");
             });
         } else if (slot == graph6MButton.getSlot()) {
             player.closeInventory();
-            MessagingUtil.sendSuccsess(player, "Preparing Graph...");
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.loading-graph"));
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 4320000, "6M");
             });
         } else if (slot == graph1YButton.getSlot()) {
             player.closeInventory();
-            MessagingUtil.sendSuccsess(player, "Preparing Graph...");
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.loading-graph"));
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 8760000, "1Y");
             });
         } else if (slot == graph2YButton.getSlot()) {
             player.closeInventory();
-            MessagingUtil.sendSuccsess(player, "Preparing Graph...");
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.loading-graph"));
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 TemporalItems.sendGraphMap(player, assetid, 17520000, "2Y");
             });

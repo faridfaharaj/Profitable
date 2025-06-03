@@ -20,17 +20,17 @@ commands:
 
   buy:
     description: Command used to buy assets on the exchange
-    usage: /buy <Asset> <Order type> <units> <price>
+    usage: /buy <Asset> <units> <price> <Order Type>
     aliases: [ ]
 
   sell:
     description: Command used to sell assets on the exchange
-    usage: /sell <Asset> <Order type> <units> <price>
+    usage: /sell <Asset> <units> <price> <Order Type>
     aliases: [ ]
 
   assets:
     description: displays all registered assets
-    usage: /assets <Asset Type>
+    usage: /assets
     aliases: [gui, profitable]
 
   top:
@@ -46,7 +46,7 @@ commands:
   wallet:
     description: Displays all asset balances on your account
     usage: /wallet or /wallet <Subcommand>
-    aliases: [wal]
+    aliases: [wal, portfolio]
 
   delivery:
     description: Displays and sets where should your items and entities arrive

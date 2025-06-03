@@ -35,7 +35,9 @@ public class Accounts {
                 k -> {
             String uuidString = k.toString();
             registerDefaultAccount(uuidString);
-            MessagingUtil.sendSuccsess(player, "Logged into default account");
+            MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("account.login",
+                    Map.entry("%account%", "Default account")
+                    ));
             return uuidString;
         }
 

@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class UserOrdersGui extends ChestGUI {
 
@@ -33,7 +34,7 @@ public final class UserOrdersGui extends ChestGUI {
 
     AssetCache[][] assetCache;
     public UserOrdersGui(Player player, AssetCache[][] assetCache) {
-        super(6, "Your active orders");
+        super(6, Profitable.getLang().get("gui.orders.title"));
         fillSlots(0, 0, 8,0, Material.BLACK_STAINED_GLASS_PANE);
         fillSlots(0, 0, 0,5, Material.BLACK_STAINED_GLASS_PANE);
         fillSlots(8, 0, 8,5, Material.BLACK_STAINED_GLASS_PANE);
@@ -48,11 +49,10 @@ public final class UserOrdersGui extends ChestGUI {
             updatePage();
 
             if(pages > 0){
-                pageButton = new GuiElement(this, new ItemStack(Material.PAPER), Component.text("Page " + page + " / " + pages), List.of(
-                        Component.empty(),
-                        GuiElement.clickAction(ClickType.LEFT, "next page"),
-                        GuiElement.clickAction(ClickType.RIGHT, "previous page")
-                ), vectorSlotPosition(7,5));
+                pageButton = new GuiElement(this, new ItemStack(Material.PAPER), Profitable.getLang().get("gui.generic.buttons.page-selector.name",
+                        Map.entry("%page%",String.valueOf(page)),
+                        Map.entry("%pages%",String.valueOf(pages))
+                ), Profitable.getLang().langToLore("gui.generic.buttons.page-selector.lore"), vectorSlotPosition(7,5));
             }
 
         });
@@ -70,7 +70,7 @@ public final class UserOrdersGui extends ChestGUI {
             if(index >= orders.size()){
                 getInventory().clear(slot);
             }else {
-                orderButtons.add(new OrderButton(this, orders.get(index), slot, "cancel this order"));
+                orderButtons.add(new OrderButton(this, orders.get(index), slot, true));
             }
 
         }
@@ -87,7 +87,10 @@ public final class UserOrdersGui extends ChestGUI {
                 orders.remove(indexOfButton);
                 updatePage();
                 if(pageButton != null){
-                    pageButton.setDisplayName(Component.text("Page " + page + " / " + pages));
+                    pageButton.setDisplayName(Profitable.getLang().get("gui.generic.buttons.page-selector.name",
+                            Map.entry("%page%",String.valueOf(page)),
+                            Map.entry("%pages%",String.valueOf(pages))
+                    ));
                     pageButton.show(this);
                 }
                 break;
@@ -108,7 +111,10 @@ public final class UserOrdersGui extends ChestGUI {
                 }
                 page = Math.clamp(page, 0, pages);
                 updatePage();
-                pageButton.setDisplayName(Component.text("Page " + page + " / " + pages));
+                pageButton.setDisplayName(Profitable.getLang().get("gui.generic.buttons.page-selector.name",
+                        Map.entry("%page%",String.valueOf(page)),
+                        Map.entry("%pages%",String.valueOf(pages))
+                ));
                 pageButton.show(this);
             }
         }

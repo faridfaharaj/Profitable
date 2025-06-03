@@ -22,11 +22,11 @@ public class TransactCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if(Configuration.MULTIWORLD){
-            DataBase.universalUpdateWorld(sender);
-        }
-
         if(sender instanceof Player player){
+
+            if(Configuration.MULTIWORLD){
+                DataBase.universalUpdateWorld(sender);
+            }
 
 
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
@@ -56,7 +56,7 @@ public class TransactCommand implements CommandExecutor {
                     try{
                         price = Double.parseDouble(args[2]);
                     }catch (Exception e){
-                        MessagingUtil.sendError(sender, "Invalid Price");
+                        MessagingUtil.sendGenericInvalidAmount(sender, args[2]);
                         return;
                     }
 
@@ -73,12 +73,12 @@ public class TransactCommand implements CommandExecutor {
                         }
                         case "market" -> {
 
-                            MessagingUtil.sendWarning(sender, "Ignoring price for market order");
+                            MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("exchange.warning.market-ignores-price"));
                             price = sideBuy ? Double.MAX_VALUE : Double.MIN_VALUE;
                             orderType = Order.OrderType.MARKET;
                         }
                         default -> {
-                            MessagingUtil.sendError(sender, "Invalid Order Type");
+                            MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("exchange.error.invalid-order-type"));
                             return;
                         }
                     }
@@ -93,7 +93,7 @@ public class TransactCommand implements CommandExecutor {
                     try{
                         units = Double.parseDouble(args[1]);
                     }catch (Exception e){
-                        MessagingUtil.sendError(sender, "Invalid Units");
+                        MessagingUtil.sendGenericInvalidAmount(sender, args[1]);
                         return;
                     }
                 }
@@ -101,7 +101,8 @@ public class TransactCommand implements CommandExecutor {
                 double finalPrice = price;
                 Order.OrderType finalOrderType = orderType;
 
-                MessagingUtil.sendPlain(player, "Processing Order...");
+                MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("exchange.loading-order"));
+
                 Profitable.getfolialib().getScheduler().runAsync(async -> {
 
                     Exchange.sendNewOrder(player, new Order(UUID.randomUUID(), Accounts.getAccount(player), asset, sideBuy, finalPrice, units, finalOrderType));
@@ -109,6 +110,10 @@ public class TransactCommand implements CommandExecutor {
                 });
             });
             return true;
+
+        }else{
+
+            MessagingUtil.sendGenericCantConsole(sender);
 
         }
 

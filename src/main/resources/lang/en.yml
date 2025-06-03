@@ -1,0 +1,368 @@
+generic:
+  error:
+    cant-console: "<red>Cant use this command from the console</red>"
+    missing-perm: "<red>You don't have permission to do that</red>"
+    invalid-subcommand: "<red>Invalid subcommand: %sub_command%</red>"
+    invalid-amount: "<red>Invalid amount %invalid_amount%</red>"
+
+temp-items:
+  error:
+    main-hand-occupied: "<red>Main hand must be free</red>"
+
+orders:
+  cancel: "<gray>Cancelled <yellow>%order%</yellow></gray>"
+  order-types:
+    limit-order: "limit"
+    market-order: "market"
+    stop-limit-order: "stop"
+  sides:
+    buy: "buy order"
+    sell: "sell order"
+  warning:
+    market-ignores-price: "<yellow>Ignoring price for market order</yellow>"
+
+
+
+account:
+  display: "<gray>Active account: <yellow>(%account%)</yellow></gray>"
+  delete: "<red>DELETED account: %account%</red>"
+  login: "<gray>Successfully logged into <yellow>%account%</yellow>!</gray>"
+  registry: "<gray>Account <yellow>%account%</yellow> registered successfully!</gray>"
+  logout: "<gray>Logged out successfully!</gray>"
+  password-update: "<gray>Password updated successfully!</gray>"
+  error:
+    account-already-exists: "<red>An account with this name already exists</red>"
+    password-too-long: "<red>Max password length is 32 characters</red>"
+    password-mismatch: "<red>Passwords do not match</red>"
+    cant-delete-default: "<red>Cannot delete default account</red>"
+    wrong-password: "<red>Incorrect password or account</red>"
+    cant-delete-active-account: "<red>Someone else is still using this account, cannot delete</red>"
+    active-account-mismatch: "<red>Account name doesn't match with active account's</red>"
+
+
+exchange:
+  fee-display: "<red>(incl. %amount% %asset% fee)</red>"
+  charge-notice: "<gray>Charged %asset_amount% %fee%</gray>"
+  payment-notice: "<gray>Received %asset_amount% %fee%</gray>"
+  selling-notice: "<gray><green>Bought</green> %base_asset_amount% for %quote_asset_amount%</gray>"
+  buying-notice: "<gray><red>Sold</red> %base_asset_amount% for %quote_asset_amount%</gray>"
+  new-order-notice: "<gray>New %order_type% %side% %base_asset_amount% at %quote_asset_amount% each</gray>"
+  loading-order: "<gray>Processing order...</gray>"
+  claim-fee-notice: "Claiming fees are %fee_asset_amount% per entity"
+  warning:
+    partial-fill: "<yellow>Partially filled</yellow>"
+    partial-fill-low-liquidity: "<yellow>Partially filled because no more orders were available</yellow>"
+    fee-higher-than-profit: "<yellow>This order is worth less than its fee (%fee_asset_amount%) there will be no profit!</yellow>"
+  error:
+    invalid-order-type: "<red>Invalid Order Type</red>"
+    identical-assets: "<red>You must trade between two different assets</red>"
+    invalid-sell-stop-trigger: "<red>Stop trigger price must be lower than market's when selling</red>"
+    invalid-buy-stop-trigger: "<red>Stop trigger price must be higher than market's when buying</red>"
+    cant-self-transact: "<red>You can't transact with yourself!, cancel current order first</red>"
+    no-orders-found: "<red>No orders available, use limit order instead!</red>"
+
+assets:
+  amount-display: "%amount% %asset%"
+  auto-deposit-notice: "Automatically deposited %asset_amount% <red>(+ fees)</red>"
+  entity-claim-notice: "Claimed %entity% using %asset_amount%"
+  loading-graph: "Loading graph..."
+  categories:
+    forex: "Forex"
+    commodity: "Commodity"
+    commodity-item: "Commodity (item)"
+    commodity-entity: "Commodity (entity)"
+  asset-types:
+    currency: "Currency"
+    commodity: "Commodity"
+    commodity-item: "Commodity (item)"
+    commodity-entity: "Commodity (entity)"
+  error:
+    asset-not-found: "<red>Cannot trade %asset% here</red>"
+    cant-fractional: "<red>Asset %asset% cant be fractional</red>"
+    minimum-deposit: "<red>Cannot deposit less than %asset_amount%</red>"
+    non-depositable: "<red>Cannot deposit or withdraw %asset%</red>"
+    not-enough-asset: "<red>Not enough %asset%</red>"
+    cant-reclaim-entity: "<red>Cannot claim owned entities</red>"
+    cant-claim-entity: "<red>Owning this entity isn't allowed</red>"
+
+delivery:
+  display: "<br><gray>Item Delivery Location: <yellow>%i_position%</yellow></gray><br><gray>Entity Delivery Location: <yellow>%e_position%</yellow></gray><br>"
+  updated-item: "<gray>Updated item delivery to: <yellow>%position%</yellow></gray>"
+  updated-entity: "<gray>Updated entity delivery to: <yellow>%position%</yellow></gray>"
+  error:
+    items-must-be-container: "<red>Item delivery location must be a container</red>"
+    missing-item-delivery:
+    missing-entity-delivery:
+
+hooks:
+  error:
+    insufficient-funds: "Insufficient funds"
+
+
+gui:
+  generic:
+    buttons:
+      return:
+        name: "<red>return</red>"
+        lore:
+          - ""
+          - "<yellow>Click to go to last menu</yellow>"
+      page-selector:
+        name: "Page %page%/%pages%"
+        lore:
+          - ""
+          - "<yellow>Left click for next page</yellow>"
+          - "<yellow>Right click for past page</yellow>"
+
+  number-selector:
+    buttons:
+      add:
+        name: "<yellow>Add %number%</yellow>"
+      subtract:
+        name: "<yellow>Subtract %number%</yellow>"
+      times-ten:
+        name: "<yellow>Click to multiply by 10</yellow>"
+      divide-ten:
+        name: "<yellow>Click to divide by 10</yellow>"
+
+  asset-explorer:
+    title: "Asset explorer"
+    buttons:
+      asset:
+        name: "<white>%asset%  $%price%  %price_change% %percentage_change%</white>"
+        lore:
+          - "<dark_gray>%asset_category%</dark_gray>"
+          - ""
+          - "<gray>%asset_name%</gray>"
+          - "<dark_gray> - </dark_gray><gray>Volume: </gray><white>%volume%</white>"
+          - "<dark_gray> - </dark_gray><gray>Open: </gray><white>$%open_price%</white>"
+          - "<dark_gray> - </dark_gray><gray>Day's range: </gray><white>$%range_low% to $%range_high%</white>"
+          - ""
+          - "<yellow>Left click to trade</yellow>"
+          - "<yellow>Right click to view graphs</yellow>"
+      category-selector:
+        name: "Categories"
+        lore:
+          - "<dark_gray>Assets</dark_gray>"
+          - ""
+          - "%category_list%"
+          - ""
+          - "<yellow>Click to cycle</yellow>"
+      orders:
+        name: "Manage orders"
+        lore:
+          - "<dark_gray>Orders</dark_gray>"
+          - ""
+          - "<yellow>Click to go view your orders</yellow>"
+      wallet:
+        name: "Manage owned assets"
+        lore:
+          - "<dark_gray>Portfolio</dark_gray>"
+          - ""
+          - "<yellow>Click to view your assets</yellow>"
+      delivery:
+        name: "Set delivery location"
+        lore:
+          - "<dark_gray>Delivery</dark_gray>"
+          - ""
+          - "<yellow>Left click to set item delivery</yellow>"
+          - "<yellow>Right to set item delivery</yellow>"
+  graphs:
+    title: "Showing graphs for %asset%"
+    buttons:
+      one-month:
+        name: "1 Month"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Right click to get graph</yellow>"
+      three-month:
+        name: "1 Month"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Right click to get graph</yellow>"
+      six-month:
+        name: "1 Month"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Right click to get graph</yellow>"
+      one-year:
+        name: "1 Month"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Right click to get graph</yellow>"
+      two-years:
+        name: "1 Month"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Right click to get graph</yellow>"
+  wallet:
+    title: "Asset portfolio"
+    buttons:
+      asset-holding:
+        lore:
+          - "<dark_gray>%asset_type%</dark_gray>"
+          - ""
+          - "<gray>Owned: %owned_asset_amount%</gray>"
+          - ""
+          - "<gray>Market price: %price_asset_amount%</gray>"
+          - "<gray>Total value: %value_asset_amount%</gray>"
+          - ""
+          - "<yellow>Left click to withdraw</yellow>"
+          - "<yellow>Right click to deposit</yellow>"
+  orders:
+    title: "Your active orders"
+    buttons:
+      order:
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<gray>Type: %order_type%</gray>"
+          - ""
+          - "<gray>Units: <white>%base_asset_amount%</white></gray>"
+          - "<gray>Price: %quote_asset_amount%</gray>"
+          - ""
+          - "<gray>Total value: %value_asset_amount%</gray>"
+          - ""
+          - "<yellow>Left click to cancel</yellow>"
+
+  deposit-withdrawal:
+    title-deposit: "Select amount to deposit."
+    title-withdrawal: "Select amount to withdraw."
+    buttons:
+      submit-deposit:
+        name: "Amount: <yellow>%amount% %asset%</yellow>"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Left click to proceed</yellow>"
+      submit-withdrawal:
+        name: "<yellow>Amount: %amount% %asset%</yellow>"
+        lore:
+          - "<dark_gray>%asset%</dark_gray>"
+          - ""
+          - "<yellow>Left click to proceed</yellow>"
+
+  order-building:
+    buy-sell:
+      title: "Pick a side."
+      buttons:
+        sell:
+          name: "%side% order"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Ask: %ask_asset_amount%</gray>"
+            - ""
+            - "<gray>Lowest prices:</gray>"
+            - "%price_list%"
+            - ""
+            - "<yellow>Left click to pick sell</yellow>"
+          no-orders-lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>No one is selling this asset yet!</gray>"
+            - ""
+            - "<yellow>Left click to pick sell</yellow>"
+        buy:
+          name: "%side% order"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Bid: %bid_asset_amount%</gray>"
+            - ""
+            - "<gray>Highest prices:</gray>"
+            - "%price_list%"
+            - ""
+            - "<yellow>Left click to pick buy</yellow>"
+          no-orders-lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>No one is buying this asset yet!</gray>"
+            - ""
+            - "<yellow>Left click to pick sell</yellow>"
+
+    type-select:
+      title: "Pick an order type."
+      buttons:
+        market:
+          name: "Market Order"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>transact <yellow>immediately</yellow></gray>"
+            - "<gray>at the best</gray>"
+            - "<gray>price available</gray>"
+            - ""
+            - "<yellow>Click to select Market</yellow>"
+          lore-no-orders:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>transact <yellow>immediately</yellow></gray>"
+            - "<gray>at the best</gray>"
+            - "<gray>price available</gray>"
+            - ""
+            - "<red>No orders available!</red>"
+        limit:
+          name: "Limit Order"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Choose a <yellow>price</yellow></gray>"
+            - "<gray>and transact once</gray>"
+            - "<gray>a match is found</gray>"
+            - ""
+            - "<yellow>Click to select Limit</yellow>"
+        stop-limit:
+          name: "Stop-Limit Order"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>place <yellow>Limit Order</yellow></gray>"
+            - "<gray>once price hits</gray>"
+            - "<gray>your trigger</gray>"
+            - ""
+            - "<yellow>Click to select Stop-limit</yellow>"
+
+    price-select:
+      title: "Select a price."
+      buttons:
+        submit:
+          name: "Your price: <yellow>%amount% %asset%</yellow>"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Current asset price: %price_asset_amount%</gray>"
+            - ""
+            - "<yellow>Click to proceed with this price</yellow>"
+    units-select:
+      title: "Select units."
+      buttons:
+        submit:
+          name: "Transacting amount: <yellow>%amount% %asset%</yellow>"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Total value: %value_asset_amount%</gray>"
+            - ""
+            - "<yellow>Click to proceed with this amount</yellow>"
+    confirmation:
+      title: "Confirm?"
+      buttons:
+        submit:
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Type: %order_type%</gray>"
+            - ""
+            - "<gray>Units: <white>%base_asset_amount%</white></gray>"
+            - "<gray>Price: %quote_asset_amount%</gray>"
+            - ""
+            - "<gray>Total value: %value_asset_amount%</gray>"
+            - ""
+            - "<yellow>Left click to send this order</yellow>"
+

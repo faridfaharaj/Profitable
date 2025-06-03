@@ -33,6 +33,7 @@ public class AdminCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
+        /*
 
         Player player = null;
         if(sender instanceof Player got){
@@ -55,7 +56,7 @@ public class AdminCommand implements CommandExecutor {
             }
 
             if(args.length < 2){
-                MessagingUtil.sendError(sender, "/admin forcelogout <player>");
+                MessagingUtil.sendSyntaxError(sender, "/admin forcelogout <player>");
                 return true;
             }
 
@@ -93,7 +94,7 @@ public class AdminCommand implements CommandExecutor {
                 MessagingUtil.sendSuccsess(sender, "Successfully reloaded config file");
                 MessagingUtil.sendWarning(sender, "Some properties require restarting the server");
             }else{
-                MessagingUtil.sendError(sender, "Invalid Subcommand");
+                MessagingUtil.sendGenericInvalidSubCom(sender, args[1]);
                 return true;
             }
 
@@ -396,7 +397,7 @@ public class AdminCommand implements CommandExecutor {
                             Profitable.getInstance().saveConfig();
 
                         }
-                        MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("DELETED " + args[2], NamedTextColor.RED)));
+                        MessagingUtil.sendCustomMessage(sender, Component.text("DELETED " + args[2], NamedTextColor.RED));
                     }else{
                         MessagingUtil.sendError(sender, "Could not delete that asset");
                     }
@@ -566,7 +567,7 @@ public class AdminCommand implements CommandExecutor {
                     }
 
                     if(Orders.deleteOrder(UUID.fromString(args[2]))){
-                        MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("DELETED order " + args[2], NamedTextColor.RED)));
+                        MessagingUtil.sendCustomMessage(sender, Component.text("DELETED order " + args[2], NamedTextColor.RED));
                     }else {
                         MessagingUtil.sendError(sender, "Couldn't delete that order");
                     }
@@ -585,7 +586,7 @@ public class AdminCommand implements CommandExecutor {
                 }
 
                 if(Orders.deleteAllOrders()){
-                    MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("DELETED all orders from all assets", NamedTextColor.RED)));
+                    MessagingUtil.sendCustomMessage(sender, Component.text("DELETED all orders from all assets", NamedTextColor.RED));
                 }else{
                     MessagingUtil.sendError(sender, "Couldn't find any");
                 }
@@ -660,7 +661,7 @@ public class AdminCommand implements CommandExecutor {
 
             }
 
-            MessagingUtil.sendError(sender, "Invalid Subcommand");
+            MessagingUtil.sendGenericInvalidSubCom(sender, args[1]);
             return true;
 
         }
@@ -691,7 +692,7 @@ public class AdminCommand implements CommandExecutor {
             account = Accounts.getAccount(gotPlayer);
             if(args.length == 2){
 
-                MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text(player.getName() + "'s active account is: " + account)));
+                MessagingUtil.sendCustomMessage(sender, Component.text(player.getName() + "'s active account is: " + account, Configuration.GUICOLORTEXT));
                 return true;
             }
 
@@ -911,7 +912,7 @@ public class AdminCommand implements CommandExecutor {
 
             String claimId = Accounts.getEntityClaimId(account);
             if(claimId != null){
-                MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text(account + "'s Entity claim id: ")).append(Component.text(claimId).color(Configuration.COLORHIGHLIGHT)));
+                MessagingUtil.sendCustomMessage(sender, Component.text(account + "'s Entity claim id: ", Configuration.GUICOLORTEXT).append(Component.text(claimId).color(Configuration.COLORHIGHLIGHT)));
             }else{
                 MessagingUtil.sendError(sender, "Could not get this claim id");
             }
@@ -939,7 +940,7 @@ public class AdminCommand implements CommandExecutor {
                     MessagingUtil.sendError(sender, "Someone is still using this account");
                 }else {
                     if(Accounts.deleteAccount(account)){
-                        MessagingUtil.sendCustomMessage(sender, MessagingUtil.profitablePrefix().append(Component.text("DELETED account: " + account, NamedTextColor.RED)));
+                        MessagingUtil.sendCustomMessage(sender, Component.text("DELETED account: " + account, NamedTextColor.RED));
                     }else {
                         MessagingUtil.sendError(sender, "Couldnt delete " + account);
                     }
@@ -953,13 +954,15 @@ public class AdminCommand implements CommandExecutor {
         }
 
         return false;
+        */
+        return false;
     }
 
     public static class CommandTabCompleter implements TabCompleter {
 
         @Override
         public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] args) {
-
+            /*
             List<String> suggestions = new ArrayList<>();
 
             if (args.length == 1) {
@@ -1186,6 +1189,9 @@ public class AdminCommand implements CommandExecutor {
             }
 
             return suggestions;
+
+             */
+            return null;
         }
     }
 
