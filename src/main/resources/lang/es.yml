@@ -7,14 +7,14 @@ generic:
 
 temp-items:
   error:
-    main-hand-occupied: "<red>La mano principal debe estar libre</red>"
+    main-hand-occupied: "<red>Tu mano principal debe estar libre</red>"
 
 orders:
   cancel: "<gray>Orden cancelada <yellow>%order%</yellow></gray>"
   order-types:
-    limit-order: "orden límite"
-    market-order: "orden de mercado"
-    stop-limit-order: "orden stop-limit"
+    limit-order: "límite"
+    market-order: "mercado"
+    stop-limit-order: "stop-limit"
   sides:
     buy: "orden de compra"
     sell: "orden de venta"
@@ -43,7 +43,7 @@ exchange:
   payment-notice: "<gray>Recibido %asset_amount% %fee%</gray>"
   selling-notice: "<gray><green>Comprado</green> %base_asset_amount% por %quote_asset_amount%</gray>"
   buying-notice: "<gray><red>Vendido</red> %base_asset_amount% por %quote_asset_amount%</gray>"
-  new-order-notice: "<gray>Nueva %order_type% %side% de %base_asset_amount% a %quote_asset_amount% cada una</gray>"
+  new-order-notice: "<gray>Nueva %side% %order_type% de %base_asset_amount% por %quote_asset_amount% c/u</gray>"
   loading-order: "<gray>Procesando orden...</gray>"
   claim-fee-notice: "Comisión por reclamar es de %fee_asset_amount% por entidad"
   warning:
@@ -102,13 +102,13 @@ gui:
         name: "<red>volver</red>"
         lore:
           - ""
-          - "<yellow>Haz clic para volver al menú anterior</yellow>"
+          - "<yellow>Haz click para volver al menú anterior</yellow>"
       page-selector:
         name: "Página %page%/%pages%"
         lore:
           - ""
-          - "<yellow>Clic izquierdo: siguiente página</yellow>"
-          - "<yellow>Clic derecho: página anterior</yellow>"
+          - "<yellow>Haz click izquierdo para siguiente página</yellow>"
+          - "<yellow>Haz click derecho para página anterior</yellow>"
 
   number-selector:
     buttons:
@@ -117,9 +117,9 @@ gui:
       subtract:
         name: "<yellow>Restar %number%</yellow>"
       times-ten:
-        name: "<yellow>Clic para multiplicar por 10</yellow>"
+        name: "<yellow>Haz click para multiplicar por 10</yellow>"
       divide-ten:
-        name: "<yellow>Clic para dividir por 10</yellow>"
+        name: "<yellow>Haz click para dividir por 10</yellow>"
 
   asset-explorer:
     title: "Explorador de activos"
@@ -134,8 +134,8 @@ gui:
           - "<dark_gray> - </dark_gray><gray>Apertura: </gray><white>$%open_price%</white>"
           - "<dark_gray> - </dark_gray><gray>Rango del día: </gray><white>$%range_low% a $%range_high%</white>"
           - ""
-          - "<yellow>Clic izquierdo para comerciar</yellow>"
-          - "<yellow>Clic derecho para ver gráficos</yellow>"
+          - "<yellow>Haz Click izquierdo para comerciar</yellow>"
+          - "<yellow>Haz Click derecho para ver gráficos</yellow>"
       category-selector:
         name: "Categorías"
         lore:
@@ -143,25 +143,26 @@ gui:
           - ""
           - "%category_list%"
           - ""
-          - "<yellow>Haz clic para cambiar</yellow>"
+          - "<yellow>Haz click para cambiar</yellow>"
       orders:
         name: "Gestionar órdenes"
         lore:
           - "<dark_gray>Órdenes</dark_gray>"
           - ""
-          - "<yellow>Clic para ir al menú anterior</yellow>"
+          - "<yellow>Haz click para ver tus ordenes</yellow>"
       wallet:
         name: "Gestionar activos"
         lore:
           - "<dark_gray>Cartera</dark_gray>"
           - ""
-          - "<yellow>Clic para ir al menú anterior</yellow>"
+          - "<yellow>Haz click para ver tus activos</yellow>"
       delivery:
-        name: "Establecer entrega"
+        name: "Establecer posicion de entrega"
         lore:
           - "<dark_gray>Entrega</dark_gray>"
           - ""
-          - "<yellow>Clic para ir al menú anterior</yellow>"
+          - "<yellow>Haz click izquierdo para posicion de items</yellow>"
+          - "<yellow>Haz click derecho para posicion de entidades</yellow>"
 
   graphs:
     title: "Mostrando gráficos de %asset%"
@@ -171,31 +172,31 @@ gui:
         lore:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
-          - "<yellow>Clic derecho para ver gráfico</yellow>"
+          - "<yellow>Haz click derecho para ver gráfico</yellow>"
       three-month:
         name: "3 Meses"
         lore:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
-          - "<yellow>Clic derecho para ver gráfico</yellow>"
+          - "<yellow>Haz click derecho para ver gráfico</yellow>"
       six-month:
         name: "6 Meses"
         lore:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
-          - "<yellow>Clic derecho para ver gráfico</yellow>"
+          - "<yellow>Haz click derecho para ver gráfico</yellow>"
       one-year:
         name: "1 Año"
         lore:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
-          - "<yellow>Clic derecho para ver gráfico</yellow>"
+          - "<yellow>Haz click derecho para ver gráfico</yellow>"
       two-years:
         name: "2 Años"
         lore:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
-          - "<yellow>Clic derecho para ver gráfico</yellow>"
+          - "<yellow>Haz click derecho para ver gráfico</yellow>"
 
   wallet:
     title: "Cartera de activos"
@@ -209,8 +210,8 @@ gui:
           - "<gray>Precio de mercado: %price_asset_amount%</gray>"
           - "<gray>Valor total: %value_asset_amount%</gray>"
           - ""
-          - "<yellow>Clic izquierdo para retirar</yellow>"
-          - "<yellow>Clic derecho para depositar</yellow>"
+          - "<yellow>Haz click izquierdo para retirar</yellow>"
+          - "<yellow>Haz click derecho para depositar</yellow>"
 
   orders:
     title: "Tus órdenes activas"
@@ -226,7 +227,7 @@ gui:
           - ""
           - "<gray>Valor total: %value_asset_amount%</gray>"
           - ""
-          - "<yellow>Clic izquierdo para cancelar</yellow>"
+          - "<yellow>Haz click izquierdo para cancelar</yellow>"
 
   deposit-withdrawal:
     title-deposit: "Selecciona la cantidad a depositar."
@@ -237,13 +238,13 @@ gui:
         lore:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
-          - "<yellow>Clic izquierdo para continuar</yellow>"
+          - "<yellow>Haz click izquierdo para continuar</yellow>"
       submit-withdrawal:
         name: "<yellow>Cantidad: %amount% %asset%</yellow>"
         lore:
           - "<dark_gray>%asset%</dark_gray>"
           - ""
-          - "<yellow>Clic izquierdo para continuar</yellow>"
+          - "<yellow>Haz click izquierdo para continuar</yellow>"
 
   order-building:
     buy-sell:
@@ -254,9 +255,114 @@ gui:
           lore:
             - "<dark_gray>%asset%</dark_gray>"
             - ""
-            - "<gray>Oferta: %ask_asset_amount%</gray>"
+            - "<gray>Precio de venta: %ask_asset_amount%</gray>"
             - ""
             - "<gray>Precios más bajos:</gray>"
             - "%price_list%"
             - ""
-            - "<yellow>Clic izquierdo para elegir venta</yellow>"
+            - "<yellow>Haz click izquierdo para vender</yellow>"
+          no-orders-lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>¡No hay vendedores aun!</gray>"
+            - ""
+            - "<yellow>Haz click izquierdo para vender</yellow>"
+        buy:
+          name: "Orden de %side%"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Precio de compra: %bid_asset_amount%</gray>"
+            - ""
+            - "<gray>Precios más altos:</gray>"
+            - "%price_list%"
+            - ""
+            - "<yellow>Haz click izquierdo para comprar</yellow>"
+          no-orders-lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>¡No hay compradores aun!</gray>"
+            - ""
+            - "<yellow>Haz click izquierdo para comprar</yellow>"
+
+    type-select:
+      title: "Elige un tipo de orden."
+      buttons:
+        market:
+          name: "Orden de Mercado"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Transacción <yellow>inmediata</yellow></gray>"
+            - "<gray>al mejor precio disponible</gray>"
+            - ""
+            - "<yellow>Haz click para seleccionar Mercado</yellow>"
+          lore-no-orders:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>transacción <yellow>inmediata</yellow></gray>"
+            - "<gray>al mejor</gray>"
+            - "<gray>precio disponible</gray>"
+            - ""
+            - "<red>¡No hay órdenes disponibles!</red>"
+        limit:
+          name: "Orden Límite"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Elige un <yellow>precio</yellow> y</gray>"
+            - "<gray>transacciona cuando el precio</gray>"
+            - "<gray>de otra orden coincida</gray>"
+            - ""
+            - "<yellow>Haz click para seleccionar Límite</yellow>"
+        stop-limit:
+          name: "Orden Stop-Limit"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>coloca una <yellow>Orden Límite</yellow></gray>"
+            - "<gray>cuando el precio de mercado</gray>"
+            - "<gray>alcance el de tu disparador</gray>"
+            - ""
+            - "<yellow>Haz click para seleccionar Stop-Limit</yellow>"
+
+    price-select:
+      title: "Selecciona un precio."
+      buttons:
+        submit:
+          name: "Tu precio: <yellow>%amount% %asset%</yellow>"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Precio actual del activo: %price_asset_amount%</gray>"
+            - ""
+            - "<yellow>Haz click para continuar con este precio</yellow>"
+
+    units-select:
+      title: "Selecciona unidades."
+      buttons:
+        submit:
+          name: "Cantidad a transaccionar: <yellow>%amount% %asset%</yellow>"
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Valor total: %value_asset_amount%</gray>"
+            - ""
+            - "<yellow>Haz click para continuar con esta cantidad</yellow>"
+
+    confirmation:
+      title: "¿Confirmar?"
+      buttons:
+        submit:
+          lore:
+            - "<dark_gray>%asset%</dark_gray>"
+            - ""
+            - "<gray>Tipo: %order_type%</gray>"
+            - ""
+            - "<gray>Unidades: <white>%base_asset_amount%</white></gray>"
+            - "<gray>Precio: %quote_asset_amount%</gray>"
+            - ""
+            - "<gray>Valor total: %value_asset_amount%</gray>"
+            - ""
+            - "<yellow>Haz click izquierdo para enviar esta orden</yellow>"
+

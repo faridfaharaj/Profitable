@@ -66,18 +66,26 @@ public class WalletCommand implements CommandExecutor {
                 }
 
                 double ammount;
-                try{
-                    ammount = Double.parseDouble(args[2]);
-                    if(asset.getAssetType() == 2 || asset.getAssetType() == 3){
-                        ammount = (int) ammount;
-                    }
-                    if(ammount <= 0){
+                if(args.length != 2){
+                    try{
+                        ammount = Double.parseDouble(args[2]);
+                        if(asset.getAssetType() == 2 || asset.getAssetType() == 3){
+                            ammount = (int) ammount;
+                        }
+                        if(ammount <= 0){
+                            MessagingUtil.sendGenericInvalidAmount(sender, args[2]);
+                            return true;
+                        }
+                    }catch (Exception e){
                         MessagingUtil.sendGenericInvalidAmount(sender, args[2]);
                         return true;
                     }
-                }catch (Exception e){
-                    MessagingUtil.sendGenericInvalidAmount(sender, args[2]);
-                    return true;
+                }else {
+                    if(args[1].equals("hand")){
+                        ammount = player.getInventory().getItemInMainHand().getAmount();
+                    }else {
+                        ammount = 1;
+                    }
                 }
 
                 depositAsset(asset, ammount, player);
@@ -102,18 +110,22 @@ public class WalletCommand implements CommandExecutor {
                 }
 
                 double ammount;
-                try{
-                    ammount = Double.parseDouble(args[2]);
-                    if(asset.getAssetType() == 2 || asset.getAssetType() == 3){
-                        ammount = (int) ammount;
-                    }
-                    if(ammount <= 0){
+                if(args.length != 2){
+                    try{
+                        ammount = Double.parseDouble(args[2]);
+                        if(asset.getAssetType() == 2 || asset.getAssetType() == 3){
+                            ammount = (int) ammount;
+                        }
+                        if(ammount <= 0){
+                            MessagingUtil.sendGenericInvalidAmount(sender, args[2]);
+                            return true;
+                        }
+                    }catch (Exception e){
                         MessagingUtil.sendGenericInvalidAmount(sender, args[2]);
                         return true;
                     }
-                }catch (Exception e){
-                    MessagingUtil.sendGenericInvalidAmount(sender, args[2]);
-                    return true;
+                }else {
+                    ammount = 1;
                 }
 
                 withdrawAsset(asset, ammount, player);

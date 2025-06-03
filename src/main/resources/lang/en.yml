@@ -153,19 +153,20 @@ gui:
         lore:
           - "<dark_gray>Orders</dark_gray>"
           - ""
-          - "<yellow>Click to go to last menu</yellow>"
+          - "<yellow>Click to go view your orders</yellow>"
       wallet:
         name: "Manage owned assets"
         lore:
           - "<dark_gray>Portfolio</dark_gray>"
           - ""
-          - "<yellow>Click to go to last menu</yellow>"
+          - "<yellow>Click to view your assets</yellow>"
       delivery:
         name: "Set delivery location"
         lore:
           - "<dark_gray>Delivery</dark_gray>"
           - ""
-          - "<yellow>Click to go to last menu</yellow>"
+          - "<yellow>Left click to set item delivery</yellow>"
+          - "<yellow>Right to set item delivery</yellow>"
   graphs:
     title: "Showing graphs for %asset%"
     buttons:
