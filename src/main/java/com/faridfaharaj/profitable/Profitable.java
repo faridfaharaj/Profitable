@@ -4,7 +4,6 @@ import com.faridfaharaj.profitable.commands.*;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.tcoded.folialib.FoliaLib;
-import net.kyori.adventure.platform.bukkit.*;
 
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
@@ -45,7 +44,6 @@ import java.util.regex.Pattern;
 public final class Profitable extends JavaPlugin {
 
     private static Profitable instance;
-    private static BukkitAudiences audiences;
     private static FoliaLib foliaLib;
     private static Lang lang;
 
@@ -57,9 +55,6 @@ public final class Profitable extends JavaPlugin {
         return lang;
     }
 
-    public static BukkitAudiences getBukkitAudiences() {
-        return audiences;
-    }
     public static FoliaLib getfolialib() {
         return foliaLib;
     }
@@ -69,7 +64,6 @@ public final class Profitable extends JavaPlugin {
         getLogger().info("====================    Profitable    ====================" );
 
         instance = this;
-        audiences = BukkitAudiences.create(this);
         foliaLib = new FoliaLib(this);
         try {
             lang = new Lang(this);
