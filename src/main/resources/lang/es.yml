@@ -60,8 +60,8 @@ exchange:
 
 assets:
   amount-display: "%amount% %asset%"
-  auto-deposit-notice: "Depositado automáticamente %asset_amount% <red>(+ comisiones)</red>"
-  entity-claim-notice: "Reclamado %entity% usando %asset_amount%"
+  auto-deposit-notice: "Se ha depositado %asset_amount% <red>(+ comisiones)</red> automáticamente"
+  entity-claim-notice: "Haz reclamado %entity% usando %asset_amount%"
   loading-graph: "Cargando gráfico..."
   categories:
     forex: "Divisas"
