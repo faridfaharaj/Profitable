@@ -7,6 +7,7 @@ import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
+import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -26,7 +27,7 @@ public class Candles {
     static String[] tables = {"day", "week", "month"};
     static long[] intervals = {24000, 168000, 720000};
 
-    public static boolean updateDay(String asset, World world, double price, double volume){
+    public static boolean updateDay(World world, String asset, double price, double volume){
 
         for(int i = 0; i<3; i++){
 
@@ -47,7 +48,7 @@ public class Candles {
 
 
             try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(Profitable.getInstance().getConfig().getInt("database.database-type") == 0? sqlite:mysql)) {
-                stmt.setBytes(1, DataBase.getCurrentWorld());
+                stmt.setBytes(1, MessagingUtil.getWorldId(world));
                 stmt.setLong(2, (world.getFullTime() / intervals[i]) * intervals[i]);
                 stmt.setDouble(3,price);
                 stmt.setDouble(4,price);
@@ -68,18 +69,18 @@ public class Candles {
         return true;
     }
 
-    public static Candle getLastDay(String asset, long time) {
+    public static Candle getLastDay(World world,String asset, long time) {
         String sql = "SELECT time, open, close, high, low, volume FROM candles_day WHERE world = ? AND asset_id = ? AND time = ? " +
                 "UNION ALL " +
                 "SELECT time, close AS open, close, close AS high, close AS low, 0 AS volume FROM candles_day WHERE world = ? AND asset_id = ? AND time = (SELECT MAX(time) FROM candles_day WHERE world = ? AND asset_id = ?) LIMIT 1;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, asset);
             stmt.setLong(3, (time / intervals[0]) * intervals[0]);
-            stmt.setBytes(4, DataBase.getCurrentWorld());
+            stmt.setBytes(4, MessagingUtil.getWorldId(world));
             stmt.setString(5, asset);
-            stmt.setBytes(6, DataBase.getCurrentWorld());
+            stmt.setBytes(6, MessagingUtil.getWorldId(world));
             stmt.setString(7, asset);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -100,7 +101,7 @@ public class Candles {
         return new Candle(0, 0, 0, 0, 0);
     }
 
-    public static List<AssetCache> getAssetsNPrice(int type, long time) {
+    public static List<AssetCache> getAssetsNPrice(World world,int type, long time) {
         List<AssetCache> result = new ArrayList<>();
 
         String sql = """
@@ -131,14 +132,14 @@ public class Candles {
         WHERE a.world = ? AND a.asset_type = ?;
     """;
 
-        byte[] world = DataBase.getCurrentWorld();
+        byte[] worldBytes = MessagingUtil.getWorldId(world);
         long roundedTime = (time / intervals[0]) * intervals[0];
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setLong(1, roundedTime); // for ROW_NUMBER priority
-            stmt.setBytes(2, world);      // for candle filtering
-            stmt.setBytes(3, world);      // for final asset filter
-            stmt.setInt(4, type);         // for asset_type filter
+            stmt.setLong(1, roundedTime);
+            stmt.setBytes(2, worldBytes);      // for candle filtering
+            stmt.setBytes(3, worldBytes);      // for final asset filter
+            stmt.setInt(4, type);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -170,14 +171,14 @@ public class Candles {
         return result;
     }
 
-    public static List<Candle> getInterval(String asset, long time, int interval) {
+    public static List<Candle> getInterval(World world,String asset, long time, int interval) {
 
         String sql = "SELECT * FROM candles_" + tables[interval] + " WHERE world = ? AND asset_id = ? AND time > ? ORDER BY time ASC;";
 
         List<Candle> candles = new ArrayList<>();
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, asset);
             stmt.setLong(3, time);
 
@@ -239,7 +240,7 @@ public class Candles {
     }
 
 
-    public static Component getHotAssets(long time, int cat) {
+    public static Component getHotAssets(World world, int cat) {
         String sql;
 
         switch (cat){
@@ -265,8 +266,8 @@ public class Candles {
         }
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
-            stmt.setLong(2, (time / intervals[2]) * intervals[2]);
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
+            stmt.setLong(2, (world.getFullTime() / intervals[2]) * intervals[2]);
 
             Component component = Component.text("");
             try (ResultSet rs = stmt.executeQuery()) {
@@ -301,11 +302,11 @@ public class Candles {
         return Component.text("error").color(Configuration.COLORERROR);
     }
 
-    public static void assetDeleteAllCandles(String asset) {
+    public static void assetDeleteAllCandles(World world,String asset) {
         String sql = "DELETE FROM candles_day WHERE world = ? AND asset_id = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, asset);
             stmt.executeUpdate();
 
@@ -316,7 +317,7 @@ public class Candles {
         sql = "DELETE FROM candles_week WHERE world = ? AND asset_id = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, asset);
             stmt.executeUpdate();
 
@@ -327,7 +328,7 @@ public class Candles {
         sql = "DELETE FROM candles_month WHERE world = ? AND asset_id = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, asset);
             stmt.executeUpdate();
 

@@ -227,24 +227,24 @@ public class Asset {
         }
     }
 
-    public static void distributeAsset(String account, Asset asset, double ammount){
+    public static void distributeAsset(World world, String account, Asset asset, double ammount){
 
         switch (asset.getAssetType()) {
             case 2: // Item
 
                 if(Configuration.PHYSICALDELIVERY){
-                    sendCommodityItem(account, asset.getCode(), (int) ammount);
+                    sendCommodityItem(world, account, asset.getCode(), (int) ammount);
                 }else {
-                    sendBalance(account, asset.getCode(), ammount);
+                    sendBalance(world, account, asset.getCode(), ammount);
                 }
                 break;
 
             case 3: // Entity
 
                 if(Configuration.PHYSICALDELIVERY){
-                    sendCommodityEntity(account, asset.getCode(), (int) ammount);
+                    sendCommodityEntity(world, account, asset.getCode(), (int) ammount);
                 }else {
-                    sendBalance(account, asset.getCode(), ammount);
+                    sendBalance(world, account, asset.getCode(), ammount);
                 }
                 break;
 
@@ -258,7 +258,7 @@ public class Asset {
 
             default: // numerical value
 
-                    sendBalance(account, asset.getCode(), ammount);
+                    sendBalance(world, account, asset.getCode(), ammount);
 
                 break;
         }
@@ -271,10 +271,10 @@ public class Asset {
 
     }
 
-    public static void sendBalance(String account, String asset, double ammount){
+    public static void sendBalance(World world, String account, String asset, double ammount){
 
-        double balance = AccountHoldings.getAccountAssetBalance(account, asset);
-        AccountHoldings.setHolding(account, asset, balance + ammount);
+        double balance = AccountHoldings.getAccountAssetBalance(world, account, asset);
+        AccountHoldings.setHolding(world, account, asset, balance + ammount);
 
     }
 
@@ -311,7 +311,7 @@ public class Asset {
 
         EntityType entityType = EntityType.fromName(asset);
 
-        String claimId = Accounts.getEntityClaimId(account);
+        String claimId = Accounts.getEntityClaimId(player.getWorld(), account);
         Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
             World world = player.getWorld();
             Location location = player.getLocation();
@@ -330,16 +330,16 @@ public class Asset {
 
     }
 
-    public static void sendCommodityItem(String account, String asset, int amount){
+    public static void sendCommodityItem(World world, String account, String asset, int amount){
 
         Material material = Material.getMaterial(asset);
         int maxStackSize = material.getMaxStackSize();
 
-        Location location = Accounts.getItemDelivery(account);
+        Location location = Accounts.getItemDelivery(world, account);
 
         Profitable.getfolialib().getScheduler().runAtLocation(location, task -> {
 
-                    World world = location.getWorld();
+                    World deliveryWorld = location.getWorld();
                     Block block = location.getBlock();
                     if (block.getState() instanceof Chest chest) {
 
@@ -351,7 +351,7 @@ public class Asset {
 
                             Inventory inventory = chest.getInventory();
                             for (ItemStack drop : inventory.addItem(itemStack).values()) {
-                                world.dropItemNaturally(location, drop);
+                                deliveryWorld.dropItemNaturally(location, drop);
                             }
 
                             missing -= giveAmount;
@@ -359,38 +359,38 @@ public class Asset {
 
                     }else{
 
-                        world.dropItemNaturally(location, new ItemStack(material, amount));
+                        deliveryWorld.dropItemNaturally(location, new ItemStack(material, amount));
 
                     }
 
-                    world.spawnParticle(Particle.FIREWORK, location.add(0.5,0.5,0.5), 5);
-                    world.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
-                    world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
-                    world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+                    deliveryWorld.spawnParticle(Particle.FIREWORK, location.add(0.5,0.5,0.5), 5);
+                    deliveryWorld.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
+                    deliveryWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
+                    deliveryWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
                 }
         );
 
     }
 
-    public static void sendCommodityEntity(String account, String asset, int amount){
+    public static void sendCommodityEntity(World world, String account, String asset, int amount){
 
         EntityType entityType = EntityType.fromName(asset);
 
-        Location location = Accounts.getEntityDelivery(account);
-        String claimId = Accounts.getEntityClaimId(account);
+        Location location = Accounts.getEntityDelivery(world ,account);
+        String claimId = Accounts.getEntityClaimId(world ,account);
         Profitable.getfolialib().getScheduler().runAtLocation(location, task -> {
-            World world = location.getWorld();
+            World deliveryWorld = location.getWorld();
 
             for(int i = 0; i<amount; i++){
-                Entity entity = world.spawnEntity(location, entityType);
+                Entity entity = deliveryWorld.spawnEntity(location, entityType);
                 entity.setCustomName(claimId);
                 entity.setCustomNameVisible(true);
             }
 
-            world.spawnParticle(Particle.FIREWORK, location, 10);
-            world.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
-            world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
-            world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+            deliveryWorld.spawnParticle(Particle.FIREWORK, location, 10);
+            deliveryWorld.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
+            deliveryWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
+            deliveryWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
         });
 
     }
@@ -408,8 +408,8 @@ public class Asset {
                 // get from wallet
                 if(Configuration.ALLOWEDCOMMODITYCOLLATERAL[0]){
                     String account = Accounts.getAccount(player);
-                    double balance = AccountHoldings.getAccountAssetBalance(account, asset.getCode());
-                    if(retrieveBalance(account, balance, asset.getCode(), ammount)){
+                    double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
+                    if(retrieveBalance(player.getWorld(), account, balance, asset.getCode(), ammount)){
                         runnable.run();
                         return;
                     }
@@ -435,8 +435,8 @@ public class Asset {
                 // get from wallet
                 if(Configuration.ALLOWEDCOMMODITYCOLLATERAL[0]){
                     String account = Accounts.getAccount(player);
-                    double balance = AccountHoldings.getAccountAssetBalance(account, asset.getCode());
-                    if(retrieveBalance(account, balance, asset.getCode(), ammount)){
+                    double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
+                    if(retrieveBalance(player.getWorld(),account, balance, asset.getCode(), ammount)){
                         runnable.run();
                         return;
                     }
@@ -445,7 +445,7 @@ public class Asset {
                 if (Configuration.ALLOWEDCOMMODITYCOLLATERAL[2]) {
 
                     Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
-                        if(retrieveCommodityEntity(player, asset.getCode(), Accounts.getEntityClaimId(Accounts.getAccount(player)), (int) ammount)){
+                        if(retrieveCommodityEntity(player, asset.getCode(), Accounts.getEntityClaimId(player.getWorld(), Accounts.getAccount(player)), (int) ammount)){
                             runnable.run();
                         }else{
                             MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
@@ -464,11 +464,11 @@ public class Asset {
             default: // any numerical value
 
                 String account = Accounts.getAccount(player);
-                double balance = AccountHoldings.getAccountAssetBalance(account, asset.getCode());
-                if(retrieveBalance(account, balance, asset.getCode(), ammount)){
+                double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
+                if(retrieveBalance(player.getWorld(), account, balance, asset.getCode(), ammount)){
                     runnable.run();
                 }else {
-                    if(retrieveBalanceExternal(account, balance, asset.getCode(), ammount, player)){
+                    if(retrieveBalanceExternal(player.getWorld(), account, balance, asset.getCode(), ammount, player)){
                         runnable.run();
                     }else {
                         MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
@@ -479,7 +479,7 @@ public class Asset {
         }
     }
 
-    public static boolean retrieveBalance(String account, double balance, String asset, double ammount){
+    public static boolean retrieveBalance(World world, String account, double balance, String asset, double ammount){
 
         double difference = balance - ammount;
         if(difference < 0){
@@ -488,15 +488,15 @@ public class Asset {
 
         }
         if(difference <= 0){
-            AccountHoldings.deleteHolding(account, asset);
+            AccountHoldings.deleteHolding(world, account, asset);
         }else{
-            AccountHoldings.setHolding(account, asset, difference);
+            AccountHoldings.setHolding(world, account, asset, difference);
         }
         return true;
 
     }
 
-    public static boolean retrieveBalanceExternal(String account, double balance, String asset, double ammount, Player player){
+    public static boolean retrieveBalanceExternal(World world, String account, double balance, String asset, double ammount, Player player){
         if(VaultHook.isConnected() && Objects.equals(asset, VaultHook.getAsset().getCode())){
 
             double fee = Configuration.parseFee(Configuration.DEPOSITFEES, ammount);
@@ -514,7 +514,7 @@ public class Asset {
             double total = Math.ceil(ammount+fee);
             if(PlayerPointsHook.getApi().take(player.getUniqueId(), (int) total)){
                 if(total-ammount+fee != 0){
-                    AccountHoldings.setHolding(account, asset, balance+(total-ammount+fee));
+                    AccountHoldings.setHolding(world, account, asset, balance+(total-ammount+fee));
                 }
                 MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.auto-deposit-notice",
                         Map.entry("%asset_amount%", MessagingUtil.assetAmmount(PlayerPointsHook.getAsset(), ammount))

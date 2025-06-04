@@ -106,22 +106,18 @@ public final class Profitable extends JavaPlugin {
         // MainCurrency
         if(Configuration.MULTIWORLD){
             for(World world : this.getServer().getWorlds()){
-                try {
-                    DataBase.updateWorld(world);
-                    Assets.generateAssets();
-                    Accounts.registerDefaultAccount("server");
-                    Accounts.changeEntityDelivery("server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
-                    Accounts.changeItemDelivery("server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                Assets.generateAssets(world);
+                Accounts.registerDefaultAccount(world, "server");
+                Accounts.changeEntityDelivery(world, "server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
+                Accounts.changeItemDelivery(world, "server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
             }
             getLogger().info("Using per-world data");
         }else{
-            Assets.generateAssets();
-            Accounts.registerDefaultAccount("server");
-            Accounts.changeEntityDelivery("server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
-            Accounts.changeItemDelivery("server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
+            World world = getServer().getWorlds().getFirst();
+            Assets.generateAssets(world);
+            Accounts.registerDefaultAccount(world, "server");
+            Accounts.changeEntityDelivery(world, "server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
+            Accounts.changeItemDelivery(world, "server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
             getLogger().info("Using single server-wide data");
         }
 
