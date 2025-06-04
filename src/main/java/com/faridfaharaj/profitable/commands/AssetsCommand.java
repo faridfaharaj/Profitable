@@ -21,10 +21,6 @@ public class AssetsCommand implements CommandExecutor {
 
         if(sender instanceof Player player){
 
-            if(Configuration.MULTIWORLD){
-                DataBase.universalUpdateWorld(sender);
-            }
-
             new AssetExplorer(player, 2, null).openGui(player);
             return true;
         }else {

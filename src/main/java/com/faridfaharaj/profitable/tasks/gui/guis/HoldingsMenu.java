@@ -41,7 +41,7 @@ public final class HoldingsMenu extends ChestGUI {
         returnButton = new ReturnButton(this, vectorSlotPosition(4, 5));
 
         Profitable.getfolialib().getScheduler().runAsync(task -> {
-            assets = AccountHoldings.AssetBalancesToAssetData(Accounts.getAccount(player));
+            assets = AccountHoldings.AssetBalancesToAssetData(player.getWorld(), Accounts.getAccount(player));
 
             pages = assets.size()/21;
 

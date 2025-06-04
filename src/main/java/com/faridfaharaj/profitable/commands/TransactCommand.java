@@ -24,10 +24,6 @@ public class TransactCommand implements CommandExecutor {
 
         if(sender instanceof Player player){
 
-            if(Configuration.MULTIWORLD){
-                DataBase.universalUpdateWorld(sender);
-            }
-
 
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
 

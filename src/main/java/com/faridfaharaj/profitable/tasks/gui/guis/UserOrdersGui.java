@@ -44,7 +44,7 @@ public final class UserOrdersGui extends ChestGUI {
         returnButton = new ReturnButton(this, vectorSlotPosition(4, 5));
 
         Profitable.getfolialib().getScheduler().runAsync(task -> {
-            orders = Orders.getAccountOrders(Accounts.getAccount(player));
+            orders = Orders.getAccountOrders(player.getWorld(), Accounts.getAccount(player));
 
             updatePage();
 

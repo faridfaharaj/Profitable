@@ -20,12 +20,9 @@ public class AccountCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
 
-        if(Configuration.MULTIWORLD){
-            DataBase.universalUpdateWorld(sender);
-        }
+        if(sender instanceof Player player){
 
-        if(args.length == 0){
-            if(sender instanceof Player player){
+            if(args.length == 0){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     String account = Accounts.getAccount(player);
 
@@ -36,49 +33,45 @@ public class AccountCommand implements CommandExecutor {
                 });
                 return true;
             }
-            return false;
-        }
 
-        //BASIC ACCOUNT COMMANDS
-        if(args[0].equals("register")){
+            //BASIC ACCOUNT COMMANDS
+            if(args[0].equals("register")){
 
-            if(!sender.hasPermission("profitable.account.manage.register")){
-                MessagingUtil.sendGenericMissingPerm(sender);
-                return true;
-            }
-
-            if(args.length < 4){
-                MessagingUtil.sendSyntaxError(sender, "/account register <Username> <Password> <Repeat Password>");
-                return true;
-            }
-
-            if(Objects.equals(args[2], args[3])){
-                if(args[2].length() < 32){
-                    Profitable.getfolialib().getScheduler().runAsync(task -> {
-                        if(Accounts.registerAccount(args[1], args[2])){
-
-                            MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("account.registry",
-                                    Map.entry("%account%", args[1])
-                            ));
-
-                        }else{
-                            MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("account.error.account-already-exists"));
-                        }
-                    });
+                if(!sender.hasPermission("profitable.account.manage.register")){
+                    MessagingUtil.sendGenericMissingPerm(sender);
                     return true;
-                }else{
-                    MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("account.error.password-too-long"));
                 }
-            }else {
-                MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("account.error.password-mismatch"));
-                return true;
+
+                if(args.length < 4){
+                    MessagingUtil.sendSyntaxError(sender, "/account register <Username> <Password> <Repeat Password>");
+                    return true;
+                }
+
+                if(Objects.equals(args[2], args[3])){
+                    if(args[2].length() < 32){
+                        Profitable.getfolialib().getScheduler().runAsync(task -> {
+                            if(Accounts.registerAccount(player.getWorld(), args[1], args[2])){
+
+                                MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("account.registry",
+                                        Map.entry("%account%", args[1])
+                                ));
+
+                            }else{
+                                MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("account.error.account-already-exists"));
+                            }
+                        });
+                        return true;
+                    }else{
+                        MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("account.error.password-too-long"));
+                    }
+                }else {
+                    MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("account.error.password-mismatch"));
+                    return true;
+                }
+
             }
 
-        }
-
-        if(args[0].equals("delete")){
-
-            if(sender instanceof Player player){
+            if(args[0].equals("delete")){
 
                 if(!sender.hasPermission("profitable.account.manage.delete")){
                     MessagingUtil.sendGenericMissingPerm(sender);
@@ -99,7 +92,7 @@ public class AccountCommand implements CommandExecutor {
 
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     if(Objects.equals(account, Accounts.getAccount(player))){
-                        if(!Accounts.comparePasswords(account, args[2])){
+                        if(!Accounts.comparePasswords(player.getWorld(), account, args[2])){
                             MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("account.error.wrong-password"));
                             return;
                         }
@@ -108,7 +101,7 @@ public class AccountCommand implements CommandExecutor {
                         if(Accounts.getCurrentAccounts().containsValue(account)) {
                             MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("account.error.cant-delete-active-account"));
                         }else{
-                            Accounts.deleteAccount(account);
+                            Accounts.deleteAccount(player.getWorld(), account);
                             MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("account.delete",
                                     Map.entry("%account%", account)
                             ));
@@ -121,30 +114,23 @@ public class AccountCommand implements CommandExecutor {
 
                 return true;
 
-            }else{
-                MessagingUtil.sendGenericCantConsole(sender);
-                return true;
             }
 
-        }
+            if(args[0].equals("login")){
 
-        if(args[0].equals("login")){
+                if(!sender.hasPermission("profitable.account.manage.login")){
+                    MessagingUtil.sendGenericMissingPerm(sender);
+                    return true;
+                }
 
-            if(!sender.hasPermission("profitable.account.manage.login")){
-                MessagingUtil.sendGenericMissingPerm(sender);
-                return true;
-            }
-
-            if(args.length < 3){
-                MessagingUtil.sendSyntaxError(sender, "/account login <Account> <Password>");
-                return true;
-            }
-
-            if(sender instanceof Player player){
+                if(args.length < 3){
+                    MessagingUtil.sendSyntaxError(sender, "/account login <Account> <Password>");
+                    return true;
+                }
 
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
 
-                    if(Accounts.logIn(player.getUniqueId(), args[1], args[2])){
+                    if(Accounts.logIn(player, args[1], args[2])){
                         MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("account.login",
                                 Map.entry("%account%", args[1])
                         ));
@@ -155,21 +141,15 @@ public class AccountCommand implements CommandExecutor {
 
                 });
 
-                return true;
-            }else{
-                MessagingUtil.sendGenericCantConsole(sender);
             }
 
-        }
+            if(args[0].equals("logout")){
 
-        if(args[0].equals("logout")){
+                if(!sender.hasPermission("profitable.account.manage.logout")){
+                    MessagingUtil.sendGenericMissingPerm(sender);
+                    return true;
+                }
 
-            if(!sender.hasPermission("profitable.account.manage.logout")){
-                MessagingUtil.sendGenericMissingPerm(sender);
-                return true;
-            }
-
-            if(sender instanceof Player player){
                 UUID playerid = player.getUniqueId();
 
                 Accounts.logOut(playerid);
@@ -180,11 +160,7 @@ public class AccountCommand implements CommandExecutor {
 
             }
 
-        }
-
-        if(args[0].equals("password")){
-
-            if(sender instanceof Player player){
+            if(args[0].equals("password")){
 
                 if(!sender.hasPermission("profitable.account.manage.password")){
                     MessagingUtil.sendGenericMissingPerm(sender);
@@ -198,9 +174,9 @@ public class AccountCommand implements CommandExecutor {
 
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     String account = Accounts.getAccount(player);
-                    if(Accounts.comparePasswords(account, args[1])){
+                    if(Accounts.comparePasswords(player.getWorld(), account, args[1])){
                         if(args[2].length() < 32){
-                            Accounts.changePassword(account, args[2]);
+                            Accounts.changePassword(player.getWorld(), account, args[2]);
                             MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("account.password-update"));
 
 
@@ -211,11 +187,12 @@ public class AccountCommand implements CommandExecutor {
                         MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("account.error.wrong-password"));
                     }
                 });
-            }else{
-                MessagingUtil.sendGenericCantConsole(sender);
+                return true;
             }
-            return true;
+
         }
+
+
 
 
 
