@@ -24,9 +24,6 @@ public class ClaimtagCommand implements CommandExecutor {
                 return true;
             }
 
-            if(Configuration.MULTIWORLD){
-                DataBase.universalUpdateWorld(sender);
-            }
 
             TemporalItems.sendClaimingTag(player);
 

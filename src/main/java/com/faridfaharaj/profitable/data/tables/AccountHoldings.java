@@ -9,6 +9,7 @@ import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.Component;
+import org.bukkit.World;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,11 +20,11 @@ import java.util.Objects;
 
 public class AccountHoldings {
 
-    public static boolean setHolding(String account, String asset, double quantity) {
+    public static boolean setHolding(World world, String account, String asset, double quantity) {
         String sql = "INSERT INTO account_assets (world , account_name, asset_id, quantity) VALUES (?, ?, ?, ?) " + (Profitable.getInstance().getConfig().getInt("database.database-type") == 0? "ON CONFLICT(world, account_name, asset_id) DO UPDATE SET quantity = excluded.quantity;" : "ON DUPLICATE KEY UPDATE quantity = VALUES(quantity);");
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, account);
             stmt.setString(3, asset);
             stmt.setDouble(4, quantity);
@@ -39,11 +40,11 @@ public class AccountHoldings {
         return false;
     }
 
-    public static void deleteHolding(String account, String asset) {
+    public static void deleteHolding(World world,String account, String asset) {
         String sql = "DELETE FROM account_assets WHERE world = ? AND account_name = ? AND asset_id = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, account);
             stmt.setString(3, asset);
 
@@ -55,11 +56,11 @@ public class AccountHoldings {
 
     }
 
-    public static double getAccountAssetBalance(String account, String asset) {
+    public static double getAccountAssetBalance(World world,String account, String asset) {
         String sql = "SELECT * FROM account_assets WHERE world = ? AND account_name = ? AND asset_id = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, account);
             stmt.setString(3, asset);
 
@@ -76,7 +77,7 @@ public class AccountHoldings {
         return 0;
     }
 
-    public static List<AssetCache> AssetBalancesToAssetData(String account) {
+    public static List<AssetCache> AssetBalancesToAssetData(World world,String account) {
         String sql = "SELECT aa.asset_id, a.asset_type, aa.quantity, a.meta, " +
                 "IFNULL(c.close, 0) AS price, " +
                 "(aa.quantity * IFNULL(c.close, 0)) AS value " +
@@ -90,7 +91,7 @@ public class AccountHoldings {
         List<AssetCache> balances = new ArrayList<>();
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, account);
 
             try (ResultSet rs = stmt.executeQuery()) {

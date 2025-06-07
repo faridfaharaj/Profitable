@@ -118,7 +118,7 @@ public class Events implements Listener {
 
                     Runnable claim = () -> {
                         Profitable.getfolialib().getScheduler().runAtEntity(entity, task -> {
-                            entity.setCustomName(Accounts.getEntityClaimId(Accounts.getAccount(player)));
+                            entity.setCustomName(Accounts.getEntityClaimId(player.getWorld(), Accounts.getAccount(player)));
                         });
                         MessagingUtil.sendComponentMessage(player,Profitable.getLang().get("assets.entity-claim-notice",
                             Map.entry("%entity%", entity.getName()),
@@ -142,15 +142,10 @@ public class Events implements Listener {
     @EventHandler
     public void onWorldInit(WorldInitEvent event) {
         if(Configuration.MULTIWORLD){
-            try {
-                DataBase.updateWorld(event.getWorld());
-                Assets.generateAssets();
-                Accounts.registerDefaultAccount("server");
-                Accounts.changeEntityDelivery("server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
-                Accounts.changeItemDelivery("server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            Assets.generateAssets(event.getWorld());
+            Accounts.registerDefaultAccount(event.getWorld(), "server");
+            Accounts.changeEntityDelivery(event.getWorld(), "server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
+            Accounts.changeItemDelivery(event.getWorld(), "server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
         }
     }
 
@@ -177,7 +172,7 @@ public class Events implements Listener {
                             return;
                         }
                         Location correctedlocation = block.getLocation();
-                        if(Accounts.changeItemDelivery(Accounts.getAccount(player), correctedlocation)){
+                        if(Accounts.changeItemDelivery(player.getWorld(), Accounts.getAccount(player), correctedlocation)){
                             MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.updated-item",
                                     Map.entry("%position%", correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")")
                             ));
@@ -194,7 +189,7 @@ public class Events implements Listener {
                     Block block = event.getClickedBlock();
                     if(block != null){
                         Location correctedlocation = block.getLocation().add(0.5,0,0.5).add(event.getBlockFace().getDirection());
-                        if(Accounts.changeEntityDelivery(Accounts.getAccount(player), correctedlocation)){
+                        if(Accounts.changeEntityDelivery(player.getWorld(), Accounts.getAccount(player), correctedlocation)){
                             MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.updated-entity",
                                     Map.entry("%position%", correctedlocation.toVector() + " (" + correctedlocation.getWorld().getName() + ")")
                             ));

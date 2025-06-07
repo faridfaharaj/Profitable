@@ -8,6 +8,7 @@ import com.faridfaharaj.profitable.hooks.VaultHook;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -223,12 +224,12 @@ public class Configuration {
         return 0;
     }
 
-    public static void loadMainCurrency() throws IOException {
+    public static void loadMainCurrency(World world) throws IOException {
         FileConfiguration config = Profitable.getInstance().getConfig();
 
 
         String[] MCdata = config.getString("main-currency.currency", "EMD_Villager Emerald_#00ff00").split("_");
-        Asset mainCurrency = Assets.getAssetData(MCdata[0]);
+        Asset mainCurrency = Assets.getAssetData(world, MCdata[0]);
 
         if(mainCurrency == null){
 
@@ -267,7 +268,7 @@ public class Configuration {
             }
 
             MAINCURRENCYASSET = new Asset(MCdata[0], 1, color, name);
-            Assets.addAsset(MAINCURRENCYASSET.getCode(), 1, Asset.metaData(MAINCURRENCYASSET));
+            Assets.addAsset(world, MAINCURRENCYASSET.getCode(), 1, Asset.metaData(MAINCURRENCYASSET));
         }else{
             MAINCURRENCYASSET = mainCurrency;
         }

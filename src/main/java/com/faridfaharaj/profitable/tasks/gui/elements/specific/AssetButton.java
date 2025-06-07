@@ -78,7 +78,7 @@ public final class AssetButton extends GuiElement {
         if(loaded){
             player.closeInventory();
             Profitable.getfolialib().getScheduler().runAsync(task -> {
-                new BuySellGui(cache, cache[index[0]][index[1]], Orders.getBidAsk(cache[index[0]][index[1]].getAsset().getCode(), true), Orders.getBidAsk(cache[index[0]][index[1]].getAsset().getCode(), false)).openGui(player);
+                new BuySellGui(cache, cache[index[0]][index[1]], Orders.getBidAsk(player.getWorld(), cache[index[0]][index[1]].getAsset().getCode(), true), Orders.getBidAsk(player.getWorld(), cache[index[0]][index[1]].getAsset().getCode(), false)).openGui(player);
             });
         }
     }

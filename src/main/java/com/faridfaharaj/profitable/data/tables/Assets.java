@@ -10,6 +10,7 @@ import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.World;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -21,7 +22,7 @@ import java.util.*;
 
 public class Assets {
 
-    public static boolean registerAsset(String symbol, int assetType, byte[] meta) {
+    public static boolean registerAsset(World world, String symbol, int assetType, byte[] meta) {
 
         if(Objects.equals(symbol, VaultHook.getAsset().getCode())){
             return false;
@@ -30,7 +31,7 @@ public class Assets {
         String sql = "INSERT INTO assets (world, asset_id, asset_type, meta) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, symbol);
             stmt.setInt(3, assetType);
             stmt.setBytes(4, meta);
@@ -46,11 +47,11 @@ public class Assets {
         return false;
     }
 
-    public static void addAsset(String ticker, int assetType, byte[] meta) {
+    public static void addAsset(World world, String ticker, int assetType, byte[] meta) {
         String sql = "INSERT " + (Profitable.getInstance().getConfig().getInt("database.database-type") == 0 ? "OR ": "") + "IGNORE INTO assets (world, asset_id, asset_type, meta) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, ticker);
             stmt.setInt(3, assetType);
             stmt.setBytes(4, meta);
@@ -62,14 +63,14 @@ public class Assets {
         }
     }
 
-    public static boolean updateAsset(String assetID, Asset updatedAsset){
+    public static boolean updateAsset(World world, String assetID, Asset updatedAsset){
         String sql = "UPDATE assets SET asset_id = ?, meta = ? WHERE world = ? AND asset_id = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
 
             stmt.setString(1,updatedAsset.getCode());
             stmt.setBytes(2, Asset.metaData(updatedAsset));
-            stmt.setBytes(3, DataBase.getCurrentWorld());
+            stmt.setBytes(3, MessagingUtil.getWorldId(world));
             stmt.setString(4, assetID);
 
             return stmt.executeUpdate() > 0;
@@ -83,11 +84,11 @@ public class Assets {
         return false;
     }
 
-    public static Asset getAssetData(String assetID) {
+    public static Asset getAssetData(World world, String assetID) {
         String sql = "SELECT * FROM assets WHERE world = ? AND asset_id = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, assetID);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -139,12 +140,12 @@ public class Assets {
         return null;
     }
 
-    public static Collection<String> getAssetCodeType(int type) {
+    public static Collection<String> getAssetCodeType(World world, int type) {
         String sql = "SELECT * FROM assets WHERE world = ? AND asset_type = ?;";
 
         Collection<String> assetsFound = new ArrayList<>();
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setInt(2, type);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -160,12 +161,12 @@ public class Assets {
         return assetsFound;
     }
 
-    public static List<Asset> getAssetFancyType(int type) {
+    public static List<Asset> getAssetFancyType(World world, int type) {
         String sql = "SELECT * FROM assets WHERE world = ? AND asset_type = ?;";
 
         List<Asset> assetsFound = new ArrayList<>();
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setInt(2, type);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -183,12 +184,12 @@ public class Assets {
         return assetsFound;
     }
 
-    public static Collection<String> getAll() {
+    public static Collection<String> getAll(World world) {
         String sql = "SELECT asset_id FROM assets WHERE world = ?;";
 
         Collection<String> assetsFound = new ArrayList<>();
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()){
@@ -203,11 +204,11 @@ public class Assets {
         return assetsFound;
     }
 
-    public static boolean deleteAsset(String asset) {
+    public static boolean deleteAsset(World world, String asset) {
         String sql = "DELETE FROM assets WHERE world = ? AND asset_id = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, asset);
             int affected = stmt.executeUpdate();
             return affected > 0;
@@ -219,13 +220,13 @@ public class Assets {
 
     }
 
-    public static void generateAssets(){
+    public static void generateAssets(World world){
 
         //Hooks asset generation----
         if(VaultHook.isConnected()){
             // Vault
             try {
-                Assets.addAsset(VaultHook.getAsset().getCode(), 1, Asset.metaData(VaultHook.getAsset()));
+                Assets.addAsset(world,VaultHook.getAsset().getCode(), 1, Asset.metaData(VaultHook.getAsset()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -233,14 +234,14 @@ public class Assets {
         if(PlayerPointsHook.isConnected()){
             // PlayerPoints
             try {
-                Assets.addAsset(PlayerPointsHook.getAsset().getCode(), 1, Asset.metaData(PlayerPointsHook.getAsset()));
+                Assets.addAsset(world,PlayerPointsHook.getAsset().getCode(), 1, Asset.metaData(PlayerPointsHook.getAsset()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
 
         try{
-            Configuration.loadMainCurrency();
+            Configuration.loadMainCurrency(world);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -249,7 +250,7 @@ public class Assets {
             //Base commodity items
             for(String item : Configuration.ALLOWEITEMS){
                 try {
-                    Assets.addAsset(item, 2, Asset.metaData(Configuration.COLORHIGHLIGHT.value(), NamingUtil.nameCommodity(item)));
+                    Assets.addAsset(world, item, 2, Asset.metaData(Configuration.COLORHIGHLIGHT.value(), NamingUtil.nameCommodity(item)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -258,7 +259,7 @@ public class Assets {
             //Base commodity entities
             for(String entity : Configuration.ALLOWENTITIES){
                 try {
-                    Assets.addAsset(entity, 3, Asset.metaData(Configuration.COLORHIGHLIGHT.value(), NamingUtil.nameCommodity(entity)));
+                    Assets.addAsset(world, entity, 3, Asset.metaData(Configuration.COLORHIGHLIGHT.value(), NamingUtil.nameCommodity(entity)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

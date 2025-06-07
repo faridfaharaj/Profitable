@@ -11,6 +11,7 @@ import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -75,20 +76,20 @@ public final class AssetExplorer extends ChestGUI {
                 , vectorSlotPosition(3, 5));
 
         long time = player.getWorld().getFullTime();
-        updateAssets(assetType, previousCache, time);
+        updateAssets(player.getWorld(), assetType, previousCache, time);
 
 
     }
 
-    private void updateAssets(int assetType, AssetCache[][] previousCache, long time) {
+    private void updateAssets(World world, int assetType, AssetCache[][] previousCache, long time) {
         Profitable.getfolialib().getScheduler().runAsync(task -> {
             page = 0;
             if(previousCache == null){
-                assetCache[assetType] = Candles.getAssetsNPrice(assetType, time).toArray(new AssetCache[0]);
+                assetCache[assetType] = Candles.getAssetsNPrice(world, assetType, time).toArray(new AssetCache[0]);
             }else {
                 assetCache = previousCache;
                 if(previousCache[assetType] == null){
-                    assetCache[assetType] = Candles.getAssetsNPrice(assetType, time).toArray(new AssetCache[0]);
+                    assetCache[assetType] = Candles.getAssetsNPrice(world, assetType, time).toArray(new AssetCache[0]);
                 }
             }
 
@@ -172,7 +173,7 @@ public final class AssetExplorer extends ChestGUI {
                             Map.entry("%category_list%", types)
             ));
             categoryButton.show(this);
-            updateAssets(assetType, assetCache, player.getWorld().getFullTime());
+            updateAssets(player.getWorld(), assetType, assetCache, player.getWorld().getFullTime());
         }
 
         if(pages > 0){

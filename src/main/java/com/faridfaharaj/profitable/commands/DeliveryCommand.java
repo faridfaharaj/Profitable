@@ -26,10 +26,6 @@ public class DeliveryCommand implements CommandExecutor {
 
         if(sender instanceof Player player){
 
-            if(Configuration.MULTIWORLD){
-                DataBase.universalUpdateWorld(sender);
-            }
-
             String account = Accounts.getAccount(player);
 
             if(args.length < 1){
@@ -40,8 +36,8 @@ public class DeliveryCommand implements CommandExecutor {
                 }
 
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
-                    Location entityDelivery = Accounts.getEntityDelivery(account);
-                    Location itemDelivery = Accounts.getItemDelivery(account);
+                    Location entityDelivery = Accounts.getEntityDelivery(player.getWorld(), account);
+                    Location itemDelivery = Accounts.getItemDelivery(player.getWorld(), account);
 
                     MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.display",
                             Map.entry("%i_position%", itemDelivery == null?"Not set":itemDelivery.toVector() + " (" + itemDelivery.getWorld().getName()+")"),
