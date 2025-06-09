@@ -3,13 +3,16 @@ package com.faridfaharaj.profitable.data.tables;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.ComEntity;
+import com.faridfaharaj.profitable.data.holderClasses.assets.ComItem;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
 import com.faridfaharaj.profitable.hooks.VaultHook;
-import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -46,19 +49,21 @@ public class Assets {
         return false;
     }
 
-    public static void addAsset(String ticker, int assetType, byte[] meta) {
+    public static void addAsset(Asset asset) {
         String sql = "INSERT " + (Profitable.getInstance().getConfig().getInt("database.database-type") == 0 ? "OR ": "") + "IGNORE INTO assets (world, asset_id, asset_type, meta) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
             stmt.setBytes(1, DataBase.getCurrentWorld());
-            stmt.setString(2, ticker);
-            stmt.setInt(3, assetType);
-            stmt.setBytes(4, meta);
+            stmt.setString(2, asset.getCode());
+            stmt.setInt(3, asset.getAssetType().getValue());
+            stmt.setBytes(4, asset.metaData());
 
             stmt.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -68,7 +73,7 @@ public class Assets {
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
 
             stmt.setString(1,updatedAsset.getCode());
-            stmt.setBytes(2, Asset.metaData(updatedAsset));
+            stmt.setBytes(2, updatedAsset.metaData());
             stmt.setBytes(3, DataBase.getCurrentWorld());
             stmt.setString(4, assetID);
 
@@ -94,40 +99,8 @@ public class Assets {
                 if (rs.next()){
 
                     byte[] meta = rs.getBytes("meta");
-                    TextColor color;
-                    String name;
 
-                    List<String> stringList = new ArrayList<>();
-                    List<Double> numericList = new ArrayList<>();
-
-                    try (ByteArrayInputStream bis = new ByteArrayInputStream(meta);
-                         DataInputStream dis = new DataInputStream(bis)) {
-
-                        color = TextColor.color(dis.readInt());
-                        name = dis.readUTF();
-
-
-                        int lengthStrings = dis.readInt();
-                        if(lengthStrings > 0){
-                            for(int i = 0; i<lengthStrings; i++){
-                                stringList.add(dis.readUTF());
-                            }
-                        }
-
-                        int lengthNumeric = dis.readInt();
-                        if(lengthNumeric > 0){
-                            for(int i = 0; i<lengthNumeric; i++){
-                                numericList.add(dis.readDouble());
-                            }
-                        }
-
-
-                    } catch (IOException e) {
-                        color = NamedTextColor.WHITE;
-                        name = assetID.toLowerCase();
-                    }
-
-                    return new Asset(assetID, rs.getInt("asset_type"), color, name, stringList, numericList);
+                    return Asset.assetFromMeta(assetID, Asset.AssetType.fromValue(rs.getInt("asset_type")), meta);
 
                 }
             }
@@ -150,29 +123,6 @@ public class Assets {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()){
                     assetsFound.add(rs.getString("asset_id"));
-                }
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return assetsFound;
-    }
-
-    public static List<Asset> getAssetFancyType(int type) {
-        String sql = "SELECT * FROM assets WHERE world = ? AND asset_type = ?;";
-
-        List<Asset> assetsFound = new ArrayList<>();
-        try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
-            stmt.setInt(2, type);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()){
-                    assetsFound.add(
-                        Asset.assetFromMeta(rs.getString("asset_id"), rs.getInt("asset_type"), rs.getBytes("meta"))
-                    );
                 }
             }
 
@@ -224,19 +174,11 @@ public class Assets {
         //Hooks asset generation----
         if(VaultHook.isConnected()){
             // Vault
-            try {
-                Assets.addAsset(VaultHook.getAsset().getCode(), 1, Asset.metaData(VaultHook.getAsset()));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            Assets.addAsset(VaultHook.getAsset());
         }
         if(PlayerPointsHook.isConnected()){
             // PlayerPoints
-            try {
-                Assets.addAsset(PlayerPointsHook.getAsset().getCode(), 1, Asset.metaData(PlayerPointsHook.getAsset()));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            Assets.addAsset(PlayerPointsHook.getAsset());
         }
 
         try{
@@ -248,20 +190,23 @@ public class Assets {
         if(Configuration.GENERATEASSETS){
             //Base commodity items
             for(String item : Configuration.ALLOWEITEMS){
-                try {
-                    Assets.addAsset(item, 2, Asset.metaData(Configuration.COLORHIGHLIGHT.value(), NamingUtil.nameCommodity(item)));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                Material material = Material.getMaterial(item);
+                if(material == null){
+                    continue;
                 }
+                Asset asset = new ComItem(item, Configuration.COLORHIGHLIGHT, NamingUtil.nameCommodity(item), new ItemStack(material));
+                Assets.addAsset(asset);
             }
 
             //Base commodity entities
             for(String entity : Configuration.ALLOWENTITIES){
-                try {
-                    Assets.addAsset(entity, 3, Asset.metaData(Configuration.COLORHIGHLIGHT.value(), NamingUtil.nameCommodity(entity)));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                Material material = Material.getMaterial(entity+"_SPAWN_EGG");
+                if(material == null){
+                    continue;
                 }
+                Asset asset = new ComEntity(entity, Configuration.COLORHIGHLIGHT, NamingUtil.nameCommodity(entity), new ItemStack(material));
+                Assets.addAsset(asset);
+
             }
         }
 

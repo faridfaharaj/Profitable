@@ -3,12 +3,9 @@ package com.faridfaharaj.profitable.data.tables;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
-import com.faridfaharaj.profitable.util.MessagingUtil;
-import com.faridfaharaj.profitable.util.NamingUtil;
-import net.kyori.adventure.text.Component;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -100,7 +97,7 @@ public class AccountHoldings {
                     byte[] meta = rs.getBytes("meta");
                     int iteratedType = rs.getInt("asset_type");
 
-                    Asset asset = Asset.assetFromMeta(assetCode, iteratedType, meta);
+                    Asset asset = Asset.assetFromMeta(assetCode, Asset.AssetType.fromValue(iteratedType), meta);
 
                     double quantity = rs.getDouble("quantity");
 

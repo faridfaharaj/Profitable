@@ -2,6 +2,7 @@ package com.faridfaharaj.profitable.tasks.gui.guis;
 
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
@@ -63,7 +64,7 @@ public final class GraphsMenu extends ChestGUI {
 
         if(slot == returnButton.getSlot()){
             player.closeInventory();
-            new AssetExplorer(player, 2, cache).openGui(player);
+            new AssetExplorer(player, Asset.AssetType.COMMODITY_ITEM, cache).openGui(player);
         }else if(slot == graph1MButton.getSlot()){
             player.closeInventory();
             MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.loading-graph"));

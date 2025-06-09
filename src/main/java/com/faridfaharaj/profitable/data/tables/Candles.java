@@ -4,7 +4,7 @@ package com.faridfaharaj.profitable.data.tables;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import net.kyori.adventure.text.Component;
@@ -145,7 +145,7 @@ public class Candles {
                     String assetID = rs.getString("asset_id");
 
                     if (!Objects.equals(assetID, Configuration.MAINCURRENCYASSET.getCode())) {
-                        int assetType = rs.getInt("asset_type");
+                        Asset.AssetType assetType = Asset.AssetType.fromValue(rs.getInt("asset_type"));
                         byte[] meta = rs.getBytes("meta");
 
                         Asset asset = Asset.assetFromMeta(assetID, assetType, meta);

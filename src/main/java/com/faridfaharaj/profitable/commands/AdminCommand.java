@@ -1,31 +1,10 @@
 package com.faridfaharaj.profitable.commands;
 
-import com.faridfaharaj.profitable.Configuration;
-import com.faridfaharaj.profitable.Profitable;
-import com.faridfaharaj.profitable.data.DataBase;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
-import com.faridfaharaj.profitable.data.holderClasses.Order;
-import com.faridfaharaj.profitable.data.tables.*;
-import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
-import com.faridfaharaj.profitable.hooks.VaultHook;
-import com.faridfaharaj.profitable.util.MessagingUtil;
-import com.faridfaharaj.profitable.util.NamingUtil;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.util.StringUtil;
 
-import java.io.IOException;
 import java.util.*;
 
 public class AdminCommand implements CommandExecutor {

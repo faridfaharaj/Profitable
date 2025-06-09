@@ -2,15 +2,13 @@ package com.faridfaharaj.profitable.tasks.gui.guis.orderBuilding;
 
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
-import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.QuantitySelectGui;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -27,7 +25,7 @@ public final class UnitsSelect extends QuantitySelectGui {
     AssetCache[][] assetCache;
     AssetCache assetData;
     public UnitsSelect(AssetCache[][] assetCache, AssetCache assetData, Order order, List<Order> bidOrders, List<Order> askOrders) {
-        super(Profitable.getLang().get("gui.order-building.units-select.title"), assetData.getAsset().getAssetType() != 2 && assetData.getAsset().getAssetType() != 3, assetData.getAsset().getAssetType() == 2 || assetData.getAsset().getAssetType() == 3, 1);
+        super(Profitable.getLang().get("gui.order-building.units-select.title"), assetData.getAsset().getAssetType() != Asset.AssetType.COMMODITY_ITEM && assetData.getAsset().getAssetType() != Asset.AssetType.COMMODITY_ENTITY, assetData.getAsset().getAssetType() == Asset.AssetType.COMMODITY_ITEM || assetData.getAsset().getAssetType() == Asset.AssetType.COMMODITY_ENTITY, 1);
         this.assetCache = assetCache;
         this.assetData = assetData;
 

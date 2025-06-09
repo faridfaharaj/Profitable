@@ -7,7 +7,7 @@ import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.data.tables.Candles;
 import com.faridfaharaj.profitable.data.tables.Orders;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.util.MessagingUtil;
@@ -41,7 +41,7 @@ public class Exchange {
         if(Configuration.PHYSICALDELIVERY){
             String assetTypeName = NamingUtil.nameType(tradedAsset.getAssetType());
 
-            if(tradedAsset.getAssetType() == 2){
+            if(tradedAsset.getAssetType() == Asset.AssetType.COMMODITY_ITEM){
                 if(!player.hasPermission("profitable.market.trade.asset.item")){
                     MessagingUtil.sendGenericMissingPerm(player);
                     return;
@@ -62,7 +62,7 @@ public class Exchange {
                 }
 
 
-            }else if(tradedAsset.getAssetType() == 3){
+            }else if(tradedAsset.getAssetType() == Asset.AssetType.COMMODITY_ENTITY){
                 if(!player.hasPermission("profitable.market.trade.asset.entity")){
                     MessagingUtil.sendGenericMissingPerm(player);
                     return;
@@ -92,7 +92,7 @@ public class Exchange {
 
         }
 
-        if(tradedAsset.getAssetType() == 2 || tradedAsset.getAssetType() == 3) order.setUnits((int) order.getUnits());
+        if(tradedAsset.getAssetType() == Asset.AssetType.COMMODITY_ITEM || tradedAsset.getAssetType() == Asset.AssetType.COMMODITY_ENTITY) order.setUnits((int) order.getUnits());
 
         if(order.getUnits() <= 0){
             MessagingUtil.sendGenericInvalidAmount(player, String.valueOf(order.getUnits()));
@@ -175,10 +175,10 @@ public class Exchange {
 
 
         double unitsTransacted = order.getUnits()-unitsMissing;
-        double takerFee = !Configuration.ASSETFEES[tradedAsset.getAssetType()][0].endsWith("%")? Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][0], 23): Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][0], moneyTransacted);
+        double takerFee = !Configuration.ASSETFEES[tradedAsset.getAssetType().getValue()][0].endsWith("%")? Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType().getValue()][0], 23): Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType().getValue()][0], moneyTransacted);
         double finalMoneyTransacted = moneyTransacted;
         Order finalPartialOrder = partialOrder;
-        Asset.chargeAndRun(player, collateralAsset, order.isSideBuy()?moneyTransacted+ takerFee :unitsTransacted, () -> {
+        collateralAsset.chargeAndRun(player, order.isSideBuy()?moneyTransacted+ takerFee :unitsTransacted, () -> {
             Profitable.getfolialib().getScheduler().runAsync(task -> {
                 List<Order> ordersToDelete = new ArrayList<>(orders);
                 if(finalPartialOrder != null){
@@ -201,14 +201,14 @@ public class Exchange {
         for(Order iteratedOrder:makerOrder){
             if(iteratedOrder.isSideBuy()){
 
-                Asset.distributeAsset(iteratedOrder.getOwner(), tradedAsset, iteratedOrder.getUnits());
+                tradedAsset.distributeAsset(iteratedOrder.getOwner(), iteratedOrder.getUnits());
                 //                                                                                                                            Paid on order placement --------v
                 sendTransactionNotice(iteratedOrder.getOwner(), true, tradedAsset, iteratedOrder.getUnits(), (iteratedOrder.getUnits()*iteratedOrder.getPrice()), 0);
 
             }else {
 
-                double makerFee = Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][1],iteratedOrder.getUnits()*iteratedOrder.getPrice());
-                Asset.distributeAsset(iteratedOrder.getOwner(), Configuration.MAINCURRENCYASSET, iteratedOrder.getUnits()*iteratedOrder.getPrice()-makerFee);
+                double makerFee = Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType().getValue()][1],iteratedOrder.getUnits()*iteratedOrder.getPrice());
+                Configuration.MAINCURRENCYASSET.distributeAsset(iteratedOrder.getOwner(), iteratedOrder.getUnits()*iteratedOrder.getPrice()-makerFee);
                 sendTransactionNotice(iteratedOrder.getOwner(), false, tradedAsset, iteratedOrder.getUnits(), (iteratedOrder.getUnits()*iteratedOrder.getPrice()), makerFee);
 
             }
@@ -229,7 +229,7 @@ public class Exchange {
 
         }
 
-        Asset.distributeAsset(takerOrder.getOwner(), takerOrder.isSideBuy()?tradedAsset:collateralAsset, takerOrder.isSideBuy()?unitsTransacted:moneyTransacted - takerFee);
+        (takerOrder.isSideBuy()?tradedAsset:collateralAsset).distributeAsset(takerOrder.getOwner(), takerOrder.isSideBuy()?unitsTransacted:moneyTransacted - takerFee);
         sendTransactionNotice(player, takerOrder.isSideBuy(), tradedAsset, unitsTransacted, moneyTransacted, takerFee);
     }
 
@@ -292,9 +292,9 @@ public class Exchange {
 
         // Collateral
         double cost = order.getPrice()*order.getUnits();
-        double makerFee = Configuration.parseFee(Configuration.ASSETFEES[tradedasset.getAssetType()][1], cost);
+        double makerFee = Configuration.parseFee(Configuration.ASSETFEES[tradedasset.getAssetType().getValue()][1], cost);
 
-        Asset.chargeAndRun(player, collateralAsset, order.isSideBuy()? cost+makerFee: order.getUnits(), () -> {
+        collateralAsset.chargeAndRun(player, order.isSideBuy()? cost+makerFee: order.getUnits(), () -> {
             // Insert
             Orders.insertOrder(UUID.randomUUID(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), order.getType());
 

@@ -1,7 +1,9 @@
 package com.faridfaharaj.profitable.hooks;
 
+import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
+import com.faridfaharaj.profitable.data.tables.Assets;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -26,7 +28,12 @@ public class VaultHook {
         }
 
         if(isConnected) {
-            ASSET = Asset.StringToCurrency(profitable.getConfig().getString("main-currency.vault-currency", "VLT_Vault Currency_#ffbb15"));
+            Asset asset = Assets.getAssetData(profitable.getConfig().getString("hooks.playerpoints.asset"));
+            if(asset == null){
+                ASSET = Configuration.MAINCURRENCYASSET;
+            }else {
+                ASSET = asset;
+            }
             profitable.getLogger().info("Connected to Vault");
         }
         return isConnected;

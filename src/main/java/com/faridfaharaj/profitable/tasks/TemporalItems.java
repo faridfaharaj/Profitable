@@ -3,7 +3,7 @@ package com.faridfaharaj.profitable.tasks;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.tables.Assets;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 
 import org.bukkit.Material;

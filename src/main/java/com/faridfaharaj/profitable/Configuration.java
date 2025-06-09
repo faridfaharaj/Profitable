@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable;
 
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Currency;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
 import com.faridfaharaj.profitable.util.RandomUtil;
@@ -11,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.IOException;
 import java.util.*;
@@ -266,8 +268,8 @@ public class Configuration {
                 color = RandomUtil.randomTextColor();
             }
 
-            MAINCURRENCYASSET = new Asset(MCdata[0], 1, color, name);
-            Assets.addAsset(MAINCURRENCYASSET.getCode(), 1, Asset.metaData(MAINCURRENCYASSET));
+            MAINCURRENCYASSET = new Currency(MCdata[0], color, name, new ItemStack(Material.EMERALD));
+            Assets.addAsset(MAINCURRENCYASSET);
         }else{
             MAINCURRENCYASSET = mainCurrency;
         }

@@ -1,12 +1,11 @@
 package com.faridfaharaj.profitable.util;
 
 import com.faridfaharaj.profitable.Profitable;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
 import org.bukkit.command.CommandSender;
@@ -38,6 +37,7 @@ public class MessagingUtil {
         Component component = Component.text("").append(Component.text(asset.getName(), asset.getColor())).appendNewline()
                 .append(Component.text(NamingUtil.nameType(asset.getAssetType()), NamedTextColor.BLUE));
 
+        /*
         if(!asset.getStringData().isEmpty()){
             component = component.appendNewline();
 
@@ -52,6 +52,8 @@ public class MessagingUtil {
                 component = component.append(Component.text(word)).appendSpace();
             }
         }
+
+         */
 
         return  component;
     }

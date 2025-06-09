@@ -2,6 +2,7 @@ package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.data.DataBase;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.tasks.gui.guis.AssetExplorer;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import org.bukkit.command.Command;
@@ -25,7 +26,7 @@ public class AssetsCommand implements CommandExecutor {
                 DataBase.universalUpdateWorld(sender);
             }
 
-            new AssetExplorer(player, 2, null).openGui(player);
+            new AssetExplorer(player, Asset.AssetType.COMMODITY_ITEM, null).openGui(player);
             return true;
         }else {
             MessagingUtil.sendGenericCantConsole(sender);

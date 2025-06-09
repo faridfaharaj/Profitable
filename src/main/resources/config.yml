@@ -231,6 +231,9 @@ main-currency: # setting for the currency used to trade on the exchange (This ca
   # Initial amount of Main Currency that new players will have on their wallets by default (other than 0 may devalue your currency, use only for initial supply)
   initial-balance: 0
 
-  # currency that will be deposited or withdrawn for every hook
-  vault-currency: VLT_Vault Currency_#ffbb15
-  playerpoints-currency: PTS_Player Points_#ff6d92
+hooks:
+  # Asset that will be deposited or withdrawn for every hook
+  vault:
+    asset: EMD
+  playerpoints:
+    asset: EMD
