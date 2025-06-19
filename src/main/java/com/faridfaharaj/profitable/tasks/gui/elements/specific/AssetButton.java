@@ -58,7 +58,7 @@ public final class AssetButton extends GuiElement {
         setLore(Profitable.getLang().langToLore("gui.asset-explorer.buttons.asset.lore",
 
                 Map.entry("%asset_category%", NamingUtil.nameType(assetData.getAsset().getAssetType())),
-                Map.entry("%asset_name%", assetData.getAsset().getName()),
+                Map.entry("%asset_name%", "<color:"+assetData.getAsset().getColor().asHexString() + ">"+assetData.getAsset().getName() + "</color>"),
                 Map.entry("%volume%", MessagingUtil.formatVolume(volume)),
                 Map.entry("%open_price%", String.valueOf(open)),
                 Map.entry("%range_low%", String.valueOf(assetData.getlastCandle().getLow())),

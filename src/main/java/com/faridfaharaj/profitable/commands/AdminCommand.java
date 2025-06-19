@@ -238,7 +238,7 @@ public class AdminCommand implements CommandExecutor {
 
                             Asset asset = Assets.getAssetData(args[2]);
                             if(asset == null){
-                                MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("assets.error.asset-not-found"));
+                                MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("assets.error.asset-not-found", Map.entry("%asset%", args[2])));
                                 return true;
                             }
                             if(Assets.deleteAsset(args[2])){
@@ -975,11 +975,11 @@ public class AdminCommand implements CommandExecutor {
                         }
 
                         if(args.length == 5){
-                            suggestions = List.of("[<Name>]");
+                            suggestions = List.of("[<Hex Color>]");
                         }
 
-                        if(args.length == 6){
-                            suggestions = List.of("[<Hex Color>]");
+                        if(args.length >= 6){
+                            suggestions = List.of("[<Name_word_"+(args.length-5)+">]");
                         }
 
                     }
