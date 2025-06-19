@@ -34,7 +34,7 @@ public class Accounts {
         return currentAccounts.computeIfAbsent(player.getUniqueId(),
                 k -> {
             String uuidString = k.toString();
-            registerDefaultAccount(uuidString);
+            registerDefaultAccount(player.getWorld(), uuidString);
             MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("account.login",
                     Map.entry("%account%", "Default account")
                     ));
@@ -65,7 +65,7 @@ public class Accounts {
 
     }
 
-    public static boolean registerAccount(String name, String password) {
+    public static boolean registerAccount(World world, String name, String password) {
         String sql = "INSERT INTO accounts (world ,account_name, password, salt, item_delivery_pos, entity_delivery_pos, entity_claim_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         int claimid = nextClaimID();
@@ -74,7 +74,7 @@ public class Accounts {
 
             byte[][] hashedpassword = hashPassword(password);
 
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, name);
             stmt.setBytes(3, hashedpassword[0]);
             stmt.setBytes(4, hashedpassword[1]);
@@ -95,14 +95,14 @@ public class Accounts {
         return false;
     }
 
-    public static boolean registerDefaultAccount(String name) {
+    public static boolean registerDefaultAccount(World world, String name) {
         String sql = "INSERT " + (Profitable.getInstance().getConfig().getInt("database.database-type") == 0 ? "OR ": "") + "IGNORE INTO accounts (world, account_name, password, salt, item_delivery_pos, entity_delivery_pos, entity_claim_id) VALUES (? ,?, ?, ?, ?, ?, ?)";
 
         int claimid = nextClaimID();
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
 
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, name);
             stmt.setString(3, "un-passwordable");
             stmt.setString(4, "password1234");
@@ -115,7 +115,7 @@ public class Accounts {
             if(stmt.executeUpdate() > 0){
                 double initialBalance = Profitable.getInstance().getConfig().getDouble("main-currency.initial-balance");
                 if(initialBalance > 0){
-                    AccountHoldings.setHolding(name, Configuration.MAINCURRENCYASSET.getCode(), initialBalance);
+                    AccountHoldings.setHolding(world, name, Configuration.MAINCURRENCYASSET.getCode(), initialBalance);
                 }
             }
 
@@ -128,12 +128,12 @@ public class Accounts {
         return false;
     }
 
-    public static Map.Entry<byte[], byte[]> getPasswordHash(String name){
+    public static Map.Entry<byte[], byte[]> getPasswordHash(World world, String name){
 
         String sql = "SELECT * FROM accounts WHERE world = ? AND account_name = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, name);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -156,7 +156,7 @@ public class Accounts {
 
     }
 
-    public static boolean changePassword(String name, String password) {
+    public static boolean changePassword(World world, String name, String password) {
         String sql = "UPDATE accounts SET password = ?, salt = ? WHERE world = ? AND account_name = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
@@ -166,7 +166,7 @@ public class Accounts {
             stmt.setBytes(1, hashedpassword[0]);
             stmt.setBytes(2, hashedpassword[1]);
 
-            stmt.setBytes(3, DataBase.getCurrentWorld());
+            stmt.setBytes(3, MessagingUtil.getWorldId(world));
             stmt.setString(4, name);
 
             return stmt.executeUpdate() > 0;
@@ -178,7 +178,7 @@ public class Accounts {
         return false;
     }
 
-    public static boolean changeItemDelivery(String name, Location location) {
+    public static boolean changeItemDelivery(World world, String name, Location location) {
 
         String sql = "UPDATE accounts SET item_delivery_pos = ? WHERE world = ? AND account_name = ?;";
 
@@ -186,7 +186,7 @@ public class Accounts {
 
             stmt.setBytes(1, encodeLocation(location));
 
-            stmt.setBytes(2, DataBase.getCurrentWorld());
+            stmt.setBytes(2, MessagingUtil.getWorldId(world));
             stmt.setString(3, name);
 
             return stmt.executeUpdate() > 0;
@@ -200,14 +200,14 @@ public class Accounts {
         return false;
     }
 
-    public static boolean changeEntityDelivery(String name, Location location) {
+    public static boolean changeEntityDelivery(World world, String name, Location location) {
         String sql = "UPDATE accounts SET entity_delivery_pos = ? WHERE world = ? AND account_name = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
 
             stmt.setBytes(1, encodeLocation(location));
 
-            stmt.setBytes(2, DataBase.getCurrentWorld());
+            stmt.setBytes(2, MessagingUtil.getWorldId(world));
             stmt.setString(3, name);
 
             return stmt.executeUpdate() > 0;
@@ -221,11 +221,11 @@ public class Accounts {
         return false;
     }
 
-    public static String getEntityClaimId(String name) {
+    public static String getEntityClaimId(World world, String name) {
         String sql = "SELECT * FROM accounts WHERE world = ? AND account_name = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, name);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -243,11 +243,11 @@ public class Accounts {
         return null;
     }
 
-    public static Location getItemDelivery(String name) {
+    public static Location getItemDelivery(World world, String name) {
         String sql = "SELECT * FROM accounts WHERE world = ? AND account_name = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, name);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -271,11 +271,11 @@ public class Accounts {
         return null;
     }
 
-    public static Location getEntityDelivery(String name) {
+    public static Location getEntityDelivery(World world, String name) {
         String sql = "SELECT * FROM accounts WHERE world = ? AND account_name = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, name);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -299,11 +299,11 @@ public class Accounts {
         return null;
     }
 
-    public static boolean deleteAccount(String asset) {
+    public static boolean deleteAccount(World world, String asset) {
         String sql = "DELETE FROM accounts WHERE world = ? AND account_name = ?;";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
-            stmt.setBytes(1, DataBase.getCurrentWorld());
+            stmt.setBytes(1, MessagingUtil.getWorldId(world));
             stmt.setString(2, asset);
             int affected = stmt.executeUpdate();
 
@@ -319,18 +319,18 @@ public class Accounts {
         currentAccounts.remove(playerid);
     }
 
-    public static boolean logIn(UUID playerid, String name, String password){
+    public static boolean logIn(Player player, String name, String password){
 
-        if(comparePasswords(name, password)){
-            currentAccounts.put(playerid, name);
+        if(comparePasswords(player.getWorld(), name, password)){
+            currentAccounts.put(player.getUniqueId(), name);
             return true;
         }
 
         return false;
     }
 
-    public static boolean comparePasswords(String name, String password){
-        Map.Entry<byte[], byte[]> hashedpassword  = getPasswordHash(name);
+    public static boolean comparePasswords(World world, String name, String password){
+        Map.Entry<byte[], byte[]> hashedpassword  = getPasswordHash(world, name);
 
         if(hashedpassword == null){
             return false;

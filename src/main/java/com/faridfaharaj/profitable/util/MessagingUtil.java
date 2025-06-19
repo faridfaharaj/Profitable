@@ -1,5 +1,6 @@
 package com.faridfaharaj.profitable.util;
 
+import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import net.kyori.adventure.text.Component;
@@ -8,11 +9,13 @@ import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.md_5.bungee.chat.ComponentSerializer;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.UUID;
@@ -138,6 +141,25 @@ public class MessagingUtil {
         MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("generic.error.invalid-subcommand",
                 Map.entry("%sub_command%", subCommand)
         ));
+    }
+
+    public static byte[] getWorldId(World world) {
+        try{
+            UUID uuid = world.getUID();
+
+            if(Configuration.MULTIWORLD){
+                ByteBuffer buffer = ByteBuffer.allocate(16);
+
+                buffer.putLong(uuid.getMostSignificantBits());
+                buffer.putLong(uuid.getLeastSignificantBits());
+
+                return buffer.array();
+            }else {
+                return "_____server_____".getBytes(StandardCharsets.US_ASCII);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static byte[] UUIDtoBytes(UUID uuid) throws IOException {

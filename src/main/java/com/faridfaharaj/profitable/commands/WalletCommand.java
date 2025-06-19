@@ -34,10 +34,6 @@ public class WalletCommand implements CommandExecutor {
                 return true;
             }
 
-            if(Configuration.MULTIWORLD){
-                DataBase.universalUpdateWorld(sender);
-            }
-
             if(args.length == 0){
 
                 new HoldingsMenu(player, null).openGui(player);
@@ -55,7 +51,7 @@ public class WalletCommand implements CommandExecutor {
                     assetid = args[1].toUpperCase();
                 }
 
-                Asset asset = Assets.getAssetData(assetid);
+                Asset asset = Assets.getAssetData(player.getWorld(), assetid);
 
                 if(asset == null){
                     MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("assets.error.asset-not-found",
@@ -99,7 +95,7 @@ public class WalletCommand implements CommandExecutor {
                     assetid = args[1].toUpperCase();
                 }
 
-                Asset asset = Assets.getAssetData(assetid);
+                Asset asset = Assets.getAssetData(player.getWorld(), assetid);
 
                 if(asset == null){
                     MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("assets.error.asset-not-found",
@@ -287,7 +283,7 @@ public class WalletCommand implements CommandExecutor {
 
                 Profitable.getfolialib().getScheduler().runAsync(async -> {
                     String account = Accounts.getAccount(player);
-                    double balance = AccountHoldings.getAccountAssetBalance(account, asset.getCode());
+                    double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
                     if(asset.retrieveBalance(account, balance, ammount)){
                         Profitable.getfolialib().getScheduler().runNextTick(global -> {
                             EconomyResponse es = VaultHook.getEconomy().depositPlayer(player, ammount);
@@ -317,7 +313,7 @@ public class WalletCommand implements CommandExecutor {
                 }
                 Profitable.getfolialib().getScheduler().runAsync(async -> {
                     String account = Accounts.getAccount(player);
-                    double balance = AccountHoldings.getAccountAssetBalance(account, asset.getCode());
+                    double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
                     if(asset.retrieveBalance(account, balance, ammount)){
                         Profitable.getfolialib().getScheduler().runNextTick(global -> {
                             double ceilFee = Math.ceil(fee);
@@ -343,7 +339,7 @@ public class WalletCommand implements CommandExecutor {
         if(asset.getAssetType() == Asset.AssetType.COMMODITY_ENTITY){
 
             String account = Accounts.getAccount(player);
-            double balance = AccountHoldings.getAccountAssetBalance(account, asset.getCode());
+            double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
             if(asset.retrieveBalance(account, balance, ammount)){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     ((ComEntity)asset).sendCommodityEntityToPlayer(player, account, (int) ammount);
@@ -361,12 +357,13 @@ public class WalletCommand implements CommandExecutor {
         if(asset.getAssetType() == Asset.AssetType.COMMODITY_ITEM){
 
             String account = Accounts.getAccount(player);
-            double balance = AccountHoldings.getAccountAssetBalance(account, asset.getCode());
+            double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
             if(asset.retrieveBalance(account, balance, ammount)){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     ((ComItem)asset).giveItemToPlayer(player, (int) ammount);
                     MessagingUtil.sendPaymentNotice(player, ammount, 0, asset);
                 });
+                return;
             }else {
                 MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
                         Map.entry("%asset%", asset.getCode())

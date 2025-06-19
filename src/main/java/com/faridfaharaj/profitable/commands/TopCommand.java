@@ -22,9 +22,6 @@ public class TopCommand  implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
 
-        if(Configuration.MULTIWORLD){
-            DataBase.universalUpdateWorld(sender);
-        }
         if(sender instanceof Player player){
 
             if(!sender.hasPermission("profitable.asset.tops")){
@@ -35,7 +32,7 @@ public class TopCommand  implements CommandExecutor {
             if(args.length == 0 || args[0].equals("HOT")){
 
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
-                    Component assetsComponent = Candles.getHotAssets(player.getWorld().getFullTime(), 0);
+                    Component assetsComponent = Candles.getHotAssets(player.getWorld(), 0);
                     MessagingUtil.sendComponentMessage(player,
 
                             Component.text("=========== [ HOT Assets ] ===========", TextColor.color(0xFF7C1E)).appendNewline().append(assetsComponent)
@@ -45,7 +42,7 @@ public class TopCommand  implements CommandExecutor {
 
             }else if(args[0].equals("LIQUID")){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
-                    Component assetsComponent = Candles.getHotAssets(player.getWorld().getFullTime(), 2);
+                    Component assetsComponent = Candles.getHotAssets(player.getWorld(), 2);
                     MessagingUtil.sendComponentMessage(player,
 
                             Component.text("========== [ Liquid Assets ] ==========", TextColor.color(0x2BCCFF)).appendNewline().append(assetsComponent)
@@ -55,7 +52,7 @@ public class TopCommand  implements CommandExecutor {
 
             }else if(args[0].equals("GROW")){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
-                    Component assetsComponent = Candles.getHotAssets(player.getWorld().getFullTime(), 1);
+                    Component assetsComponent = Candles.getHotAssets(player.getWorld(), 1);
                     MessagingUtil.sendComponentMessage(player,
 
                             Component.text("========= [ Growing Assets ] =========", TextColor.color(0xFF7A)).appendNewline().append(assetsComponent)
@@ -65,7 +62,7 @@ public class TopCommand  implements CommandExecutor {
 
             }else if(args[0].equals("BIG")){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
-                    Component assetsComponent = Candles.getHotAssets(player.getWorld().getFullTime(), 3);
+                    Component assetsComponent = Candles.getHotAssets(player.getWorld(), 3);
                     MessagingUtil.sendComponentMessage(player,
 
                             Component.text("========= [ Biggest Assets ] =========", TextColor.color(0xFFCA00)).appendNewline().append(assetsComponent)

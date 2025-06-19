@@ -20,10 +20,6 @@ public class OrdersCommand  implements CommandExecutor {
 
         if(sender instanceof Player player){
 
-            if(Configuration.MULTIWORLD){
-                DataBase.universalUpdateWorld(sender);
-            }
-
             new UserOrdersGui(player, null).openGui(player);
 
         }else{

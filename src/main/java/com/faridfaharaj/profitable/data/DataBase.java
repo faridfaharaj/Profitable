@@ -22,11 +22,6 @@ import java.util.zip.ZipInputStream;
 public class DataBase {
 
     private static Connection connection;
-    private static byte[] currentWorldid;
-
-    static {
-        currentWorldid = "_____server_____".getBytes(StandardCharsets.US_ASCII);
-    }
 
     public static void connectMySQL() throws SQLException{
 
@@ -80,29 +75,11 @@ public class DataBase {
     }
 
     // Get the current world id
-    public static byte[] getCurrentWorld() {
+    /*public static byte[] getCurrentWorld() {
         return currentWorldid;
     }
 
-    //update world
-    public static void updateWorld(World world) throws IOException {
-        currentWorldid = MessagingUtil.UUIDtoBytes(world.getUID());
-    }
-
-    public static void universalUpdateWorld(CommandSender sender) {
-        World world;
-        if(sender instanceof Player player){
-            world = player.getWorld();
-        }else {
-            world = Profitable.getInstance().getServer().getWorlds().getFirst();
-        }
-
-        try {
-            updateWorld(world);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+     */
 
     public static void migrateDatabase(Connection connection) throws IOException {
         Profitable.getInstance().getLogger().info("Migrating database...");

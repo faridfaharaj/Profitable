@@ -54,11 +54,11 @@ public class MapGraphRenderer extends MapRenderer {
         List<Candle> candles;
 
         if (time > 5376000) {
-            candles = Candles.getInterval(asset, player.getWorld().getFullTime()/720000*720000-time, 2);
+            candles = Candles.getInterval(player.getWorld(), asset, player.getWorld().getFullTime()/720000*720000-time, 2);
         }else if(time > 768000){
-            candles = Candles.getInterval(asset, player.getWorld().getFullTime()/168000*168000-time, 1);
+            candles = Candles.getInterval(player.getWorld(), asset, player.getWorld().getFullTime()/168000*168000-time, 1);
         } else{
-            candles = Candles.getInterval(asset, player.getWorld().getFullTime()/24000*24000-time, 0);
+            candles = Candles.getInterval(player.getWorld(), asset, player.getWorld().getFullTime()/24000*24000-time, 0);
         }
 
         if(candles.size() <= 1){

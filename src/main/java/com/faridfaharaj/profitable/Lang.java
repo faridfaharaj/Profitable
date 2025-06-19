@@ -29,8 +29,11 @@ public class Lang {
     }
 
     public void saveDefaultLangFiles() {
-        for(String langCode : langCodes){
-            plugin.saveResource("lang/" + langCode + ".yml", false);
+        for (String langCode : langCodes) {
+            File file = new File(plugin.getDataFolder(), "lang/" + langCode + ".yml");
+            if (!file.exists()) {
+                plugin.saveResource("lang/" + langCode + ".yml", false);
+            }
         }
     }
 

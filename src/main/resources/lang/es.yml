@@ -45,11 +45,11 @@ exchange:
   buying-notice: "<gray><red>Vendido</red> %base_asset_amount% por %quote_asset_amount%</gray>"
   new-order-notice: "<gray>Nueva %side% %order_type% de %base_asset_amount% por %quote_asset_amount% c/u</gray>"
   loading-order: "<gray>Procesando orden...</gray>"
-  claim-fee-notice: "Comisión por reclamar es de %fee_asset_amount% por entidad"
+  claim-fee-notice: "La comisión para reclamar es de %fee_asset_amount% por entidad"
   warning:
-    partial-fill: "<yellow>Orden parcialmente completada</yellow>"
+    partial-fill: "<yellow>Tu orden fue parcialmente completada</yellow>"
     partial-fill-low-liquidity: "<yellow>Parcialmente completada porque no hay más órdenes disponibles</yellow>"
-    fee-higher-than-profit: "<yellow>¡Esta orden vale menos que la comisión (%fee_asset_amount%), no habrá ganancia!</yellow>"
+    fee-higher-than-profit: "<yellow>¡Esta orden vale menos que su comisión (%fee_asset_amount%), no habrá ganancia!</yellow>"
   error:
     invalid-order-type: "<red>Tipo de orden inválido</red>"
     identical-assets: "<red>Debes intercambiar entre dos activos diferentes</red>"
@@ -60,8 +60,8 @@ exchange:
 
 assets:
   amount-display: "%amount% %asset%"
-  auto-deposit-notice: "Depositado automáticamente %asset_amount% <red>(+ comisiones)</red>"
-  entity-claim-notice: "Reclamado %entity% usando %asset_amount%"
+  auto-deposit-notice: "Se ha depositado %asset_amount% <red>(+ comisiones)</red> automáticamente"
+  entity-claim-notice: "Haz reclamado %entity% usando %asset_amount%"
   loading-graph: "Cargando gráfico..."
   categories:
     forex: "Divisas"
@@ -79,7 +79,7 @@ assets:
     minimum-deposit: "<red>No se puede depositar menos de %asset_amount%</red>"
     not-depositable: "<red>No se puede depositar ni retirar %asset%</red>"
     not-enough-asset: "<red>No tienes suficiente %asset%</red>"
-    cant-reclaim-entity: "<red>No se pueden reclamar entidades propias</red>"
+    cant-reclaim-entity: "<red>No se pueden reclamar entidades con dueño</red>"
     cant-claim-entity: "<red>No está permitido poseer esta entidad</red>"
 
 delivery:

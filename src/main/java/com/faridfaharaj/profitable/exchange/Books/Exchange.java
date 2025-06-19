@@ -30,7 +30,7 @@ public class Exchange {
             return;
         }
 
-        Asset tradedAsset = Assets.getAssetData(order.getAsset());
+        Asset tradedAsset = Assets.getAssetData(player.getWorld(), order.getAsset());
         if(tradedAsset == null){
             MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.asset-not-found",
                     Map.entry("%asset%", order.getAsset())
@@ -46,7 +46,7 @@ public class Exchange {
                     MessagingUtil.sendGenericMissingPerm(player);
                     return;
                 }
-                if(Accounts.getItemDelivery(order.getOwner()) == null){
+                if(Accounts.getItemDelivery(player.getWorld(), order.getOwner()) == null){
                     MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.error.missing-item-delivery"));
                     System.out.println(
 
@@ -67,7 +67,7 @@ public class Exchange {
                     MessagingUtil.sendGenericMissingPerm(player);
                     return;
                 }
-                if(Accounts.getEntityDelivery(order.getOwner()) == null){
+                if(Accounts.getEntityDelivery(player.getWorld(), order.getOwner()) == null){
                     MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.error.missing-entity-delivery"));
 
                     System.out.println(
@@ -109,7 +109,7 @@ public class Exchange {
         // Stop orders
         Asset collateralAsset = order.isSideBuy()? Configuration.MAINCURRENCYASSET: tradedAsset;
 
-        Candle lastday = Candles.getLastDay(tradedAsset.getCode(), player.getWorld().getFullTime());
+        Candle lastday = Candles.getLastDay(player.getWorld() ,tradedAsset.getCode(), player.getWorld().getFullTime());
         if(order.getType() == Order.OrderType.STOP_LIMIT){
 
             if(order.isSideBuy()?lastday.getClose() >= order.getPrice(): lastday.getClose() <= order.getPrice()){
@@ -129,7 +129,7 @@ public class Exchange {
         }
 
         //lookup
-        List<Order> orders = Orders.getBestOrders(order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits());
+        List<Order> orders = Orders.getBestOrders(player.getWorld(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits());
         //no matches
         if(orders.isEmpty()){
 
@@ -183,14 +183,14 @@ public class Exchange {
                 List<Order> ordersToDelete = new ArrayList<>(orders);
                 if(finalPartialOrder != null){
 
-                    Orders.updateOrderUnits(finalPartialOrder.getUuid(), finalPartialOrder.getUnits());
+                    Orders.updateOrderUnits(player.getWorld(), finalPartialOrder.getUuid(), finalPartialOrder.getUnits());
                     ordersToDelete.removeLast();
 
                 }
                 wrapTransactions(player, order, orders, takerFee, tradedAsset, collateralAsset, finalMoneyTransacted, unitsTransacted);
-                Candles.updateDay(tradedAsset.getCode(), player.getWorld(), orders.getLast().getPrice(), unitsTransacted);
-                Orders.updateStopLimit(lastday.getClose(), orders.getLast().getPrice());
-                Orders.deleteOrders(ordersToDelete);
+                Candles.updateDay(player.getWorld(), tradedAsset.getCode(), orders.getLast().getPrice(), unitsTransacted);
+                Orders.updateStopLimit(player.getWorld(), lastday.getClose(), orders.getLast().getPrice());
+                Orders.deleteOrders(player.getWorld(), ordersToDelete);
             });
         });
 
@@ -296,7 +296,7 @@ public class Exchange {
 
         collateralAsset.chargeAndRun(player, order.isSideBuy()? cost+makerFee: order.getUnits(), () -> {
             // Insert
-            Orders.insertOrder(UUID.randomUUID(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), order.getType());
+            Orders.insertOrder(player.getWorld(), UUID.randomUUID(), order.getOwner(), order.getAsset(), order.isSideBuy(), order.getPrice(), order.getUnits(), order.getType());
 
             // Feedback
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> player.playSound(player, Sound.ITEM_BOOK_PAGE_TURN, 1 , 1));

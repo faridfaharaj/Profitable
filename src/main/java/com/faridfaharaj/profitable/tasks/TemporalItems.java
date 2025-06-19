@@ -96,7 +96,7 @@ public class TemporalItems {
             return;
         }
 
-        Asset asset = Assets.getAssetData(assetid);
+        Asset asset = Assets.getAssetData(player.getWorld(), assetid);
 
         if(asset == null){
             MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.asset-not-found",
