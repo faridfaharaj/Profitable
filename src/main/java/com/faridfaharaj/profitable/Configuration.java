@@ -172,14 +172,6 @@ public class Configuration {
         ALLOWEDCOMMODITYCOLLATERAL[1] = config.getBoolean("exchange.commodities.take-inventory");
         ALLOWEDCOMMODITYCOLLATERAL[2] = config.getBoolean("exchange.commodities.take-world");
 
-        // hooks
-        if(VaultHook.inithook(profitable)){
-            HOOKED = true;
-        }
-        if(PlayerPointsHook.initHook(profitable)){
-            HOOKED = true;
-        }
-
         // Colors
         COLORBULLISH = TextColor.fromHexString(config.getString("colors.bullish", "#8CD740"));
         COLORBEARISH = TextColor.fromHexString(config.getString("colors.bearish", "#FA413B"));

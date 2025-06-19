@@ -177,6 +177,9 @@ public class Assets {
             throw new RuntimeException(e);
         }
 
+        VaultHook.inithook(Profitable.getInstance());
+        PlayerPointsHook.initHook(Profitable.getInstance());
+
         //Hooks asset generation----
         if(VaultHook.isConnected()){
             // Vault
