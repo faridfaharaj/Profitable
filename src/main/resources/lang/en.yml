@@ -77,7 +77,7 @@ assets:
     commodity-item: "Commodity (item)"
     commodity-entity: "Commodity (entity)"
   error:
-    asset-not-found: "<red>Cannot trade %asset% here</red>"
+    asset-not-found: "<red>Asset %asset% isn't traded here</red>"
     cant-fractional: "<red>Asset %asset% cant be fractional</red>"
     minimum-deposit: "<red>Cannot deposit less than %asset_amount%</red>"
     not-depositable: "<red>Cannot deposit or withdraw %asset%</red>"
@@ -91,12 +91,60 @@ delivery:
   updated-entity: "<gray>Updated entity delivery to: <yellow>%position%</yellow></gray>"
   error:
     items-must-be-container: "<red>Item delivery location must be a container</red>"
-    missing-item-delivery:
-    missing-entity-delivery:
+    missing-item-delivery: "<red>You must set an item delivery first!</red>"
+    missing-entity-delivery: "<red>You must set an entity delivery first!</red>"
 
 hooks:
   error:
     insufficient-funds: "Insufficient funds"
+
+admin:
+  reload-config:
+    reloaded: "<gray>Successfully reloaded config file (Some properties require restarting)</gray>"
+  assets:
+    add:
+      success: "<gray>Registered new %asset_type% asset %asset%</gray>"
+      failure: "<red>There is already an asset with code %asset%</red>"
+      error:
+        entity-name-unmatch: "<red>Symbol must match an existing entity name when adding CommodityEntity</red>"
+        invalid-asset-type: "<red>Invalid asset type %type%</red>"
+    from-id:
+      new-transaction:
+        success: "<gray>inserted transaction for %asset%</gray>"
+        failure: "<red>Could not insert transaction on %asset%</red>"
+      resettransactions:
+        success: "<gray>wiped all %asset%'s transactions</gray>"
+      delete:
+        success: "<red>DELETED %asset%</red>"
+        failure: "<red>Couldnt delete that asset</red>"
+        error:
+          confirmation-fail: "<red>Assets don't match</red>"
+          its-main-currency: "<red>Cannot delete main currency</red>"
+  orders:
+    title: "<gray>Showing all active orders in asset %asset%</gray>"
+    cancel-button: "Cancel"
+    delete-all: "<red>DELETED all orders from all assets</red>"
+    cancel-all: "<gray>Canceled all orders from all assets</gray>"
+  get-player-account:
+    player-not-found: "<red>%player% isn't online</red>"
+    display: "<gray>%player%'s active account is %account%</gray>"
+  account:
+    set:
+      success: "<gray>Set %asset% to %amount% on %account%'s wallet</gray>"
+      failure: "<red>Could not set %asset% on %account%</red>"
+    delete:
+      success: "<red>DELETED account %account%</red>"
+      failure: "<red>Couldnt delete account %account%</red>"
+      error:
+        confirmation-fail: "<red>Accounts don't match</red>"
+    password-reset:
+      success: "%account%'s password was set to '1234' for recovery"
+      failure: "couldn't find account %account%"
+
+
+
+
+
 
 
 gui:

@@ -161,10 +161,7 @@ public final class AssetExplorer extends ChestGUI {
         }
 
         if(categoryButton.getSlot() == slot){
-            assetType = Asset.AssetType.fromValue(assetType.getValue() + 1);
-            if(assetType.getValue() >= 4){
-                assetType = Asset.AssetType.fromValue(1);
-            }
+            assetType = Asset.AssetType.fromValue(assetType.getValue() == 3? 1: assetType.getValue()+1);
 
             String types = "<white>♦ </white><color:" + (assetType == Asset.AssetType.CURRENCY? NamedTextColor.WHITE.asHexString():NamedTextColor.GRAY.asHexString()) + ">" + Profitable.getLang().getString("assets.categories.forex") + "</color>%&new_line&%" +
                     "<green>♦ </green><color:" + (assetType == Asset.AssetType.COMMODITY_ITEM? NamedTextColor.GREEN.asHexString():NamedTextColor.GRAY.asHexString()) + ">" + Profitable.getLang().getString("assets.categories.commodity-item") + "</color>%&new_line&%" +

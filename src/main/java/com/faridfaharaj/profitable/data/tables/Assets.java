@@ -24,19 +24,15 @@ import java.util.*;
 
 public class Assets {
 
-    public static boolean registerAsset(String symbol, int assetType, byte[] meta) {
-
-        if(Objects.equals(symbol, VaultHook.getAsset().getCode())){
-            return false;
-        }
+    public static boolean registerAsset(Asset asset) {
 
         String sql = "INSERT INTO assets (world, asset_id, asset_type, meta) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement stmt = DataBase.getConnection().prepareStatement(sql)) {
             stmt.setBytes(1, DataBase.getCurrentWorld());
-            stmt.setString(2, symbol);
-            stmt.setInt(3, assetType);
-            stmt.setBytes(4, meta);
+            stmt.setString(2, asset.getCode());
+            stmt.setInt(3, asset.getAssetType().getValue());
+            stmt.setBytes(4, asset.metaData());
 
             stmt.executeUpdate();
 
@@ -44,6 +40,8 @@ public class Assets {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         return false;

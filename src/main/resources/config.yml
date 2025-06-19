@@ -47,7 +47,7 @@ exchange:
       entity-claiming-fees: 0
 
     # Commodities spawn on account's delivery location when transacting (commodities are added to wallet when false)
-    physical-delivery: true
+    physical-delivery: false
 
     # Allow taking commodities from your wallet for transactions
     take-wallet: true

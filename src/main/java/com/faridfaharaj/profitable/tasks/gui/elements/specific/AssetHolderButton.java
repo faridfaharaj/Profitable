@@ -32,12 +32,9 @@ public final class AssetHolderButton extends GuiElement {
             this.asset = assetButtonData.getAsset();
             this.lastestDay = assetButtonData.getlastCandle();
 
-            if(asset.getAssetType() == Asset.AssetType.COMMODITY_ITEM){
-                this.display = new ItemStack(Material.getMaterial(asset.getCode()));
-            }if(asset.getAssetType() == Asset.AssetType.COMMODITY_ENTITY){
-                this.display = new ItemStack(Material.getMaterial(asset.getCode()+"_SPAWN_EGG"));
-            }if(asset.getAssetType() == Asset.AssetType.CURRENCY) {
-                this.display = new ItemStack(Material.EMERALD);
+            this.display = assetButtonData.getAsset().getStack();
+
+            if(asset.getAssetType() == Asset.AssetType.CURRENCY) {
                 ItemMeta meta = this.display.getItemMeta();
                 meta.setEnchantmentGlintOverride(true);
                 this.display.setItemMeta(meta);

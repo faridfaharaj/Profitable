@@ -7,6 +7,7 @@ import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
 import com.faridfaharaj.profitable.hooks.VaultHook;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -17,6 +18,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
+import org.json.simple.JSONObject;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -93,9 +97,9 @@ public abstract class Asset {
             dos.writeInt(getColor().value());
             dos.writeUTF(getName());
 
-            Map<String, Object> map = stack.serialize();
-            String json = GsonComponentSerializer.gson().serializer().toJson(map);
-            dos.writeUTF(json);
+            try (BukkitObjectOutputStream boos = new BukkitObjectOutputStream(dos)) {
+                boos.writeObject(stack);
+            }
 
             return bos.toByteArray();
         }
@@ -105,7 +109,6 @@ public abstract class Asset {
         TextColor color;
         String name;
         ItemStack stack;
-        String desc;
 
         try (ByteArrayInputStream bis = new ByteArrayInputStream(meta);
              DataInputStream dis = new DataInputStream(bis)) {
@@ -113,16 +116,14 @@ public abstract class Asset {
             color = TextColor.color(dis.readInt());
             name = dis.readUTF();
 
-            String json = dis.readUTF();
-            Type type = new TypeToken<Map<String, Object>>(){}.getType();
-            Map<String, Object> map = GsonComponentSerializer.gson().serializer().fromJson(json, type);
-            stack = ItemStack.deserialize(map);
-
-            desc = dis.readUTF();
+            try (BukkitObjectInputStream bois = new BukkitObjectInputStream(dis)) {
+                stack = (ItemStack) bois.readObject();
+            }
 
 
 
         } catch (Exception e) {
+            e.printStackTrace();
             color = NamedTextColor.WHITE;
             name = code.toLowerCase();
             if(assetType == AssetType.CURRENCY){
