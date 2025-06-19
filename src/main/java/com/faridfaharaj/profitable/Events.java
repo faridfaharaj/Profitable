@@ -2,7 +2,7 @@ package com.faridfaharaj.profitable;
 
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.tables.Accounts;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
@@ -130,7 +130,7 @@ public class Events implements Listener {
                     if(Configuration.ENTITYCLAIMINGFEES <= 0){
                         claim.run();
                     }else {
-                        Asset.chargeAndRun(player, Configuration.MAINCURRENCYASSET, Configuration.ENTITYCLAIMINGFEES, claim);
+                        Configuration.MAINCURRENCYASSET.chargeAndRun(player, Configuration.ENTITYCLAIMINGFEES, claim);
                     }
 
                 }

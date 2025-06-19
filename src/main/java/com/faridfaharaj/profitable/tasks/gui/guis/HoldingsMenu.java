@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.tasks.gui.guis;
 
 import com.faridfaharaj.profitable.Profitable;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
@@ -90,7 +91,7 @@ public final class HoldingsMenu extends ChestGUI {
 
         if(returnButton.getSlot() == slot){
             player.closeInventory();
-            new AssetExplorer(player, 2, assetCache).openGui(player);
+            new AssetExplorer(player, Asset.AssetType.COMMODITY_ITEM, assetCache).openGui(player);
         }
 
         if(pageButton != null){

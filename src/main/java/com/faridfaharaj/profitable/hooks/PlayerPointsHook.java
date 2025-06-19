@@ -1,12 +1,12 @@
 package com.faridfaharaj.profitable.hooks;
 
+import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
+import com.faridfaharaj.profitable.data.tables.Assets;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Bukkit;
-
-import java.io.IOException;
 
 public class PlayerPointsHook {
 
@@ -29,7 +29,7 @@ public class PlayerPointsHook {
         }
 
         if(isConnected) {
-            ASSET = Asset.StringToCurrency(profitable.getConfig().getString("main-currency.playerpoints-currency", "PTS_Player Points_#ff6d92"));
+            ASSET = Configuration.MAINCURRENCYASSET;
             profitable.getLogger().info("Connected to PlayerPoints");
         }
         return isConnected;

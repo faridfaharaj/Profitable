@@ -1,6 +1,6 @@
 package com.faridfaharaj.profitable.tasks.gui.elements.specific;
 
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 
 public final class AssetCache {

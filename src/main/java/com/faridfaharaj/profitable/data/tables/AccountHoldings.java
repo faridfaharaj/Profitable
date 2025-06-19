@@ -3,7 +3,7 @@ package com.faridfaharaj.profitable.data.tables;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.util.MessagingUtil;
@@ -101,7 +101,7 @@ public class AccountHoldings {
                     byte[] meta = rs.getBytes("meta");
                     int iteratedType = rs.getInt("asset_type");
 
-                    Asset asset = Asset.assetFromMeta(assetCode, iteratedType, meta);
+                    Asset asset = Asset.assetFromMeta(assetCode, Asset.AssetType.fromValue(iteratedType), meta);
 
                     double quantity = rs.getDouble("quantity");
 
@@ -109,10 +109,15 @@ public class AccountHoldings {
                     if(!Objects.equals(assetCode, Configuration.MAINCURRENCYASSET.getCode())){
                         value = rs.getDouble("value");
                     }else {
-                        value = 1;
+                        balances.addFirst(new AssetCache(asset, new Candle(0, 1, 0,0, quantity)));
+                        continue;
                     }
 
                     balances.add(new AssetCache(asset, new Candle(0, value, 0,0, quantity)));
+                }
+
+                if(balances.isEmpty() || !Objects.equals(balances.getFirst().getAsset().getCode(), Configuration.MAINCURRENCYASSET.getCode())){
+                    balances.addFirst(new AssetCache(Configuration.MAINCURRENCYASSET, new Candle(0, 1, 0,0, 0)));
                 }
 
             }

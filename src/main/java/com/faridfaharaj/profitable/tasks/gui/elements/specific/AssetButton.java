@@ -2,6 +2,7 @@ package com.faridfaharaj.profitable.tasks.gui.elements.specific;
 
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.tables.Orders;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
@@ -34,14 +35,11 @@ public final class AssetButton extends GuiElement {
                 change = assetData.getlastCandle().getClose()-assetData.getlastCandle().getOpen(),
                 volume = assetData.getlastCandle().getVolume(), open = assetData.getlastCandle().getOpen();
 
-        String symbol = assetData.getAsset().getAssetType() == 1? Configuration.MAINCURRENCYASSET.getCode() + "/" + assetData.getAsset().getCode():assetData.getAsset().getCode();
+        String symbol = assetData.getAsset().getAssetType() == Asset.AssetType.CURRENCY? Configuration.MAINCURRENCYASSET.getCode() + "/" + assetData.getAsset().getCode():assetData.getAsset().getCode();
 
-        if(assetData.getAsset().getAssetType() == 2){
-            this.display = new ItemStack(Material.getMaterial(assetData.getAsset().getCode()));
-        }if(assetData.getAsset().getAssetType() == 3){
-            this.display = new ItemStack(Material.getMaterial(assetData.getAsset().getCode()+"_SPAWN_EGG"));
-        }if(assetData.getAsset().getAssetType() == 1) {
-            this.display = new ItemStack(Material.EMERALD);
+        this.display = assetData.getAsset().getStack();
+
+        if(assetData.getAsset().getAssetType() == Asset.AssetType.CURRENCY) {
             ItemMeta meta = this.display.getItemMeta();
             meta.setEnchantmentGlintOverride(true);
             this.display.setItemMeta(meta);
@@ -60,7 +58,7 @@ public final class AssetButton extends GuiElement {
         setLore(Profitable.getLang().langToLore("gui.asset-explorer.buttons.asset.lore",
 
                 Map.entry("%asset_category%", NamingUtil.nameType(assetData.getAsset().getAssetType())),
-                Map.entry("%asset_name%", assetData.getAsset().getName()),
+                Map.entry("%asset_name%", "<color:"+assetData.getAsset().getColor().asHexString() + ">"+assetData.getAsset().getName() + "</color>"),
                 Map.entry("%volume%", MessagingUtil.formatVolume(volume)),
                 Map.entry("%open_price%", String.valueOf(open)),
                 Map.entry("%range_low%", String.valueOf(assetData.getlastCandle().getLow())),

@@ -2,12 +2,11 @@ package com.faridfaharaj.profitable.tasks.gui.guis;
 
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.commands.WalletCommand;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.tasks.gui.QuantitySelectGui;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -22,7 +21,7 @@ public final class DepositWithdrawalGui extends QuantitySelectGui {
 
     AssetCache[][] assetCache;
     public DepositWithdrawalGui(Asset asset, boolean depositing, AssetCache[][] assetCache) {
-        super(Profitable.getLang().get(depositing?"gui.deposit-withdrawal.title-deposit":"gui.deposit-withdrawal.title-withdrawal"), asset.getAssetType() != 2 && asset.getAssetType() != 3, asset.getAssetType() == 2 || asset.getAssetType() == 3, 1);
+        super(Profitable.getLang().get(depositing?"gui.deposit-withdrawal.title-deposit":"gui.deposit-withdrawal.title-withdrawal"), asset.getAssetType() != Asset.AssetType.COMMODITY_ITEM && asset.getAssetType() != Asset.AssetType.COMMODITY_ENTITY, asset.getAssetType() == Asset.AssetType.COMMODITY_ITEM || asset.getAssetType() == Asset.AssetType.COMMODITY_ENTITY, 1);
         this.assetCache = assetCache;
         this.depositing = depositing;
         this.asset = asset;

@@ -1,6 +1,7 @@
 package com.faridfaharaj.profitable.util;
 
 import com.faridfaharaj.profitable.Profitable;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,10 +59,10 @@ public class NamingUtil {
         return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
     }
 
-    public static String nameType(int assetType) {
-        if (assetType < 1 || assetType >= assetTypeNaming.length) {
+    public static String nameType(Asset.AssetType assetType) {
+        if (assetType.getValue() < 1 || assetType.getValue() >= assetTypeNaming.length) {
             return "Unknown";
         }
-        return Profitable.getLang().getString(assetTypeNaming[assetType]);
+        return Profitable.getLang().getString(assetTypeNaming[assetType.getValue()]);
     }
 }

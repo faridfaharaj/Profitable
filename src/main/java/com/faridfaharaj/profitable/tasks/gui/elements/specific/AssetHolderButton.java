@@ -2,7 +2,7 @@ package com.faridfaharaj.profitable.tasks.gui.elements.specific;
 
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
@@ -12,11 +12,9 @@ import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,12 +32,9 @@ public final class AssetHolderButton extends GuiElement {
             this.asset = assetButtonData.getAsset();
             this.lastestDay = assetButtonData.getlastCandle();
 
-            if(asset.getAssetType() == 2){
-                this.display = new ItemStack(Material.getMaterial(asset.getCode()));
-            }if(asset.getAssetType() == 3){
-                this.display = new ItemStack(Material.getMaterial(asset.getCode()+"_SPAWN_EGG"));
-            }if(asset.getAssetType() == 1) {
-                this.display = new ItemStack(Material.EMERALD);
+            this.display = assetButtonData.getAsset().getStack();
+
+            if(asset.getAssetType() == Asset.AssetType.CURRENCY) {
                 ItemMeta meta = this.display.getItemMeta();
                 meta.setEnchantmentGlintOverride(true);
                 this.display.setItemMeta(meta);

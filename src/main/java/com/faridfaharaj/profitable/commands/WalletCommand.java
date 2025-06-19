@@ -3,7 +3,9 @@ package com.faridfaharaj.profitable.commands;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.ComEntity;
+import com.faridfaharaj.profitable.data.holderClasses.assets.ComItem;
 import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.Assets;
@@ -19,9 +21,6 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.util.*;
-
-import static com.faridfaharaj.profitable.data.holderClasses.Asset.retrieveCommodityEntity;
-import static com.faridfaharaj.profitable.data.holderClasses.Asset.retrieveCommodityItem;
 
 public class WalletCommand implements CommandExecutor {
 
@@ -65,7 +64,7 @@ public class WalletCommand implements CommandExecutor {
                 if(args.length != 2){
                     try{
                         ammount = Double.parseDouble(args[2]);
-                        if(asset.getAssetType() == 2 || asset.getAssetType() == 3){
+                        if(asset.getAssetType() == Asset.AssetType.COMMODITY_ITEM || asset.getAssetType() == Asset.AssetType.COMMODITY_ENTITY){
                             ammount = (int) ammount;
                         }
                         if(ammount <= 0){
@@ -109,7 +108,7 @@ public class WalletCommand implements CommandExecutor {
                 if(args.length != 2){
                     try{
                         ammount = Double.parseDouble(args[2]);
-                        if(asset.getAssetType() == 2 || asset.getAssetType() == 3){
+                        if(asset.getAssetType() == Asset.AssetType.COMMODITY_ITEM || asset.getAssetType() == Asset.AssetType.COMMODITY_ENTITY){
                             ammount = (int) ammount;
                         }
                         if(ammount <= 0){
@@ -185,7 +184,7 @@ public class WalletCommand implements CommandExecutor {
 
     public static void depositAsset(Asset asset, double amount, Player player){
 
-        if(asset.getAssetType() == 1){
+        if(asset.getAssetType() == Asset.AssetType.CURRENCY){
 
             double fee = Configuration.parseFee(Configuration.DEPOSITFEES, amount);
             if(fee > amount){
@@ -200,7 +199,7 @@ public class WalletCommand implements CommandExecutor {
 
                 if(VaultHook.getEconomy().withdrawPlayer(player, amount).transactionSuccess()){
                     Profitable.getfolialib().getScheduler().runAsync(task -> {
-                        Asset.distributeAsset(player.getWorld(), Accounts.getAccount(player), asset, amount -fee);
+                        asset.distributeAsset(player.getWorld(), Accounts.getAccount(player), amount -fee);
                         MessagingUtil.sendPaymentNotice(player, amount, fee, asset);
                     });
 
@@ -220,7 +219,7 @@ public class WalletCommand implements CommandExecutor {
                 }
                 if(PlayerPointsHook.getApi().take(player.getUniqueId(), integerAmount)){
                     Profitable.getfolialib().getScheduler().runAsync(task -> {
-                        Asset.distributeAsset(player.getWorld() ,Accounts.getAccount(player), asset, integerAmount- Math.ceil(fee));
+                        asset.distributeAsset(player.getWorld(), Accounts.getAccount(player), integerAmount- Math.ceil(fee));
                         MessagingUtil.sendPaymentNotice(player, amount, Math.ceil(fee), asset);
                     });
                     return;
@@ -239,12 +238,12 @@ public class WalletCommand implements CommandExecutor {
 
         }
 
-        if(asset.getAssetType() == 2){
+        if(asset.getAssetType() == Asset.AssetType.COMMODITY_ITEM){
 
 
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
-                if(retrieveCommodityItem(player, asset.getCode(), (int) amount)){
-                    Asset.sendBalance(player.getWorld() ,Accounts.getAccount(player), asset.getCode(), amount);
+                if(((ComItem)asset).retrieveCommodityItem(player, (int) amount)){
+                    asset.sendBalance(player.getWorld(),Accounts.getAccount(player), amount);
                     MessagingUtil.sendPaymentNotice(player, amount, 0, asset);
                 }else {
                     MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
@@ -256,11 +255,11 @@ public class WalletCommand implements CommandExecutor {
 
         }
 
-        if(asset.getAssetType() == 3){
+        if(asset.getAssetType() == Asset.AssetType.COMMODITY_ENTITY){
 
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
-                if(retrieveCommodityEntity(player, asset.getCode(), Accounts.getEntityClaimId(player.getWorld(), Accounts.getAccount(player)), (int) amount)){
-                    Asset.sendBalance(player.getWorld() ,Accounts.getAccount(player), asset.getCode(), amount);
+                if(((ComEntity)asset).retrieveCommodityEntity(player, Accounts.getEntityClaimId(player.getWorld(),Accounts.getAccount(player)), (int) amount)){
+                    asset.sendBalance(player.getWorld(),Accounts.getAccount(player), amount);
                     MessagingUtil.sendPaymentNotice(player, amount, 0, asset);
                 }else{
                     MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
@@ -276,7 +275,7 @@ public class WalletCommand implements CommandExecutor {
 
     public static void withdrawAsset(Asset asset, double ammount, Player player){
 
-        if(asset.getAssetType() == 1){
+        if(asset.getAssetType() == Asset.AssetType.CURRENCY){
 
             double fee = Configuration.parseFee(Configuration.WITHDRAWALFEES, ammount);
 
@@ -284,15 +283,15 @@ public class WalletCommand implements CommandExecutor {
 
                 Profitable.getfolialib().getScheduler().runAsync(async -> {
                     String account = Accounts.getAccount(player);
-                    double balance = AccountHoldings.getAccountAssetBalance(player.getWorld() ,account, asset.getCode());
-                    if(Asset.retrieveBalance(player.getWorld() ,account, balance, asset.getCode(), ammount)){
+                    double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
+                    if(asset.retrieveBalance(player.getWorld(),account, balance, ammount)){
                         Profitable.getfolialib().getScheduler().runNextTick(global -> {
                             EconomyResponse es = VaultHook.getEconomy().depositPlayer(player, ammount);
                             if(es.transactionSuccess()){
                                 MessagingUtil.sendChargeNotice(player, ammount+fee, fee, asset);
                             }else{
                                 MessagingUtil.sendSyntaxError(player, es.errorMessage);
-                                Asset.distributeAsset(player.getWorld() ,Accounts.getAccount(player), asset, ammount);
+                                asset.distributeAsset(player.getWorld(), Accounts.getAccount(player), ammount);
                             }
                         });
                     }else {
@@ -314,8 +313,8 @@ public class WalletCommand implements CommandExecutor {
                 }
                 Profitable.getfolialib().getScheduler().runAsync(async -> {
                     String account = Accounts.getAccount(player);
-                    double balance = AccountHoldings.getAccountAssetBalance(player.getWorld() ,account, asset.getCode());
-                    if(Asset.retrieveBalance(player.getWorld() ,account, balance, asset.getCode(), ammount)){
+                    double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
+                    if(asset.retrieveBalance(player.getWorld(),account, balance, ammount)){
                         Profitable.getfolialib().getScheduler().runNextTick(global -> {
                             double ceilFee = Math.ceil(fee);
                             PlayerPointsHook.getApi().give(player.getUniqueId(), (int) (integerAmount-ceilFee));
@@ -337,13 +336,13 @@ public class WalletCommand implements CommandExecutor {
 
         }
 
-        if(asset.getAssetType() == 3){
+        if(asset.getAssetType() == Asset.AssetType.COMMODITY_ENTITY){
 
             String account = Accounts.getAccount(player);
-            double balance = AccountHoldings.getAccountAssetBalance(player.getWorld() ,account, asset.getCode());
-            if(Asset.retrieveBalance(player.getWorld() ,account, balance, asset.getCode(), ammount)){
+            double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
+            if(asset.retrieveBalance(player.getWorld(),account, balance, ammount)){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
-                    Asset.sendCommodityEntityToPlayer(player, account, asset.getCode(), (int) ammount);
+                    ((ComEntity)asset).sendCommodityEntityToPlayer(player, account, (int) ammount);
                     MessagingUtil.sendPaymentNotice(player, ammount, 0, asset);
                 });
             }else {
@@ -355,13 +354,13 @@ public class WalletCommand implements CommandExecutor {
 
         }
 
-        if(asset.getAssetType() == 2){
+        if(asset.getAssetType() == Asset.AssetType.COMMODITY_ITEM){
 
             String account = Accounts.getAccount(player);
-            double balance = AccountHoldings.getAccountAssetBalance(player.getWorld() ,account, asset.getCode());
-            if(Asset.retrieveBalance(player.getWorld() ,account, balance, asset.getCode(), ammount)){
+            double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
+            if(asset.retrieveBalance(player.getWorld(),account, balance, ammount)){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
-                    Asset.sendItemToPlayer(player, asset.getCode(), (int) ammount);
+                    ((ComItem)asset).giveItemToPlayer(player, (int) ammount);
                     MessagingUtil.sendPaymentNotice(player, ammount, 0, asset);
                 });
                 return;

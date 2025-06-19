@@ -3,7 +3,7 @@ package com.faridfaharaj.profitable.data.tables;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
-import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import org.bukkit.Sound;
@@ -383,11 +383,11 @@ public class Orders {
         Asset asset = sideBuy? Configuration.MAINCURRENCYASSET : tradedAsset;
 
         double ammountToSendBack = sideBuy?
-                order.getPrice() * order.getUnits() + Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][1], order.getPrice() * order.getUnits())
+                order.getPrice() * order.getUnits() + Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType().getValue()][1], order.getPrice() * order.getUnits())
                 :
                 order.getUnits();
 
-        Asset.distributeAsset(player.getWorld(), account, asset, ammountToSendBack);
+        asset.distributeAsset(player.getWorld(), account, ammountToSendBack);
 
         player.playSound(player, Sound.ENTITY_ITEM_BREAK, 1 , 1);
 
@@ -414,11 +414,11 @@ public class Orders {
         Asset asset = sideBuy? Configuration.MAINCURRENCYASSET : tradedAsset;
 
         double ammountToSendBack = sideBuy?
-                order.getPrice() * order.getUnits() + Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType()][1], order.getPrice() * order.getUnits())
+                order.getPrice() * order.getUnits() + Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType().getValue()][1], order.getPrice() * order.getUnits())
                 :
                 order.getUnits();
 
-        Asset.distributeAsset(world, order.getOwner(), asset, ammountToSendBack);
+        asset.distributeAsset(world, order.getOwner(), ammountToSendBack);
 
         Orders.deleteOrder(world, order.getUuid());
 
