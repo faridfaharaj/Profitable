@@ -231,21 +231,12 @@ public class Configuration {
 
 
         String[] MCdata = config.getString("main-currency.currency", "EMD_Villager Emerald_#00ff00").split("_");
+        if(MCdata.length == 0){
+            MCdata = new String[]{"EMD","Villager Emerald", "#00ff00"};
+        }
         Asset mainCurrency = Assets.getAssetData(world, MCdata[0]);
 
         if(mainCurrency == null){
-
-            if(config.getBoolean("main-currency.create-last-resort-only")){
-
-                if(VaultHook.isConnected()){
-                    MAINCURRENCYASSET = VaultHook.getAsset();
-                    return;
-                }else if(PlayerPointsHook.isConnected()){
-                    MAINCURRENCYASSET = PlayerPointsHook.getAsset();
-                    return;
-                }
-
-            }
 
             TextColor color;
             String name;
@@ -270,6 +261,9 @@ public class Configuration {
             }
 
             MAINCURRENCYASSET = new Currency(MCdata[0], color, name, new ItemStack(Material.EMERALD));
+            if(MAINCURRENCYASSET == null){
+                MAINCURRENCYASSET = new Currency("EMD", NamedTextColor.GREEN, "Villager Emerald", new ItemStack(Material.EMERALD));
+            }
             Assets.addAsset(world,MAINCURRENCYASSET);
         }else{
             MAINCURRENCYASSET = mainCurrency;

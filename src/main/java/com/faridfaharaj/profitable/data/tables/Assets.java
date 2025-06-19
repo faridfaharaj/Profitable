@@ -171,6 +171,12 @@ public class Assets {
 
     public static void generateAssets(World world){
 
+        try{
+            Configuration.loadMainCurrency(world);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         //Hooks asset generation----
         if(VaultHook.isConnected()){
             // Vault
@@ -179,12 +185,6 @@ public class Assets {
         if(PlayerPointsHook.isConnected()){
             // PlayerPoints
             Assets.addAsset(world,PlayerPointsHook.getAsset());
-        }
-
-        try{
-            Configuration.loadMainCurrency(world);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
 
         if(Configuration.GENERATEASSETS){
