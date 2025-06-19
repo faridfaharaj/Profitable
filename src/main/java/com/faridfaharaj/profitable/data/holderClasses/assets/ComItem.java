@@ -21,25 +21,25 @@ public class ComItem extends Asset {
     }
 
     @Override
-    public void distributeAsset(String account, double ammount) {
+    public void distributeAsset(World world, String account, double ammount) {
         if(Configuration.PHYSICALDELIVERY){
-            sendCommodityItem(account, (int) ammount);
+            sendCommodityItem(world,account, (int) ammount);
         }else {
-            sendBalance(account, ammount);
+            sendBalance(world,account, ammount);
         }
     }
 
-    public void sendCommodityItem(String account, int amount){
+    public void sendCommodityItem(World world,String account, int amount){
 
-        Location location = Accounts.getItemDelivery(account);
+        Location location = Accounts.getItemDelivery(world,account);
 
         Profitable.getfolialib().getScheduler().runAtLocation(location, task -> {
 
-                    World world = location.getWorld();
+                    World locWorld = location.getWorld();
                     Block block = location.getBlock();
                     if (block.getState() instanceof Chest chest) {
 
-                        int missing = amount;
+                        int missing = amount*stack.getAmount();
                         while (missing > 0) {
                             int giveAmount = Math.min(missing, stack.getMaxStackSize());
                             ItemStack itemStack = stack.asQuantity(giveAmount);
@@ -47,7 +47,7 @@ public class ComItem extends Asset {
 
                             Inventory inventory = chest.getInventory();
                             for (ItemStack drop : inventory.addItem(itemStack).values()) {
-                                world.dropItemNaturally(location, drop);
+                                locWorld.dropItemNaturally(location, drop);
                             }
 
                             missing -= giveAmount;
@@ -55,14 +55,14 @@ public class ComItem extends Asset {
 
                     }else{
 
-                        world.dropItemNaturally(location, stack.asQuantity(amount));
+                        locWorld.dropItemNaturally(location, stack.asQuantity(amount));
 
                     }
 
-                    world.spawnParticle(Particle.FIREWORK, location.add(0.5,0.5,0.5), 5);
-                    world.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
-                    world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
-                    world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+                    locWorld.spawnParticle(Particle.FIREWORK, location.add(0.5,0.5,0.5), 5);
+                    locWorld.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
+                    locWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
+                    locWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
                 }
         );
 
@@ -72,7 +72,7 @@ public class ComItem extends Asset {
 
         Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
 
-                    int missing = amount;
+                    int missing = amount*stack.getAmount();
                     while (missing > 0) {
                         int giveAmount = Math.min(missing, stack.getMaxStackSize());
                         ItemStack itemStack = stack.asQuantity(giveAmount);
@@ -104,8 +104,8 @@ public class ComItem extends Asset {
         // get from wallet
         if(Configuration.ALLOWEDCOMMODITYCOLLATERAL[0]){
             String account = Accounts.getAccount(player);
-            double balance = AccountHoldings.getAccountAssetBalance(account, code);
-            if(retrieveBalance(account, balance, ammount)){
+            double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, code);
+            if(retrieveBalance(player.getWorld(), account, balance, ammount)){
                 runnable.run();
                 return;
             }

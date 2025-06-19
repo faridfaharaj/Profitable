@@ -29,12 +29,7 @@ public class PlayerPointsHook {
         }
 
         if(isConnected) {
-            Asset asset = Assets.getAssetData(profitable.getConfig().getString("hooks.playerpoints.asset"));
-            if(asset == null){
-                ASSET = Configuration.MAINCURRENCYASSET;
-            }else {
-                ASSET = asset;
-            }
+            ASSET = Configuration.MAINCURRENCYASSET;
             profitable.getLogger().info("Connected to PlayerPoints");
         }
         return isConnected;

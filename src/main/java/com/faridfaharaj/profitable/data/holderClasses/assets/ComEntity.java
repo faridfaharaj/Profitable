@@ -30,11 +30,11 @@ public class ComEntity extends Asset {
     }
 
     @Override
-    public void distributeAsset(String account, double ammount) {
+    public void distributeAsset(World world, String account, double ammount) {
         if(Configuration.PHYSICALDELIVERY){
-            sendCommodityEntity(account, (int) ammount);
+            sendCommodityEntity(world,account, (int) ammount);
         }else {
-            sendBalance(account, ammount);
+            sendBalance(world,account, ammount);
         }
     }
 
@@ -42,7 +42,7 @@ public class ComEntity extends Asset {
 
         EntityType entityType = EntityType.fromName(stack.getType().name().replace("SPAWN_",""));
 
-        String claimId = Accounts.getEntityClaimId(account);
+        String claimId = Accounts.getEntityClaimId(player.getWorld(),account);
         Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
             World world = player.getWorld();
             Location location = player.getLocation();
@@ -61,25 +61,25 @@ public class ComEntity extends Asset {
 
     }
 
-    public void sendCommodityEntity(String account, int amount){
+    public void sendCommodityEntity(World world, String account, int amount){
 
         EntityType entityType = EntityType.fromName(stack.getType().name().replace("_SPAWN_EGG",""));
 
-        Location location = Accounts.getEntityDelivery(account);
-        String claimId = Accounts.getEntityClaimId(account);
+        Location location = Accounts.getEntityDelivery(world,account);
+        String claimId = Accounts.getEntityClaimId(world,account);
         Profitable.getfolialib().getScheduler().runAtLocation(location, task -> {
-            World world = location.getWorld();
+            World locWorld = location.getWorld();
 
             for(int i = 0; i<amount; i++){
-                Entity entity = world.spawnEntity(location, entityType);
+                Entity entity = locWorld.spawnEntity(location, entityType);
                 entity.setCustomName(claimId);
                 entity.setCustomNameVisible(true);
             }
 
-            world.spawnParticle(Particle.FIREWORK, location, 10);
-            world.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
-            world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
-            world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
+            locWorld.spawnParticle(Particle.FIREWORK, location, 10);
+            locWorld.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
+            locWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
+            locWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
         });
 
     }
@@ -94,8 +94,8 @@ public class ComEntity extends Asset {
         // get from wallet
         if(Configuration.ALLOWEDCOMMODITYCOLLATERAL[0]){
             String account = Accounts.getAccount(player);
-            double balance = AccountHoldings.getAccountAssetBalance(account, code);
-            if(retrieveBalance(account, balance, ammount)){
+            double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, code);
+            if(retrieveBalance(player.getWorld(), account, balance, ammount)){
                 runnable.run();
                 return;
             }
@@ -104,7 +104,7 @@ public class ComEntity extends Asset {
         if (Configuration.ALLOWEDCOMMODITYCOLLATERAL[2]) {
 
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
-                if(retrieveCommodityEntity(player, Accounts.getEntityClaimId(Accounts.getAccount(player)), (int) ammount)){
+                if(retrieveCommodityEntity(player, Accounts.getEntityClaimId(player.getWorld(), Accounts.getAccount(player)), (int) ammount)){
                     runnable.run();
                 }else{
                     MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",

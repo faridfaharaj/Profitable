@@ -199,7 +199,7 @@ public class WalletCommand implements CommandExecutor {
 
                 if(VaultHook.getEconomy().withdrawPlayer(player, amount).transactionSuccess()){
                     Profitable.getfolialib().getScheduler().runAsync(task -> {
-                        asset.distributeAsset(Accounts.getAccount(player), amount -fee);
+                        asset.distributeAsset(player.getWorld(), Accounts.getAccount(player), amount -fee);
                         MessagingUtil.sendPaymentNotice(player, amount, fee, asset);
                     });
 
@@ -219,7 +219,7 @@ public class WalletCommand implements CommandExecutor {
                 }
                 if(PlayerPointsHook.getApi().take(player.getUniqueId(), integerAmount)){
                     Profitable.getfolialib().getScheduler().runAsync(task -> {
-                        asset.distributeAsset(Accounts.getAccount(player), integerAmount- Math.ceil(fee));
+                        asset.distributeAsset(player.getWorld(), Accounts.getAccount(player), integerAmount- Math.ceil(fee));
                         MessagingUtil.sendPaymentNotice(player, amount, Math.ceil(fee), asset);
                     });
                     return;
@@ -243,7 +243,7 @@ public class WalletCommand implements CommandExecutor {
 
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
                 if(((ComItem)asset).retrieveCommodityItem(player, (int) amount)){
-                    asset.sendBalance(Accounts.getAccount(player), amount);
+                    asset.sendBalance(player.getWorld(),Accounts.getAccount(player), amount);
                     MessagingUtil.sendPaymentNotice(player, amount, 0, asset);
                 }else {
                     MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
@@ -258,8 +258,8 @@ public class WalletCommand implements CommandExecutor {
         if(asset.getAssetType() == Asset.AssetType.COMMODITY_ENTITY){
 
             Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {
-                if(((ComEntity)asset).retrieveCommodityEntity(player, Accounts.getEntityClaimId(Accounts.getAccount(player)), (int) amount)){
-                    asset.sendBalance(Accounts.getAccount(player), amount);
+                if(((ComEntity)asset).retrieveCommodityEntity(player, Accounts.getEntityClaimId(player.getWorld(),Accounts.getAccount(player)), (int) amount)){
+                    asset.sendBalance(player.getWorld(),Accounts.getAccount(player), amount);
                     MessagingUtil.sendPaymentNotice(player, amount, 0, asset);
                 }else{
                     MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
@@ -284,14 +284,14 @@ public class WalletCommand implements CommandExecutor {
                 Profitable.getfolialib().getScheduler().runAsync(async -> {
                     String account = Accounts.getAccount(player);
                     double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
-                    if(asset.retrieveBalance(account, balance, ammount)){
+                    if(asset.retrieveBalance(player.getWorld(),account, balance, ammount)){
                         Profitable.getfolialib().getScheduler().runNextTick(global -> {
                             EconomyResponse es = VaultHook.getEconomy().depositPlayer(player, ammount);
                             if(es.transactionSuccess()){
                                 MessagingUtil.sendChargeNotice(player, ammount+fee, fee, asset);
                             }else{
                                 MessagingUtil.sendSyntaxError(player, es.errorMessage);
-                                asset.distributeAsset(Accounts.getAccount(player), ammount);
+                                asset.distributeAsset(player.getWorld(), Accounts.getAccount(player), ammount);
                             }
                         });
                     }else {
@@ -314,7 +314,7 @@ public class WalletCommand implements CommandExecutor {
                 Profitable.getfolialib().getScheduler().runAsync(async -> {
                     String account = Accounts.getAccount(player);
                     double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
-                    if(asset.retrieveBalance(account, balance, ammount)){
+                    if(asset.retrieveBalance(player.getWorld(),account, balance, ammount)){
                         Profitable.getfolialib().getScheduler().runNextTick(global -> {
                             double ceilFee = Math.ceil(fee);
                             PlayerPointsHook.getApi().give(player.getUniqueId(), (int) (integerAmount-ceilFee));
@@ -340,7 +340,7 @@ public class WalletCommand implements CommandExecutor {
 
             String account = Accounts.getAccount(player);
             double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
-            if(asset.retrieveBalance(account, balance, ammount)){
+            if(asset.retrieveBalance(player.getWorld(),account, balance, ammount)){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     ((ComEntity)asset).sendCommodityEntityToPlayer(player, account, (int) ammount);
                     MessagingUtil.sendPaymentNotice(player, ammount, 0, asset);
@@ -358,7 +358,7 @@ public class WalletCommand implements CommandExecutor {
 
             String account = Accounts.getAccount(player);
             double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
-            if(asset.retrieveBalance(account, balance, ammount)){
+            if(asset.retrieveBalance(player.getWorld(),account, balance, ammount)){
                 Profitable.getfolialib().getScheduler().runAsync(task -> {
                     ((ComItem)asset).giveItemToPlayer(player, (int) ammount);
                     MessagingUtil.sendPaymentNotice(player, ammount, 0, asset);

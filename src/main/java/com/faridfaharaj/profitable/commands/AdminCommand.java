@@ -65,12 +65,7 @@ public class AdminCommand implements CommandExecutor {
 
                 if(Configuration.MULTIWORLD){
                     for(World world:Profitable.getInstance().getServer().getWorlds()){
-                        try {
-                            DataBase.updateWorld(world);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        Assets.generateAssets();
+                        Assets.generateAssets(world);
                     }
                 }
 
@@ -144,7 +139,7 @@ public class AdminCommand implements CommandExecutor {
                                 return true;
                         }
 
-                        if (Assets.registerAsset(asset)) {
+                        if (Assets.registerAsset(player.getWorld(), asset)) {
 
                             MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("admin.assets.add.success",
                                     Map.entry("%asset_type%",asset.getAssetType().name()),
@@ -194,7 +189,7 @@ public class AdminCommand implements CommandExecutor {
                             }
 
 
-                            if(Candles.updateDay(args[2], world, Double.parseDouble(args[4]), Double.parseDouble(args[5]))){
+                            if(Candles.updateDay(player.getWorld(), args[2], Double.parseDouble(args[4]), Double.parseDouble(args[5]))){
                                 MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("admin.assets.from-id.new-transaction.success",
                                         Map.entry("%asset%",args[2])
                                 ));
@@ -215,7 +210,7 @@ public class AdminCommand implements CommandExecutor {
                                 return true;
                             }
 
-                            Candles.assetDeleteAllCandles(args[2]);
+                            Candles.assetDeleteAllCandles(player.getWorld(), args[2]);
                             MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("admin.assets.from-id.new-transaction.success",
                                     Map.entry("%asset%",args[2])
                             ));
@@ -246,12 +241,12 @@ public class AdminCommand implements CommandExecutor {
                                 return true;
                             }
 
-                            Asset asset = Assets.getAssetData(args[2]);
+                            Asset asset = Assets.getAssetData(player.getWorld(),args[2]);
                             if(asset == null){
                                 MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("assets.error.asset-not-found", Map.entry("%asset%", args[2])));
                                 return true;
                             }
-                            if(Assets.deleteAsset(args[2])){
+                            if(Assets.deleteAsset(player.getWorld(),args[2])){
                                 if(Configuration.GENERATEASSETS){
 
                                     if(asset.getAssetType() == Asset.AssetType.COMMODITY_ITEM){
@@ -325,7 +320,7 @@ public class AdminCommand implements CommandExecutor {
                     }
 
                     List<String> ordersString = new ArrayList<>();
-                    List<Order> orders = Orders.getAssetOrders(args[2]);
+                    List<Order> orders = Orders.getAssetOrders(player.getWorld(),args[2]);
                     for(Order order : orders){
                         ordersString.add(order.toString());
                     }
@@ -366,7 +361,7 @@ public class AdminCommand implements CommandExecutor {
                             return true;
                         }
 
-                        Orders.cancelOrder(UUID.fromString(args[2]));
+                        Orders.cancelOrder(player.getWorld(),UUID.fromString(args[2]));
                         MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("orders.cancel",
                                 Map.entry("%order%", args[2]))
                         );
@@ -399,7 +394,7 @@ public class AdminCommand implements CommandExecutor {
                     List<Order> orders = Orders.getAllOrders();
 
                     for(Order order : orders){
-                        Orders.cancelOrder(order.getUuid());
+                        Orders.cancelOrder(player.getWorld(),order.getUuid());
                     }
 
                     MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("admin.orders.cancel-all"));
@@ -446,7 +441,7 @@ public class AdminCommand implements CommandExecutor {
 
 
                     if(player != null){
-                        if(Orders.insertOrder(UUID.randomUUID(), "server", args[2], sidebuy, price, units, Order.OrderType.LIMIT)){
+                        if(Orders.insertOrder(player.getWorld(),UUID.randomUUID(), "server", args[2], sidebuy, price, units, Order.OrderType.LIMIT)){
                             MessagingUtil.sendComponentMessage(player,Profitable.getLang().get("exchange.new-order-notice",
                                             Map.entry("%order_type%", Order.OrderType.LIMIT.toString().replace("_","-").toLowerCase()),
                                             Map.entry("%side%", sidebuy?
@@ -540,7 +535,7 @@ public class AdminCommand implements CommandExecutor {
                 }
 
 
-                if(AccountHoldings.setHolding(account, args[3], ammount)){
+                if(AccountHoldings.setHolding(player.getWorld(),account, args[3], ammount)){
                     MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("admin.account.set.success",
                             Map.entry("%account%", account),
                             Map.entry("%amount%", String.valueOf(ammount)),
@@ -767,7 +762,7 @@ public class AdminCommand implements CommandExecutor {
                     if(Accounts.getCurrentAccounts().containsValue(account)){
                         MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("account.error.cant-delete-active-account"));
                     }else {
-                        if(Accounts.deleteAccount(account)){
+                        if(Accounts.deleteAccount(player.getWorld(),account)){
                             MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("admin.account.delete.success",
                                     Map.entry("%account%",account)
                             ));
@@ -797,7 +792,7 @@ public class AdminCommand implements CommandExecutor {
                     return true;
                 }
 
-                if(Accounts.changePassword(account, "1234")){
+                if(Accounts.changePassword(player.getWorld(),account, "1234")){
                     MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("admin.account.password-reset.success",
                             Map.entry("%account%",account)
                     ));

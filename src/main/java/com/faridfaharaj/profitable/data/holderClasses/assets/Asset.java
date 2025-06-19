@@ -87,7 +87,7 @@ public abstract class Asset {
     }
 
     public ItemStack getStack(){
-        return stack;
+        return stack.clone();
     }
 
     public byte[] metaData() throws IOException {
@@ -160,18 +160,18 @@ public abstract class Asset {
         }
     }
 
-    public abstract void distributeAsset(String account, double ammount);
+    public abstract void distributeAsset(World world,String account, double ammount);
 
-    public void sendBalance(String account, double ammount){
+    public void sendBalance(World world ,String account, double ammount){
 
-        double balance = AccountHoldings.getAccountAssetBalance(account, code);
-        AccountHoldings.setHolding(account, code, balance + ammount);
+        double balance = AccountHoldings.getAccountAssetBalance(world, account, code);
+        AccountHoldings.setHolding(world ,account, code, balance + ammount);
 
     }
 
     public abstract void chargeAndRun(Player player, double ammount, Runnable runnable);
 
-    public boolean retrieveBalance(String account, double balance, double ammount){
+    public boolean retrieveBalance(World world,String account, double balance, double ammount){
 
         double difference = balance - ammount;
         if(difference < 0){
@@ -180,9 +180,9 @@ public abstract class Asset {
 
         }
         if(difference <= 0){
-            AccountHoldings.deleteHolding(account, code);
+            AccountHoldings.deleteHolding(world,account, code);
         }else{
-            AccountHoldings.setHolding(account, code, difference);
+            AccountHoldings.setHolding(world,account, code, difference);
         }
         return true;
 
@@ -206,7 +206,7 @@ public abstract class Asset {
             double total = Math.ceil(ammount+fee);
             if(PlayerPointsHook.getApi().take(player.getUniqueId(), (int) total)){
                 if(total-ammount+fee != 0){
-                    AccountHoldings.setHolding(account, asset, balance+(total-ammount+fee));
+                    AccountHoldings.setHolding(player.getWorld(), account, asset, balance+(total-ammount+fee));
                 }
                 MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.auto-deposit-notice",
                         Map.entry("%asset_amount%", MessagingUtil.assetAmmount(PlayerPointsHook.getAsset(), ammount))

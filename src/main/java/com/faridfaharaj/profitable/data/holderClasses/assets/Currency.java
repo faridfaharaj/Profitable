@@ -5,6 +5,7 @@ import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.format.TextColor;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,9 +18,9 @@ public class Currency extends Asset {
     }
 
     @Override
-    public void distributeAsset(String account, double ammount){
+    public void distributeAsset(World world, String account, double ammount){
 
-        sendBalance(account, ammount);
+        sendBalance(world,account, ammount);
 
     }
 
@@ -32,8 +33,8 @@ public class Currency extends Asset {
         }
 
         String account = Accounts.getAccount(player);
-        double balance = AccountHoldings.getAccountAssetBalance(account, code);
-        if(retrieveBalance(account, balance, ammount)){
+        double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, code);
+        if(retrieveBalance(player.getWorld(), account, balance, ammount)){
             runnable.run();
         }else {
             if(retrieveBalanceHook(account, balance, code, ammount, player)){
