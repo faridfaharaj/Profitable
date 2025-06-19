@@ -108,6 +108,7 @@ admin:
       error:
         entity-name-unmatch: "<red>Symbol must match an existing entity name when adding CommodityEntity</red>"
         invalid-asset-type: "<red>Invalid asset type %type%</red>"
+        main-hand-empty: "<red>You must be holding an item on your main hand</red>"
     from-id:
       new-transaction:
         success: "<gray>inserted transaction for %asset%</gray>"

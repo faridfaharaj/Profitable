@@ -16,6 +16,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -86,8 +87,8 @@ public class AdminCommand implements CommandExecutor {
                             return true;
                         }
 
-                        if (args.length < 5) {
-                            MessagingUtil.sendSyntaxError(sender, "/admin add currency <Symbol>");
+                        if (args.length < 3) {
+                            MessagingUtil.sendSyntaxError(sender, "/admin add <Asset type> <Symbol>");
                             return true;
                         }
 
@@ -102,8 +103,17 @@ public class AdminCommand implements CommandExecutor {
                         for (int i = 5; i < args.length; i++) {
                             name.append(args[i]).append(" ");
                         }
+                        if(name.isEmpty()){
+                            name.append(args[3]);
+                        }
 
                         ItemStack stack = player.getInventory().getItemInMainHand();
+                        if(stack.isEmpty() || stack.getType() == Material.AIR){
+                            MessagingUtil.sendComponentMessage(sender, Profitable.getLang().get("admin.assets.add.error.main-hand-empty",
+                                    Map.entry("%type%", args[2])
+                            ));
+                            return true;
+                        }
 
                         Asset asset;
                         switch (args[2]) {
