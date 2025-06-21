@@ -11,6 +11,7 @@ import com.faridfaharaj.profitable.data.holderClasses.assets.ComItem;
 import com.faridfaharaj.profitable.data.holderClasses.assets.Currency;
 import com.faridfaharaj.profitable.data.tables.*;
 import com.faridfaharaj.profitable.util.MessagingUtil;
+import com.faridfaharaj.profitable.util.RandomUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -82,16 +83,21 @@ public class AdminCommand implements CommandExecutor {
                             return true;
                         }
 
-                        if (args.length < 3) {
+                        if (args.length < 4) {
                             MessagingUtil.sendSyntaxError(sender, "/admin add <Asset type> <Symbol>");
                             return true;
                         }
 
 
                         String assetid = args[3].toUpperCase();
-                        TextColor color = TextColor.fromHexString(args[4]);
-                        if (color == null) {
-                            color = NamedTextColor.YELLOW;
+                        TextColor color;
+                        if(args.length >= 5){
+                            color = TextColor.fromHexString(args[4]);
+                            if (color == null) {
+                                color = NamedTextColor.YELLOW;
+                            }
+                        }else {
+                            color = RandomUtil.randomTextColor();
                         }
 
                         StringBuilder name = new StringBuilder();
