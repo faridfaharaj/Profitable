@@ -132,7 +132,7 @@ public class ComItem extends Asset {
 
         // get from inventory
         Inventory inventory = player.getInventory();
-        ItemStack itemStack = stack;
+        ItemStack itemStack = stack.asQuantity(stack.getAmount()*amount);
         if (inventory.containsAtLeast(itemStack, amount)) {
             inventory.removeItem(itemStack);
             return true;
