@@ -11,7 +11,9 @@ import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -36,7 +38,8 @@ public final class AssetHolderButton extends GuiElement {
 
             if(asset.getAssetType() == Asset.AssetType.CURRENCY) {
                 ItemMeta meta = this.display.getItemMeta();
-                meta.setEnchantmentGlintOverride(true);
+                meta.addEnchant(Enchantment.LURE, 1, true);
+                meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 this.display.setItemMeta(meta);
             }
 

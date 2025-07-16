@@ -12,10 +12,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.io.BukkitObjectInputStream;
@@ -129,7 +131,8 @@ public abstract class Asset {
             if(assetType == AssetType.CURRENCY){
                 stack = new ItemStack(Material.EMERALD);
                 ItemMeta itemMeta = stack.getItemMeta();
-                itemMeta.setEnchantmentGlintOverride(true);
+                itemMeta.addEnchant(Enchantment.LURE, 1, true);
+                itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                 stack.setItemMeta(itemMeta);
             }else if(assetType == AssetType.COMMODITY_ITEM){
                 Material material = Material.getMaterial(code);

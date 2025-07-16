@@ -3,7 +3,7 @@ version: ${project.version}
 main: com.faridfaharaj.profitable.Profitable
 author: faridfaharaj
 prefix: "Profitable"
-api-version: '1.21'
+api-version: '1.20'
 description: "Real supply and demand in minecraft!"
 website: "https://github.com/faridfaharaj/Profitable"
 softdepend:
@@ -18,15 +18,15 @@ commands:
     usage: /help or /help admin
     aliases: []
 
-  buy:
+  pbuy:
     description: Command used to buy assets on the exchange
     usage: /buy <Asset> <units> <price> <Order Type>
-    aliases: [ ]
+    aliases: [ buy ]
 
-  sell:
+  psell:
     description: Command used to sell assets on the exchange
     usage: /sell <Asset> <units> <price> <Order Type>
-    aliases: [ ]
+    aliases: [ sell ]
 
   assets:
     description: displays all registered assets

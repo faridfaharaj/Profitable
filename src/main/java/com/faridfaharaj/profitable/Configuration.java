@@ -82,6 +82,8 @@ public class Configuration {
                 Set<String> itemWhitelist = new HashSet<>(Profitable.getInstance().getConfig().getStringList("exchange.commodities.generation.commodity-item-whitelist"));
 
                 for (Material material : Material.values()) {
+                    if(!material.isItem()) continue;
+                    if(material.isAir()) continue;
                     String name = material.name();
 
                     if (itemWhitelist.contains(name)) {
@@ -95,6 +97,8 @@ public class Configuration {
                 Set<String> itemBlacklist = new HashSet<>(Profitable.getInstance().getConfig().getStringList("exchange.commodities.generation.commodity-item-blacklist"));
 
                 for (Material material : Material.values()) {
+                    if(!material.isItem()) continue;
+                    if(material.isAir()) continue;
                     String name = material.name();
 
                     if (!itemBlacklist.contains(name)) {
@@ -148,6 +152,8 @@ public class Configuration {
         }else{
 
             for (Material material : Material.values()) {
+                if(!material.isItem()) continue;
+                if(material.isAir()) continue;
                 String name = material.name();
 
                 ALLOWEITEMS.add(name);

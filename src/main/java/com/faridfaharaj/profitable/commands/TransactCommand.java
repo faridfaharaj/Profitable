@@ -35,9 +35,9 @@ public class TransactCommand implements CommandExecutor {
                 }
 
                 boolean sideBuy;
-                if(command.getName().equals("buy")){
+                if(command.getName().equals("pbuy")||command.getName().equals("buy")){
                     sideBuy = true;
-                }else if(command.getName().equals("sell")){
+                }else if(command.getName().equals("psell")||command.getName().equals("sell")){
                     sideBuy = false;
                 }else{
                     return;

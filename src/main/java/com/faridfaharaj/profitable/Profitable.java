@@ -124,11 +124,11 @@ public final class Profitable extends JavaPlugin {
         getLogger().info("Using " + Configuration.MAINCURRENCYASSET.getCode() + " as main currency on the exchange");
 
         //commands-------------------------
-        getCommand("buy").setExecutor(new TransactCommand());
-        getCommand("buy").setTabCompleter(new TransactCommand.CommandTabCompleter());
+        getCommand("pbuy").setExecutor(new TransactCommand());
+        getCommand("pbuy").setTabCompleter(new TransactCommand.CommandTabCompleter());
 
-        getCommand("sell").setExecutor(new TransactCommand());
-        getCommand("sell").setTabCompleter(new TransactCommand.CommandTabCompleter());
+        getCommand("psell").setExecutor(new TransactCommand());
+        getCommand("psell").setTabCompleter(new TransactCommand.CommandTabCompleter());
 
 
         getCommand("assets").setExecutor(new AssetsCommand());

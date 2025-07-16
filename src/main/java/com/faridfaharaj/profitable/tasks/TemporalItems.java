@@ -8,7 +8,9 @@ import com.faridfaharaj.profitable.util.MessagingUtil;
 
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -115,7 +117,8 @@ public class TemporalItems {
 
         if (meta != null) {
             meta.setDisplayName(displayName);
-            meta.setEnchantmentGlintOverride(true);
+            meta.addEnchant(Enchantment.LURE, 1, true);
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             item.setItemMeta(meta);
         }
 
