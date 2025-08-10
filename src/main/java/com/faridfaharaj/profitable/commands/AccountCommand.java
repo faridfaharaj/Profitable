@@ -141,6 +141,8 @@ public class AccountCommand implements CommandExecutor {
 
                 });
 
+                return true;
+
             }
 
             if(args[0].equals("logout")){
