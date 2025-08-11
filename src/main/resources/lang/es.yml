@@ -266,7 +266,7 @@ gui:
             - ""
             - "<gray>¡No hay vendedores aun!</gray>"
             - ""
-            - "<yellow>Haz click izquierdo para vender</yellow>"
+            - "<gray>Haz click izquierdo para vender</gray>"
         buy:
           name: "Orden de %side%"
           lore:
@@ -283,7 +283,7 @@ gui:
             - ""
             - "<gray>¡No hay compradores aun!</gray>"
             - ""
-            - "<yellow>Haz click izquierdo para comprar</yellow>"
+            - "<gray>Haz click izquierdo para comprar</gray>"
 
     type-select:
       title: "Elige un tipo de orden."
