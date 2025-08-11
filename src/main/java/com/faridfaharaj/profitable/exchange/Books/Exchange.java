@@ -107,7 +107,8 @@ public class Exchange {
         // Send Order -------------------------
 
         // Stop orders
-        Asset collateralAsset = order.isSideBuy()? Configuration.MAINCURRENCYASSET: tradedAsset;
+        Asset baseAsset = Configuration.MAINCURRENCYASSET;
+        Asset collateralAsset = order.isSideBuy()? baseAsset: tradedAsset;
 
         Candle lastday = Candles.getLastDay(player.getWorld() ,tradedAsset.getCode(), player.getWorld().getFullTime());
         if(order.getType() == Order.OrderType.STOP_LIMIT){
@@ -187,7 +188,7 @@ public class Exchange {
                     ordersToDelete.removeLast();
 
                 }
-                wrapTransactions(player, order, orders, takerFee, tradedAsset, collateralAsset, finalMoneyTransacted, unitsTransacted);
+                wrapTransactions(player, order, orders, takerFee, baseAsset, tradedAsset, finalMoneyTransacted, unitsTransacted);
                 Candles.updateDay(player.getWorld(), tradedAsset.getCode(), orders.getLast().getPrice(), unitsTransacted);
                 Orders.updateStopLimit(player.getWorld(), lastday.getClose(), orders.getLast().getPrice());
                 Orders.deleteOrders(player.getWorld(), ordersToDelete);
@@ -196,20 +197,20 @@ public class Exchange {
 
     }
 
-    private static void wrapTransactions(Player player, Order takerOrder, List<Order> makerOrder, double takerFee, Asset tradedAsset, Asset collateralAsset, double moneyTransacted, double unitsTransacted) {
+    private static void wrapTransactions(Player player, Order takerOrder, List<Order> makerOrders, double takerFee, Asset baseAsset, Asset quoteAsset, double moneyTransacted, double unitsTransacted) {
 
-        for(Order iteratedOrder:makerOrder){
+        for(Order iteratedOrder:makerOrders){
             if(iteratedOrder.isSideBuy()){
 
-                tradedAsset.distributeAsset(player.getWorld(), iteratedOrder.getOwner(), iteratedOrder.getUnits());
+                quoteAsset.distributeAsset(player.getWorld(), iteratedOrder.getOwner(), iteratedOrder.getUnits());
                 //                                                                                                                            Paid on order placement --------v
-                sendTransactionNotice(iteratedOrder.getOwner(), true, tradedAsset, iteratedOrder.getUnits(), (iteratedOrder.getUnits()*iteratedOrder.getPrice()), 0);
+                sendTransactionNotice(iteratedOrder.getOwner(), true, quoteAsset, iteratedOrder.getUnits(), (iteratedOrder.getUnits()*iteratedOrder.getPrice()), 0);
 
             }else {
 
-                double makerFee = Configuration.parseFee(Configuration.ASSETFEES[tradedAsset.getAssetType().getValue()][1],iteratedOrder.getUnits()*iteratedOrder.getPrice());
+                double makerFee = Configuration.parseFee(Configuration.ASSETFEES[quoteAsset.getAssetType().getValue()][1],iteratedOrder.getUnits()*iteratedOrder.getPrice());
                 Configuration.MAINCURRENCYASSET.distributeAsset(player.getWorld(), iteratedOrder.getOwner(), iteratedOrder.getUnits()*iteratedOrder.getPrice()-makerFee);
-                sendTransactionNotice(iteratedOrder.getOwner(), false, tradedAsset, iteratedOrder.getUnits(), (iteratedOrder.getUnits()*iteratedOrder.getPrice()), makerFee);
+                sendTransactionNotice(iteratedOrder.getOwner(), false, quoteAsset, iteratedOrder.getUnits(), (iteratedOrder.getUnits()*iteratedOrder.getPrice()), makerFee);
 
             }
         }
@@ -224,13 +225,13 @@ public class Exchange {
         }else{
             if(unitsTransacted != takerOrder.getUnits()){
                 takerOrder.setUnits(takerOrder.getUnits()-unitsTransacted);
-                addToBook(player, takerOrder, Configuration.MAINCURRENCYASSET, tradedAsset, collateralAsset);
+                addToBook(player, takerOrder, Configuration.MAINCURRENCYASSET, quoteAsset, baseAsset);
             }
 
         }
 
-        (takerOrder.isSideBuy()?tradedAsset:collateralAsset).distributeAsset(player.getWorld(), takerOrder.getOwner(), takerOrder.isSideBuy()?unitsTransacted:moneyTransacted - takerFee);
-        sendTransactionNotice(player, takerOrder.isSideBuy(), tradedAsset, unitsTransacted, moneyTransacted, takerFee);
+        (takerOrder.isSideBuy()?quoteAsset:baseAsset).distributeAsset(player.getWorld(), takerOrder.getOwner(), takerOrder.isSideBuy()?unitsTransacted:moneyTransacted - takerFee);
+        sendTransactionNotice(player, takerOrder.isSideBuy(), quoteAsset, unitsTransacted, moneyTransacted, takerFee);
     }
 
     public static void sendTransactionNotice(Player player, boolean sideBuy, Asset tradedAsset, double units, double money, double fee){
