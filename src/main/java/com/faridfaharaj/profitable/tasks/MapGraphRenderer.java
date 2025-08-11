@@ -96,8 +96,6 @@ public class MapGraphRenderer extends MapRenderer {
 
         for(int i = 0; i<candles.size()-1-start; i++){
 
-            System.out.println(candles.get(i+start).toString());
-
             int candleIndex = i+start;
             int offset = wideness*i;
 

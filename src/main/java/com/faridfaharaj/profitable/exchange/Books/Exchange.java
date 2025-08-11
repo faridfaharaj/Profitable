@@ -48,15 +48,6 @@ public class Exchange {
                 }
                 if(Accounts.getItemDelivery(player.getWorld(), order.getOwner()) == null){
                     MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.error.missing-item-delivery"));
-                    System.out.println(
-
-                            MiniMessage.miniMessage().serialize(
-
-                                    Component.text("You must set a location for delivery ", Configuration.COLORWARN).append(MessagingUtil.buttonComponent("[Click here!]","/delivery set item"))
-
-                            )
-
-                    );
                     TemporalItems.sendDeliveryStick(player, true);
                     return;
                 }
@@ -69,16 +60,6 @@ public class Exchange {
                 }
                 if(Accounts.getEntityDelivery(player.getWorld(), order.getOwner()) == null){
                     MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("delivery.error.missing-entity-delivery"));
-
-                    System.out.println(
-
-                            MiniMessage.miniMessage().serialize(
-
-                                    Component.text("You must set a location for delivery ", Configuration.COLORWARN).append(MessagingUtil.buttonComponent("[Click here!]","/delivery set entity"))
-
-                            )
-
-                    );
 
                     TemporalItems.sendDeliveryStick(player, false);
                     return;
