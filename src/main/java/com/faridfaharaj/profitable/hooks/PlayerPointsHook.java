@@ -58,4 +58,12 @@ public final class PlayerPointsHook extends EconomyHook{
         }
     }
 
+    @Override
+    public double balanceUUID(UUID uuid) {
+        if(isConnected()){
+            return uuid == null ? 0 : getApi().look(uuid);
+        }
+        return 0;
+    }
+
 }

@@ -263,6 +263,13 @@ gui:
           - ""
           - "<yellow>Left click to withdraw</yellow>"
           - "<yellow>Right click to deposit</yellow>"
+        lore-no-deposit-able:
+          - "<dark_gray>%asset_type%</dark_gray>"
+          - ""
+          - "<gray>Owned: %owned_asset_amount%</gray>"
+          - ""
+          - "<gray>Market price: %price_asset_amount%</gray>"
+          - "<gray>Total value: %value_asset_amount%</gray>"
   orders:
     title: "Your active orders"
     buttons:

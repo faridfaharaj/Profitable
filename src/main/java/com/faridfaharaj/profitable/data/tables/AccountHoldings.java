@@ -5,6 +5,7 @@ import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Candle;
+import com.faridfaharaj.profitable.hooks.Hooks;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.util.NamingUtil;
@@ -17,6 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class AccountHoldings {
 
@@ -104,6 +106,11 @@ public class AccountHoldings {
                     Asset asset = Asset.assetFromMeta(assetCode, Asset.AssetType.fromValue(iteratedType), meta);
 
                     double quantity = rs.getDouble("quantity");
+                    if(Objects.equals(asset.getCode(), Configuration.MAINCURRENCYASSET.getCode()) && Configuration.DIRECT_HOOK_BALANCE){
+                        UUID uuid = Accounts.getAccUUID(account);
+                        quantity += Hooks.vaultHook.balanceUUID(uuid) + Hooks.playerPointsHook.balanceUUID(uuid);
+                    }
+
 
                     double price;
                     if(!Objects.equals(assetCode, Configuration.MAINCURRENCYASSET.getCode())){
@@ -117,7 +124,14 @@ public class AccountHoldings {
                 }
 
                 if(balances.isEmpty() || !Objects.equals(balances.getFirst().getAsset().getCode(), Configuration.MAINCURRENCYASSET.getCode())){
-                    balances.addFirst(new AssetCache(Configuration.MAINCURRENCYASSET, new Candle(0, 1, 0,0, 0)));
+                    double quantity = 0;
+                    if(Configuration.DIRECT_HOOK_BALANCE){
+                        UUID uuid = Accounts.getAccUUID(account);
+                        quantity = Hooks.vaultHook.balanceUUID(uuid) + Hooks.playerPointsHook.balanceUUID(uuid);
+                    }
+
+
+                    balances.addFirst(new AssetCache(Configuration.MAINCURRENCYASSET, new Candle(0, 1, 0,0, quantity)));
                 }
 
             }

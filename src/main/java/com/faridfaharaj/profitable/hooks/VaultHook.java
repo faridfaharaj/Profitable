@@ -79,4 +79,16 @@ public final class VaultHook extends EconomyHook{
         }
     }
 
+    @Override
+    public double balanceUUID(UUID uuid) {
+        if(isConnected()){
+            if(uuid != null){
+                OfflinePlayer offlinePlayer = Profitable.getInstance().getServer().getOfflinePlayer(uuid);
+                return getApi().getBalance(offlinePlayer);
+            }
+        }
+        return 0;
+    }
+
+
 }

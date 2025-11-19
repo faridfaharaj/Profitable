@@ -45,12 +45,24 @@ public final class AssetHolderButton extends GuiElement {
 
             setDisplayName(Component.text(asset.getCode(),asset.getColor()));
 
-            List<Component> lore = Profitable.getLang().langToLore("gui.wallet.buttons.asset-holding.lore",
-                    Map.entry("%asset_type%", NamingUtil.nameType(asset.getAssetType())),
-                    Map.entry("%owned_asset_amount%", MessagingUtil.assetAmmount(asset, lastestDay.getVolume())),
-                    Map.entry("%price_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getClose())),
-                    Map.entry("%value_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getVolume()*lastestDay.getClose()))
-            );
+
+            List<Component> lore;
+            if(asset != Configuration.MAINCURRENCYASSET || !Configuration.DIRECT_HOOK_BALANCE){
+                lore = Profitable.getLang().langToLore("gui.wallet.buttons.asset-holding.lore",
+                        Map.entry("%asset_type%", NamingUtil.nameType(asset.getAssetType())),
+                        Map.entry("%owned_asset_amount%", MessagingUtil.assetAmmount(asset, lastestDay.getVolume())),
+                        Map.entry("%price_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getClose())),
+                        Map.entry("%value_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getVolume()*lastestDay.getClose()))
+                );
+            }else{
+                lore = Profitable.getLang().langToLore("gui.wallet.buttons.asset-holding.lore-no-deposit-able",
+                        Map.entry("%asset_type%", NamingUtil.nameType(asset.getAssetType())),
+                        Map.entry("%owned_asset_amount%", MessagingUtil.assetAmmount(asset, lastestDay.getVolume())),
+                        Map.entry("%price_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getClose())),
+                        Map.entry("%value_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, lastestDay.getVolume()*lastestDay.getClose()))
+                );
+            }
+
 
             setLore(lore);
 
@@ -63,6 +75,8 @@ public final class AssetHolderButton extends GuiElement {
     }
 
     public void manage(Player player, boolean depositing, AssetCache[][] assetCache){
-        new DepositWithdrawalGui(asset, depositing, assetCache).openGui(player);
+        if(asset != Configuration.MAINCURRENCYASSET || !Configuration.DIRECT_HOOK_BALANCE){
+            new DepositWithdrawalGui(asset, depositing, assetCache).openGui(player);
+        }
     }
 }

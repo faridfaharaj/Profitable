@@ -4,6 +4,8 @@ import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 
+import java.util.UUID;
+
 public abstract class EconomyHook extends Hook {
 
     private Asset ASSET;
@@ -19,5 +21,6 @@ public abstract class EconomyHook extends Hook {
 
     public abstract void depositAccount(String account, double ammount);
     public abstract void withdrawAccount(String account, double ammount);
+    public abstract double balanceUUID(UUID uuid);
 
 }
