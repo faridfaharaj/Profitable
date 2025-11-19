@@ -3,6 +3,7 @@ package com.faridfaharaj.profitable.data.holderClasses.assets;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.tables.AccountHoldings;
+import com.faridfaharaj.profitable.hooks.Hooks;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
 import com.faridfaharaj.profitable.hooks.VaultHook;
 import com.faridfaharaj.profitable.util.MessagingUtil;
@@ -192,27 +193,27 @@ public abstract class Asset {
     }
 
     public static boolean retrieveBalanceHook(String account, double balance, String asset, double ammount, Player player){
-        if(VaultHook.isConnected() && Objects.equals(asset, VaultHook.getAsset().getCode())){
+        if(Hooks.vaultHook.isConnected() && Objects.equals(asset, Hooks.vaultHook.getAsset().getCode())){
 
             double fee = Configuration.parseFee(Configuration.DEPOSITFEES, ammount);
 
-            if(VaultHook.getEconomy().withdrawPlayer(player, ammount+fee).transactionSuccess()){
+            if(Hooks.vaultHook.getApi().withdrawPlayer(player, ammount+fee).transactionSuccess()){
                 MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.auto-deposit-notice",
-                    Map.entry("%asset_amount%", MessagingUtil.assetAmmount(VaultHook.getAsset(), ammount))
+                    Map.entry("%asset_amount%", MessagingUtil.assetAmmount(Hooks.playerPointsHook.getAsset(), ammount))
                 ));
                 return true;
             }
 
-        } else if (PlayerPointsHook.isConnected() && Objects.equals(asset, PlayerPointsHook.getAsset().getCode())) {
+        } else if (Hooks.playerPointsHook.isConnected() && Objects.equals(asset, Hooks.playerPointsHook.getAsset().getCode())) {
 
             double fee = Configuration.parseFee(Configuration.DEPOSITFEES, ammount);
             double total = Math.ceil(ammount+fee);
-            if(PlayerPointsHook.getApi().take(player.getUniqueId(), (int) total)){
+            if(Hooks.playerPointsHook.getApi().take(player.getUniqueId(), (int) total)){
                 if(total-ammount+fee != 0){
                     AccountHoldings.setHolding(player.getWorld(), account, asset, balance+(total-ammount+fee));
                 }
                 MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.auto-deposit-notice",
-                        Map.entry("%asset_amount%", MessagingUtil.assetAmmount(PlayerPointsHook.getAsset(), ammount))
+                        Map.entry("%asset_amount%", MessagingUtil.assetAmmount(Hooks.playerPointsHook.getAsset(), ammount))
                 ));
                 return true;
             }

@@ -1,8 +1,10 @@
 package com.faridfaharaj.profitable.data.holderClasses.assets;
 
+import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.data.tables.Accounts;
+import com.faridfaharaj.profitable.hooks.Hooks;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.World;
@@ -10,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class Currency extends Asset {
 
@@ -20,6 +23,15 @@ public class Currency extends Asset {
     @Override
     public void distributeAsset(World world, String account, double ammount){
 
+        if(Configuration.DIRECT_HOOK_BALANCE){
+            if(Objects.equals(this.getCode(), Hooks.vaultHook.getAsset().getCode())){
+                Hooks.vaultHook.depositAccount(account,ammount);
+                return;
+            }else if(Objects.equals(this.getCode(), Hooks.playerPointsHook.getAsset().getCode())){
+                Hooks.playerPointsHook.depositAccount(account, ammount);
+                return;
+            }
+        }
         sendBalance(world,account, ammount);
 
     }
@@ -33,16 +45,32 @@ public class Currency extends Asset {
         }
 
         String account = Accounts.getAccount(player);
-        double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, code);
-        if(retrieveBalance(player.getWorld(), account, balance, ammount)){
-            runnable.run();
-        }else {
-            if(retrieveBalanceHook(account, balance, code, ammount, player)){
+
+        if(Configuration.DIRECT_HOOK_BALANCE){
+            if(retrieveBalanceHook(account, 0, code, ammount, player)){
                 runnable.run();
             }else {
-                MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
-                        Map.entry("%asset%", code)
-                ));
+                double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, code);
+                if(retrieveBalance(player.getWorld(), account, balance, ammount)){
+                    runnable.run();
+                }else{
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                            Map.entry("%asset%", code)
+                    ));
+                }
+            }
+        }else{
+            double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, code);
+            if(retrieveBalance(player.getWorld(), account, balance, ammount)){
+                runnable.run();
+            }else {
+                if(retrieveBalanceHook(account, balance, code, ammount, player)){
+                    runnable.run();
+                }else {
+                    MessagingUtil.sendComponentMessage(player, Profitable.getLang().get("assets.error.not-enough-asset",
+                            Map.entry("%asset%", code)
+                    ));
+                }
             }
         }
     }

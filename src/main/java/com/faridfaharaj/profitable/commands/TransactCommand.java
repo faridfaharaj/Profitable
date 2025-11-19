@@ -6,6 +6,7 @@ import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.exchange.Books.Exchange;
+import com.faridfaharaj.profitable.hooks.Hooks;
 import com.faridfaharaj.profitable.hooks.VaultHook;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import org.bukkit.command.Command;
@@ -127,8 +128,8 @@ public class TransactCommand implements CommandExecutor {
             if(args.length == 1){
                 List<String> options = new ArrayList<>(Configuration.ALLOWEITEMS);
                 options.addAll(Configuration.ALLOWENTITIES);
-                if(VaultHook.isConnected()){
-                    options.add(VaultHook.getAsset().getCode());
+                if(Hooks.vaultHook.isConnected()){
+                    options.add(Hooks.vaultHook.getAsset().getCode());
                 }
                 options.add("hand");
 

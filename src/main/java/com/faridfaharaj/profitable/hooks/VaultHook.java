@@ -1,37 +1,36 @@
 package com.faridfaharaj.profitable.hooks;
 
-import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
-import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
-import com.faridfaharaj.profitable.data.tables.Assets;
+import com.faridfaharaj.profitable.data.tables.Accounts;
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-public class VaultHook {
+import java.util.UUID;
 
-    private static Asset ASSET;
+public final class VaultHook extends EconomyHook{
+
     private static Economy economy = null;
-    private static boolean isConnected;
 
-    public static boolean inithook(Profitable profitable){
+    public VaultHook(Profitable profitable) {
+        super(profitable);
+    }
+
+    @Override
+    public boolean initHook(Profitable profitable){
         if(profitable.getConfig().getBoolean("vault-support")){
-
             economy = VaultHook.findEconomy(profitable);
-            isConnected = economy != null;
-
-        }else{
-
-            isConnected = false;
+            if(economy != null){
+                profitable.getLogger().info("Connected to Vault");
+                return true;
+            }
 
         }
-
-        if(isConnected) {
-            ASSET = Configuration.MAINCURRENCYASSET;
-            profitable.getLogger().info("Connected to Vault");
-        }
-        return isConnected;
+        return false;
     }
 
     private static Economy findEconomy(Plugin plugin) {
@@ -47,16 +46,37 @@ public class VaultHook {
         return rsp.getProvider();
     }
 
-    public static Economy getEconomy(){
+    @Override
+    public Economy getApi() {
         return economy;
     }
 
-    public static Asset getAsset(){
-        return ASSET;
+    @Override
+    public void depositAccount(String account, double ammount){
+        UUID uuid = Accounts.getAccUUID(account);
+        if(uuid != null){
+            Player player = Profitable.getInstance().getServer().getPlayer(uuid);
+            if(player != null){
+                EconomyResponse es = getApi().depositPlayer(player, ammount);
+            }else{
+                OfflinePlayer offlinePlayer = Profitable.getInstance().getServer().getOfflinePlayer(uuid);
+                EconomyResponse es = getApi().depositPlayer(offlinePlayer, ammount);
+            }
+        }
     }
 
-    public static boolean isConnected(){
-        return isConnected;
+    @Override
+    public void withdrawAccount(String account, double ammount) {
+        UUID uuid = Accounts.getAccUUID(account);
+        if(uuid != null){
+            Player player = Profitable.getInstance().getServer().getPlayer(uuid);
+            if(player != null){
+                EconomyResponse es = getApi().withdrawPlayer(player, ammount);
+            }else{
+                OfflinePlayer offlinePlayer = Profitable.getInstance().getServer().getOfflinePlayer(uuid);
+                EconomyResponse es = getApi().withdrawPlayer(offlinePlayer, ammount);
+            }
+        }
     }
 
 }

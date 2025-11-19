@@ -6,6 +6,7 @@ import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.assets.ComEntity;
 import com.faridfaharaj.profitable.data.holderClasses.assets.ComItem;
+import com.faridfaharaj.profitable.hooks.Hooks;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
 import com.faridfaharaj.profitable.hooks.VaultHook;
 import com.faridfaharaj.profitable.util.MessagingUtil;
@@ -177,17 +178,16 @@ public class Assets {
             throw new RuntimeException(e);
         }
 
-        VaultHook.inithook(Profitable.getInstance());
-        PlayerPointsHook.initHook(Profitable.getInstance());
+        Hooks.initHooks(Profitable.getInstance());
 
         //Hooks asset generation----
-        if(VaultHook.isConnected()){
+        if(Hooks.vaultHook.isConnected()){
             // Vault
-            Assets.addAsset(world,VaultHook.getAsset());
+            Assets.addAsset(world,Hooks.vaultHook.getAsset());
         }
-        if(PlayerPointsHook.isConnected()){
+        if(Hooks.playerPointsHook.isConnected()){
             // PlayerPoints
-            Assets.addAsset(world,PlayerPointsHook.getAsset());
+            Assets.addAsset(world,Hooks.playerPointsHook.getAsset());
         }
 
         if(Configuration.GENERATEASSETS){

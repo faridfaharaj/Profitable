@@ -22,11 +22,13 @@ public class ComItem extends Asset {
 
     @Override
     public void distributeAsset(World world, String account, double ammount) {
-        if(Configuration.PHYSICALDELIVERY){
+        /*if(Configuration.PHYSICALDELIVERY){
             sendCommodityItem(world,account, (int) ammount);
         }else {
             sendBalance(world,account, ammount);
-        }
+        }*/
+
+        sendBalance(world,account, ammount);
     }
 
     public void sendCommodityItem(World world,String account, int amount){

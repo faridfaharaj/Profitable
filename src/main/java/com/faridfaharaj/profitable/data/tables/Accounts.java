@@ -315,6 +315,8 @@ public class Accounts {
         return false;
     }
 
+
+    // UTIL
     public static void logOut(UUID playerid){
         currentAccounts.remove(playerid);
     }
@@ -419,6 +421,14 @@ public class Accounts {
 
         return new Location(world, buffer.getDouble(), buffer.getDouble(), buffer.getDouble());
 
+    }
+
+    public static UUID getAccUUID(String account){
+        try{
+            return UUID.fromString(account);
+        }catch (Exception e){
+            return null;
+        }
     }
 
 }

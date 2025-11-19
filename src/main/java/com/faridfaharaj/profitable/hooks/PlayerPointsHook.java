@@ -3,44 +3,59 @@ package com.faridfaharaj.profitable.hooks;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
+import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.Assets;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
-public class PlayerPointsHook {
+import java.util.UUID;
 
-    private static Asset ASSET;
+public final class PlayerPointsHook extends EconomyHook{
+
     private static PlayerPointsAPI api;
-    private static boolean isConnected;
 
-    public static PlayerPointsAPI getApi(){
+    public PlayerPointsHook(Profitable profitable) {
+        super(profitable);
+    }
+
+    @Override
+    public PlayerPointsAPI getApi(){
         return api;
     }
 
-    public static boolean initHook(Profitable profitable){
+    @Override
+    public boolean initHook(Profitable profitable){
         if(profitable.getConfig().getBoolean("player-points-support")){
             if (Bukkit.getPluginManager().isPluginEnabled("PlayerPoints")) {
                 api = PlayerPoints.getInstance().getAPI();
-                isConnected = api != null;
+                if(api != null){
+                    // ASSET = Configuration.MAINCURRENCYASSET;
+                    profitable.getLogger().info("Connected to PlayerPoints");
+                    return true;
+                }
             }
-        }else {
-            isConnected = false;
         }
-
-        if(isConnected) {
-            ASSET = Configuration.MAINCURRENCYASSET;
-            profitable.getLogger().info("Connected to PlayerPoints");
-        }
-        return isConnected;
+        return false;
     }
 
-    public static Asset getAsset(){
-        return ASSET;
+    @Override
+    public void depositAccount(String account, double ammount){
+        UUID uuid = Accounts.getAccUUID(account);
+        if(uuid != null){
+            getApi().give(uuid,(int) ammount);
+        }
     }
 
-    public static boolean isConnected(){
-        return isConnected;
+    @Override
+    public void withdrawAccount(String account, double ammount) {
+        UUID uuid = Accounts.getAccUUID(account);
+        if(uuid != null){
+            getApi().take(uuid,(int) ammount);
+        }
     }
 
 }

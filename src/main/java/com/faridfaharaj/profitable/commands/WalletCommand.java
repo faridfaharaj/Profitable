@@ -9,6 +9,7 @@ import com.faridfaharaj.profitable.data.holderClasses.assets.ComItem;
 import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.Assets;
+import com.faridfaharaj.profitable.hooks.Hooks;
 import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
 import com.faridfaharaj.profitable.tasks.gui.guis.HoldingsMenu;
 import com.faridfaharaj.profitable.util.MessagingUtil;
@@ -195,9 +196,9 @@ public class WalletCommand implements CommandExecutor {
                 return;
             }
 
-            if(VaultHook.isConnected() && Objects.equals(VaultHook.getAsset().getCode(), asset.getCode())){
+            if(Hooks.vaultHook.isConnected() && Objects.equals(Hooks.vaultHook.getAsset().getCode(), asset.getCode())){
 
-                if(VaultHook.getEconomy().withdrawPlayer(player, amount).transactionSuccess()){
+                if(Hooks.vaultHook.getApi().withdrawPlayer(player, amount).transactionSuccess()){
                     Profitable.getfolialib().getScheduler().runAsync(task -> {
                         asset.distributeAsset(player.getWorld(), Accounts.getAccount(player), amount -fee);
                         MessagingUtil.sendPaymentNotice(player, amount, fee, asset);
@@ -208,7 +209,7 @@ public class WalletCommand implements CommandExecutor {
 
             }
 
-            if (PlayerPointsHook.isConnected() && Objects.equals(PlayerPointsHook.getAsset().getCode(), asset.getCode())){
+            if (Hooks.playerPointsHook.isConnected() && Objects.equals(Hooks.playerPointsHook.getAsset().getCode(), asset.getCode())){
 
                 int integerAmount = (int) amount;
                 if(integerAmount < 1){
@@ -217,7 +218,7 @@ public class WalletCommand implements CommandExecutor {
                     ));
                     return;
                 }
-                if(PlayerPointsHook.getApi().take(player.getUniqueId(), integerAmount)){
+                if(Hooks.playerPointsHook.getApi().take(player.getUniqueId(), integerAmount)){
                     Profitable.getfolialib().getScheduler().runAsync(task -> {
                         asset.distributeAsset(player.getWorld(), Accounts.getAccount(player), integerAmount- Math.ceil(fee));
                         MessagingUtil.sendPaymentNotice(player, amount, Math.ceil(fee), asset);
@@ -279,14 +280,14 @@ public class WalletCommand implements CommandExecutor {
 
             double fee = Configuration.parseFee(Configuration.WITHDRAWALFEES, ammount);
 
-            if(VaultHook.isConnected() && asset.getCode().equals(VaultHook.getAsset().getCode())){
+            if(Hooks.vaultHook.isConnected() && asset.getCode().equals(Hooks.vaultHook.getAsset().getCode())){
 
                 Profitable.getfolialib().getScheduler().runAsync(async -> {
                     String account = Accounts.getAccount(player);
                     double balance = AccountHoldings.getAccountAssetBalance(player.getWorld(), account, asset.getCode());
                     if(asset.retrieveBalance(player.getWorld(),account, balance, ammount)){
                         Profitable.getfolialib().getScheduler().runNextTick(global -> {
-                            EconomyResponse es = VaultHook.getEconomy().depositPlayer(player, ammount);
+                            EconomyResponse es = Hooks.vaultHook.getApi().depositPlayer(player, ammount);
                             if(es.transactionSuccess()){
                                 MessagingUtil.sendChargeNotice(player, ammount+fee, fee, asset);
                             }else{
@@ -302,7 +303,7 @@ public class WalletCommand implements CommandExecutor {
                 });
                 return;
 
-            }else if (PlayerPointsHook.isConnected() && asset.getCode().equals(PlayerPointsHook.getAsset().getCode())){
+            }else if (Hooks.playerPointsHook.isConnected() && asset.getCode().equals(Hooks.playerPointsHook.getAsset().getCode())){
 
                 int integerAmount = (int) ammount;
                 if(integerAmount < 1){
@@ -317,7 +318,7 @@ public class WalletCommand implements CommandExecutor {
                     if(asset.retrieveBalance(player.getWorld(),account, balance, ammount)){
                         Profitable.getfolialib().getScheduler().runNextTick(global -> {
                             double ceilFee = Math.ceil(fee);
-                            PlayerPointsHook.getApi().give(player.getUniqueId(), (int) (integerAmount-ceilFee));
+                            Hooks.playerPointsHook.getApi().give(player.getUniqueId(), (int) (integerAmount-ceilFee));
                             MessagingUtil.sendChargeNotice(player, ammount-ceilFee, ceilFee, asset);
                         });
                     }else {

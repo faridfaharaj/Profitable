@@ -38,7 +38,7 @@ public class Exchange {
             return;
         }
 
-        if(Configuration.PHYSICALDELIVERY){
+        /* if(Configuration.PHYSICALDELIVERY){
             String assetTypeName = NamingUtil.nameType(tradedAsset.getAssetType());
 
             if(tradedAsset.getAssetType() == Asset.AssetType.COMMODITY_ITEM){
@@ -71,7 +71,7 @@ public class Exchange {
                 return;
             }
 
-        }
+        }*/
 
         if(tradedAsset.getAssetType() == Asset.AssetType.COMMODITY_ITEM || tradedAsset.getAssetType() == Asset.AssetType.COMMODITY_ENTITY) order.setUnits((int) order.getUnits());
 
@@ -239,12 +239,7 @@ public class Exchange {
     }
 
     public static void sendTransactionNotice(String account, boolean sideBuy, Asset tradedAsset, double units, double money, double fee){
-        UUID playerid;
-        try{
-            playerid = UUID.fromString(account);
-        }catch (Exception e){
-            return;
-        }
+        UUID playerid = Accounts.getAccUUID(account);
 
         Player player = Profitable.getInstance().getServer().getPlayer(playerid);
         if(player != null){

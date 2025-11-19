@@ -43,9 +43,9 @@ public class Configuration {
     public static boolean MULTIWORLD;
     public static boolean GENERATEASSETS;
 
-    public static boolean PHYSICALDELIVERY;
     public static boolean[] ALLOWEDCOMMODITYCOLLATERAL = new boolean[3];
 
+    public static boolean DIRECT_HOOK_BALANCE;
 
     public static String WITHDRAWALFEES;
     public static String DEPOSITFEES;
@@ -173,10 +173,11 @@ public class Configuration {
             }
 
         }
-        PHYSICALDELIVERY = config.getBoolean("exchange.commodities.physical-delivery");
         ALLOWEDCOMMODITYCOLLATERAL[0] = config.getBoolean("exchange.commodities.take-wallet");
         ALLOWEDCOMMODITYCOLLATERAL[1] = config.getBoolean("exchange.commodities.take-inventory");
         ALLOWEDCOMMODITYCOLLATERAL[2] = config.getBoolean("exchange.commodities.take-world");
+
+        DIRECT_HOOK_BALANCE = config.getBoolean("main-currency.direct-hook-balance");
 
         // Colors
         COLORBULLISH = TextColor.fromHexString(config.getString("colors.bullish", "#8CD740"));

@@ -31,11 +31,13 @@ public class ComEntity extends Asset {
 
     @Override
     public void distributeAsset(World world, String account, double ammount) {
-        if(Configuration.PHYSICALDELIVERY){
+        /*if(Configuration.PHYSICALDELIVERY){
             sendCommodityEntity(world,account, (int) ammount);
         }else {
             sendBalance(world,account, ammount);
-        }
+        }*/
+
+        sendBalance(world,account, ammount);
     }
 
     public void sendCommodityEntityToPlayer(Player player, String account, int amount){
