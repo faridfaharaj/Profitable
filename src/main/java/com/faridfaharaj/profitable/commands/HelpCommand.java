@@ -1,7 +1,5 @@
 package com.faridfaharaj.profitable.commands;
 
-import com.faridfaharaj.profitable.util.MessagingUtil;
-import net.kyori.adventure.text.Component;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

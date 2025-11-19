@@ -1,7 +1,5 @@
 package com.faridfaharaj.profitable.commands;
 
-import com.faridfaharaj.profitable.Configuration;
-import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.tasks.gui.guis.AssetExplorer;
 import com.faridfaharaj.profitable.util.MessagingUtil;

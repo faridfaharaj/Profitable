@@ -1,7 +1,6 @@
 package com.faridfaharaj.profitable.tasks.gui;
 
 import com.faridfaharaj.profitable.Profitable;
-import com.tcoded.folialib.FoliaLib;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;

@@ -9,11 +9,7 @@ import com.faridfaharaj.profitable.data.tables.Candles;
 import com.faridfaharaj.profitable.data.tables.Orders;
 import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.Order;
-import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.util.MessagingUtil;
-import com.faridfaharaj.profitable.util.NamingUtil;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 

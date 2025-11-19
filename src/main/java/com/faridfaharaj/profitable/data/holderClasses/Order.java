@@ -3,7 +3,6 @@ package com.faridfaharaj.profitable.data.holderClasses;
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.util.UUID;
 

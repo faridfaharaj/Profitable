@@ -8,8 +8,6 @@ import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.hooks.Hooks;
 import com.faridfaharaj.profitable.tasks.gui.elements.specific.AssetCache;
 import com.faridfaharaj.profitable.util.MessagingUtil;
-import com.faridfaharaj.profitable.util.NamingUtil;
-import net.kyori.adventure.text.Component;
 import org.bukkit.World;
 
 import java.sql.PreparedStatement;

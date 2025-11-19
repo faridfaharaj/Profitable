@@ -1,7 +1,5 @@
 package com.faridfaharaj.profitable.commands;
 
-import com.faridfaharaj.profitable.Configuration;
-import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.tasks.TemporalItems;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import org.bukkit.command.Command;

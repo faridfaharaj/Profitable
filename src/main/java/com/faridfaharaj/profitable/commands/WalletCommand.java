@@ -2,7 +2,6 @@ package com.faridfaharaj.profitable.commands;
 
 import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
-import com.faridfaharaj.profitable.data.DataBase;
 import com.faridfaharaj.profitable.data.holderClasses.assets.Asset;
 import com.faridfaharaj.profitable.data.holderClasses.assets.ComEntity;
 import com.faridfaharaj.profitable.data.holderClasses.assets.ComItem;
@@ -10,10 +9,8 @@ import com.faridfaharaj.profitable.data.tables.AccountHoldings;
 import com.faridfaharaj.profitable.data.tables.Accounts;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.hooks.Hooks;
-import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
 import com.faridfaharaj.profitable.tasks.gui.guis.HoldingsMenu;
 import com.faridfaharaj.profitable.util.MessagingUtil;
-import com.faridfaharaj.profitable.hooks.VaultHook;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
