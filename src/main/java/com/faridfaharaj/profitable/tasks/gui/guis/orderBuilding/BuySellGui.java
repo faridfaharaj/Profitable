@@ -63,7 +63,7 @@ public final class BuySellGui extends ChestGUI {
 
             sellLore = Profitable.getLang().langToLore("gui.order-building.buy-sell.buttons.sell.lore",
                     Map.entry("%asset%", this.assetData.getAsset().getCode()),
-                    Map.entry("%ask_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, askOrders.getFirst().getPrice())),
+                    Map.entry("%ask_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, askOrders.get(0).getPrice())),
                     Map.entry("%price_list%", prices.toString())
             );
         }else {
@@ -91,7 +91,7 @@ public final class BuySellGui extends ChestGUI {
 
             buyLore = Profitable.getLang().langToLore("gui.order-building.buy-sell.buttons.buy.lore",
                     Map.entry("%asset%", this.assetData.getAsset().getCode()),
-                    Map.entry("%bid_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, bidOrders.getFirst().getPrice())),
+                    Map.entry("%bid_asset_amount%", MessagingUtil.assetAmmount(Configuration.MAINCURRENCYASSET, bidOrders.get(0).getPrice())),
                     Map.entry("%price_list%", prices.toString())
             );
         }else {

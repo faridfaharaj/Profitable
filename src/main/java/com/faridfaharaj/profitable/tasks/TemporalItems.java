@@ -4,6 +4,7 @@ import com.faridfaharaj.profitable.Configuration;
 import com.faridfaharaj.profitable.Profitable;
 import com.faridfaharaj.profitable.data.tables.Assets;
 import com.faridfaharaj.profitable.data.holderClasses.Asset;
+import com.faridfaharaj.profitable.util.ItemMetaUtil;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 
 import org.bukkit.Material;
@@ -115,8 +116,8 @@ public class TemporalItems {
 
         if (meta != null) {
             meta.setDisplayName(displayName);
-            meta.setEnchantmentGlintOverride(true);
             item.setItemMeta(meta);
+            ItemMetaUtil.applyGlint(item);
         }
 
         Profitable.getfolialib().getScheduler().runAtEntity(player, task -> {

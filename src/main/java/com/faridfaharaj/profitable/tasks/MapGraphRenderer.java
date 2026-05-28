@@ -68,8 +68,8 @@ public class MapGraphRenderer extends MapRenderer {
             return;
         }
 
-        double lowest = candles.getLast().getLow();
-        double highest = candles.getLast().getHigh();
+        double lowest = candles.get(candles.size() - 1).getLow();
+        double highest = candles.get(candles.size() - 1).getHigh();
 
         if(highest == lowest){
             canvas.drawText(25, bottom - top/2 - 5, MinecraftFont.Font, "No price change");
@@ -117,7 +117,7 @@ public class MapGraphRenderer extends MapRenderer {
 
 
             if(volume > 0){
-                volume = bottom - (int) Math.ceil(volume / candles.getLast().getVolume() * ((double) top /3));
+                volume = bottom - (int) Math.ceil(volume / candles.get(candles.size() - 1).getVolume() * ((double) top /3));
                 shadedRectangle(canvas, offset+spacing, bottom,offset+wideness-1, (int) volume, volumeColor);
             }
 

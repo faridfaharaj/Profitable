@@ -44,7 +44,7 @@ public class MessagingUtil {
         if(!asset.getStringData().isEmpty()){
             component = component.appendNewline();
 
-            String[] words = asset.getStringData().getFirst().split(" ");
+            String[] words = asset.getStringData().get(0).split(" ");
             int linelen = 0;
             for (String word : words) {
                 linelen += word.length();
