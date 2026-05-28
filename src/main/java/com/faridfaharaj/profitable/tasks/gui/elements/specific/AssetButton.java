@@ -7,6 +7,7 @@ import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.guis.GraphsMenu;
 import com.faridfaharaj.profitable.tasks.gui.guis.orderBuilding.BuySellGui;
+import com.faridfaharaj.profitable.util.ItemMetaUtil;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.Component;
@@ -14,7 +15,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,9 +42,7 @@ public final class AssetButton extends GuiElement {
             this.display = new ItemStack(Material.getMaterial(assetData.getAsset().getCode()+"_SPAWN_EGG"));
         }if(assetData.getAsset().getAssetType() == 1) {
             this.display = new ItemStack(Material.EMERALD);
-            ItemMeta meta = this.display.getItemMeta();
-            meta.setEnchantmentGlintOverride(true);
-            this.display.setItemMeta(meta);
+            ItemMetaUtil.applyGlint(this.display);
         }
 
         setDisplayName(

@@ -109,15 +109,15 @@ public class AccountHoldings {
                     if(!Objects.equals(assetCode, Configuration.MAINCURRENCYASSET.getCode())){
                         value = rs.getDouble("value");
                     }else {
-                        balances.addFirst(new AssetCache(asset, new Candle(0, 1, 0,0, quantity)));
+                        balances.add(0, new AssetCache(asset, new Candle(0, 1, 0,0, quantity)));
                         continue;
                     }
 
                     balances.add(new AssetCache(asset, new Candle(0, value, 0,0, quantity)));
                 }
 
-                if(balances.isEmpty() || !Objects.equals(balances.getFirst().getAsset().getCode(), Configuration.MAINCURRENCYASSET.getCode())){
-                    balances.addFirst(new AssetCache(Configuration.MAINCURRENCYASSET, new Candle(0, 1, 0,0, 0)));
+                if(balances.isEmpty() || !Objects.equals(balances.get(0).getAsset().getCode(), Configuration.MAINCURRENCYASSET.getCode())){
+                    balances.add(0, new AssetCache(Configuration.MAINCURRENCYASSET, new Candle(0, 1, 0,0, 0)));
                 }
 
             }

@@ -108,16 +108,16 @@ public final class Profitable extends JavaPlugin {
             for(World world : this.getServer().getWorlds()){
                 Assets.generateAssets(world);
                 Accounts.registerDefaultAccount(world, "server");
-                Accounts.changeEntityDelivery(world, "server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
-                Accounts.changeItemDelivery(world, "server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
+                Accounts.changeEntityDelivery(world, "server", new Location(Profitable.getInstance().getServer().getWorlds().get(0), 0, 0 ,0));
+                Accounts.changeItemDelivery(world, "server", new Location(Profitable.getInstance().getServer().getWorlds().get(0), 0, 0 ,0));
             }
             getLogger().info("Using per-world data");
         }else{
-            World world = getServer().getWorlds().getFirst();
+            World world = getServer().getWorlds().get(0);
             Assets.generateAssets(world);
             Accounts.registerDefaultAccount(world, "server");
-            Accounts.changeEntityDelivery(world, "server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
-            Accounts.changeItemDelivery(world, "server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
+            Accounts.changeEntityDelivery(world, "server", new Location(Profitable.getInstance().getServer().getWorlds().get(0), 0, 0 ,0));
+            Accounts.changeItemDelivery(world, "server", new Location(Profitable.getInstance().getServer().getWorlds().get(0), 0, 0 ,0));
             getLogger().info("Using single server-wide data");
         }
 
