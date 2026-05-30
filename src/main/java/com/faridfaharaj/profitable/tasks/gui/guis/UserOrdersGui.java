@@ -109,7 +109,7 @@ public final class UserOrdersGui extends ChestGUI {
                 }if(click.isRightClick()){
                     page-=1;
                 }
-                page = Math.clamp(page, 0, pages);
+                page = Math.max(0, Math.min(page, pages));
                 updatePage();
                 pageButton.setDisplayName(Profitable.getLang().get("gui.generic.buttons.page-selector.name",
                         Map.entry("%page%",String.valueOf(page)),

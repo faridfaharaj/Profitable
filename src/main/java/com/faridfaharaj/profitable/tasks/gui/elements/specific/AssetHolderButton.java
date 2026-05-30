@@ -7,6 +7,7 @@ import com.faridfaharaj.profitable.data.holderClasses.Candle;
 import com.faridfaharaj.profitable.tasks.gui.ChestGUI;
 import com.faridfaharaj.profitable.tasks.gui.elements.GuiElement;
 import com.faridfaharaj.profitable.tasks.gui.guis.DepositWithdrawalGui;
+import com.faridfaharaj.profitable.util.ItemMetaCompat;
 import com.faridfaharaj.profitable.util.MessagingUtil;
 import com.faridfaharaj.profitable.util.NamingUtil;
 import net.kyori.adventure.text.Component;
@@ -41,7 +42,7 @@ public final class AssetHolderButton extends GuiElement {
             }if(asset.getAssetType() == 1) {
                 this.display = new ItemStack(Material.EMERALD);
                 ItemMeta meta = this.display.getItemMeta();
-                meta.setEnchantmentGlintOverride(true);
+                ItemMetaCompat.setEnchantmentGlintOverride(meta, true);
                 this.display.setItemMeta(meta);
             }
 

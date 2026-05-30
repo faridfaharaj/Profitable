@@ -29,7 +29,7 @@ public final class PriceSelect  extends QuantitySelectGui {
     AssetCache assetData;
     public PriceSelect(AssetCache[][] assetCache, AssetCache assetData, Order order, List<Order> bidOrders, List<Order> askOrders) {
         super(Profitable.getLang().get("gui.order-building.price-select.title"), true, false,
-                Math.max(order.isSideBuy()? (bidOrders.isEmpty()? assetData.getlastCandle().getClose() : bidOrders.getFirst().getPrice()) :(askOrders.isEmpty()? assetData.getlastCandle().getClose() : askOrders.getFirst().getPrice()), 0.001)
+                Math.max(order.isSideBuy()? (bidOrders.isEmpty()? assetData.getlastCandle().getClose() : bidOrders.get(0).getPrice()) :(askOrders.isEmpty()? assetData.getlastCandle().getClose() : askOrders.get(0).getPrice()), 0.001)
         );
         this.assetCache = assetCache;
         this.assetData = assetData;
