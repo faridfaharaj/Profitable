@@ -8,6 +8,7 @@ import com.faridfaharaj.profitable.hooks.PlayerPointsHook;
 import com.faridfaharaj.profitable.hooks.VaultHook;
 import com.faridfaharaj.profitable.util.RandomUtil;
 import com.faridfaharaj.profitable.util.MessagingUtil;
+import com.faridfaharaj.profitable.util.ParticleCompat;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.*;
@@ -322,7 +323,7 @@ public class Asset {
                 entity.setCustomNameVisible(true);
             }
 
-            world.spawnParticle(Particle.FIREWORK, location, 10);
+            world.spawnParticle(ParticleCompat.firework(), location, 10);
             world.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
             world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
             world.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
@@ -363,7 +364,7 @@ public class Asset {
 
                     }
 
-                    deliveryWorld.spawnParticle(Particle.FIREWORK, location.add(0.5,0.5,0.5), 5);
+                    deliveryWorld.spawnParticle(ParticleCompat.firework(), location.add(0.5,0.5,0.5), 5);
                     deliveryWorld.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
                     deliveryWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
                     deliveryWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
@@ -387,7 +388,7 @@ public class Asset {
                 entity.setCustomNameVisible(true);
             }
 
-            deliveryWorld.spawnParticle(Particle.FIREWORK, location, 10);
+            deliveryWorld.spawnParticle(ParticleCompat.firework(), location, 10);
             deliveryWorld.playSound(location, Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1,1);
             deliveryWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1,1);
             deliveryWorld.playSound(location, Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1,1);
@@ -596,7 +597,7 @@ public class Asset {
                 World world = player.getWorld();
                 for(Entity retrieved : entities){
                     world.playSound(retrieved.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-                    world.spawnParticle(Particle.HAPPY_VILLAGER, retrieved.getLocation(), 5, 1,1,1,1);
+                    world.spawnParticle(ParticleCompat.happyVillager(), retrieved.getLocation(), 5, 1,1,1,1);
                     retrieved.remove();
                 }
                 return true;

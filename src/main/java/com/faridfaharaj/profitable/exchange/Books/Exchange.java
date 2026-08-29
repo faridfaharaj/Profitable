@@ -184,12 +184,12 @@ public class Exchange {
                 if(finalPartialOrder != null){
 
                     Orders.updateOrderUnits(player.getWorld(), finalPartialOrder.getUuid(), finalPartialOrder.getUnits());
-                    ordersToDelete.removeLast();
+                    ordersToDelete.remove(ordersToDelete.size() - 1);
 
                 }
                 wrapTransactions(player, order, orders, takerFee, tradedAsset, collateralAsset, finalMoneyTransacted, unitsTransacted);
-                Candles.updateDay(player.getWorld(), tradedAsset.getCode(), orders.getLast().getPrice(), unitsTransacted);
-                Orders.updateStopLimit(player.getWorld(), lastday.getClose(), orders.getLast().getPrice());
+                Candles.updateDay(player.getWorld(), tradedAsset.getCode(), orders.get(orders.size() - 1).getPrice(), unitsTransacted);
+                Orders.updateStopLimit(player.getWorld(), lastday.getClose(), orders.get(orders.size() - 1).getPrice());
                 Orders.deleteOrders(player.getWorld(), ordersToDelete);
             });
         });

@@ -144,8 +144,8 @@ public class Events implements Listener {
         if(Configuration.MULTIWORLD){
             Assets.generateAssets(event.getWorld());
             Accounts.registerDefaultAccount(event.getWorld(), "server");
-            Accounts.changeEntityDelivery(event.getWorld(), "server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
-            Accounts.changeItemDelivery(event.getWorld(), "server", new Location(Profitable.getInstance().getServer().getWorlds().getFirst(), 0, 0 ,0));
+            Accounts.changeEntityDelivery(event.getWorld(), "server", new Location(Profitable.getInstance().getServer().getWorlds().get(0), 0, 0 ,0));
+            Accounts.changeItemDelivery(event.getWorld(), "server", new Location(Profitable.getInstance().getServer().getWorlds().get(0), 0, 0 ,0));
         }
     }
 
